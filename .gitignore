@@ -1,0 +1,4 @@
+bin/azipgtk
+bin/gmon.out
+obj/*
+tests/driver/*

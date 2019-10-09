@@ -26,7 +26,6 @@ with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Cell_Area_Box; use Gtk.Cell_Area_Box;
 with Gtk.Cell_Renderer_Text; use Gtk.Cell_Renderer_Text;
-with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
 with Gtk.Container; use Gtk.Container;
 with Gtk.Dialog; use Gtk.Dialog;
@@ -35,9 +34,9 @@ with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Chooser_Widget; use Gtk.File_Chooser_Widget;
 with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.GEntry; use Gtk.GEntry;
-with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
+with Gtk.Menu_Tool_Button; use Gtk.Menu_Tool_Button;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
@@ -50,9 +49,7 @@ with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
-with Glib.Error; use Glib.Error;
 with Glib.Object; use Glib.Object;
-with Gdk.Pixbuf; use Gdk.Pixbuf;
 
 package body MainWindow is
 
@@ -236,18 +233,6 @@ package body MainWindow is
       Hide(Gtk_Widget(DirectoryDialog));
    end ExtractArchive;
 
-   procedure ToggleView(Object: access Gtkada_Builder_Record'Class) is
-   begin
-      if Get_Active
-          (Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))) then
-         Set_Active
-           (Gtk_Check_Menu_Item(Get_Object(Object, "flatviewitem")), True);
-      else
-         Set_Active
-           (Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem")), True);
-      end if;
-   end ToggleView;
-
    procedure AddFile(User_Data: access GObject_Record'Class) is
       FileDialog: constant Gtk_Dialog :=
         Gtk_Dialog(Get_Object(Builder, "filedialog2"));
@@ -404,11 +389,12 @@ package body MainWindow is
    end CloseArchive;
 
    procedure ChangeView(Object: access Gtkada_Builder_Record'Class) is
+      pragma Unreferenced(Object);
    begin
       MChild := Get_Focus_Child(MWindow);
       Set_Visible
         (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
-         Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
+         not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
    end ChangeView;
 
    procedure CloseAll(Object: access Gtkada_Builder_Record'Class) is
@@ -432,17 +418,6 @@ package body MainWindow is
    end SplitWindow;
 
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
-      Error: GError;
-      ToolsIcons, Icon: Gdk_Pixbuf;
-      StartX: Gint := 0;
-      ImagesNames: constant array(Positive range <>) of Unbounded_String :=
-        (To_Unbounded_String("imgadd"), To_Unbounded_String("imgdelete"),
-         To_Unbounded_String("imgextract"), To_Unbounded_String("imgfind"),
-         To_Unbounded_String("imgtest"), To_Unbounded_String("imgupdate"),
-         To_Unbounded_String("imgadd2"), To_Unbounded_String("imgproperties"),
-         Null_Unbounded_String, To_Unbounded_String("imgrecompress"),
-         To_Unbounded_String("imgnew"), To_Unbounded_String("imgopen"),
-         To_Unbounded_String("imgview"));
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
@@ -451,7 +426,6 @@ package body MainWindow is
       Register_Handler(Builder, "Open_File", OpenFile'Access);
       Register_Handler(Builder, "Apply_Filter", ApplyFilter'Access);
       Register_Handler(Builder, "Extract_Archive", ExtractArchive'Access);
-      Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
       Register_Handler(Builder, "Close_Dialog", CloseDialog'Access);
       Register_Handler(Builder, "Add_File", AddFile'Access);
@@ -467,20 +441,21 @@ package body MainWindow is
       Register_Handler(Builder, "Close_All", CloseAll'Access);
       Register_Handler(Builder, "Split_Window", SplitWindow'Access);
       Do_Connect(Builder);
-      Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
-      if Error /= null then
-         Quit(Builder);
-         Put_Line(Get_Message(Error));
-         return;
-      end if;
-      ToolsIcons := Add_Alpha(ToolsIcons, True, 163, 73, 164);
-      for ImageName of ImagesNames loop
-         if ImageName /= Null_Unbounded_String then
-            Icon := Gdk_New_Subpixbuf(ToolsIcons, StartX, 0, 32, 32);
-            Set(Gtk_Image(Get_Object(Builder, To_String(ImageName))), Icon);
-         end if;
-         StartX := StartX + 32;
-      end loop;
+      Set_Menu
+        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnadd")),
+         Gtk_Widget(Get_Object(Builder, "menuadd")));
+      Set_Menu
+        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnopen")),
+         Gtk_Widget(Get_Object(Builder, "menurecent")));
+      Set_Menu
+        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnrecompress")),
+         Gtk_Widget(Get_Object(Builder, "menutools")));
+      Set_Menu
+        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnwindow")),
+         Gtk_Widget(Get_Object(Builder, "menuwindow")));
+      Set_Menu
+        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnhelp")),
+         Gtk_Widget(Get_Object(Builder, "menuhelp")));
       Gtk_New(MWindow, null);
       Pack_Start
         (Gtk_Box(Get_Object(Builder, "archivesbox")), Gtk_Widget(MWindow));

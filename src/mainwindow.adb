@@ -450,12 +450,6 @@ package body MainWindow is
       Set_Menu
         (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnrecompress")),
          Gtk_Widget(Get_Object(Builder, "menutools")));
-      Set_Menu
-        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnwindow")),
-         Gtk_Widget(Get_Object(Builder, "menuwindow")));
-      Set_Menu
-        (Gtk_Menu_Tool_Button(Get_Object(Builder, "btnhelp")),
-         Gtk_Widget(Get_Object(Builder, "menuhelp")));
       Gtk_New(MWindow, null);
       Pack_Start
         (Gtk_Box(Get_Object(Builder, "archivesbox")), Gtk_Widget(MWindow));

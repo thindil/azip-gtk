@@ -324,19 +324,15 @@ package body MainWindow is
    end SearchItems;
 
    procedure Find(Object: access Gtkada_Builder_Record'Class) is
-      FindDialog: constant Gtk_Dialog :=
-        Gtk_Dialog(Get_Object(Object, "finddialog"));
+      pragma Unreferenced(Object);
    begin
       MChild := Get_Focus_Child(MWindow);
-      if Run(FindDialog) = Gtk_Response_OK then
-         Gtk.List_Store.Foreach
-           (-(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            SearchItems'Access);
-      end if;
-      Hide(FindDialog);
+      Gtk.List_Store.Foreach
+         (-(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+      SearchItems'Access);
    end Find;
 
    procedure UpdateArchive(Object: access Gtkada_Builder_Record'Class) is

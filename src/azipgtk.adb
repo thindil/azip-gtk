@@ -20,6 +20,7 @@
 
 with Ada.Environment_Variables; use Ada.Environment_Variables;
 with Ada.Text_IO; use Ada.Text_IO;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with Gtk.Main; use Gtk.Main;
 with Gtkada.Builder; use Gtkada.Builder;
 with Gtkada.Intl; use Gtkada.Intl;
@@ -31,7 +32,8 @@ procedure AZipGtk is
    Builder: Gtkada_Builder;
    Error: aliased GError;
 begin
-   if not Ada.Environment_Variables.Exists("RUNFROMSCRIPT") then
+   if not Ada.Environment_Variables.Exists("RUNFROMSCRIPT") and
+     Dir_Separator = '/' then
       Put_Line
         ("The program can be run only via 'run.sh' script. Please don't run binary directly.");
       return;

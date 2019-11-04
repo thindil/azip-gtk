@@ -54,6 +54,7 @@ with Glib.Error; use Glib.Error;
 with Glib.Object; use Glib.Object;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
 with AboutDialog; use AboutDialog;
+with InfoDialog; use InfoDialog;
 
 package body MainWindow is
 
@@ -429,6 +430,12 @@ package body MainWindow is
       end if;
    end SplitWindow;
 
+   procedure ShowInfo(Object: access Gtkada_Builder_Record'Class) is
+   begin
+      MChild := Get_Focus_Child(MWindow);
+      ShowInfoDialog(Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
+   end ShowInfo;
+
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
       ToolsIcons, Icon: Gdk_Pixbuf;
@@ -464,6 +471,7 @@ package body MainWindow is
       Register_Handler(Builder, "Change_View", ChangeView'Access);
       Register_Handler(Builder, "Close_All", CloseAll'Access);
       Register_Handler(Builder, "Split_Window", SplitWindow'Access);
+      Register_Handler(Builder, "Show_Info", ShowInfo'Access);
       Do_Connect(Builder);
       Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
       if Error /= null then

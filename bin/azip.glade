@@ -799,7 +799,7 @@ THE SOFTWARE.
                 <property name="label" translatable="yes">Properties</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">imgproperties</property>
-                <signal name="clicked" handler="Open_Dialog" object="infodialog" swapped="no"/>
+                <signal name="clicked" handler="Show_Info" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

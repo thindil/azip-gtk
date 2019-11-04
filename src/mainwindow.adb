@@ -53,6 +53,7 @@ with Glib; use Glib;
 with Glib.Error; use Glib.Error;
 with Glib.Object; use Glib.Object;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
+with AboutDialog; use AboutDialog;
 
 package body MainWindow is
 
@@ -67,11 +68,8 @@ package body MainWindow is
    end Quit;
 
    procedure ShowAbout(Object: access Gtkada_Builder_Record'Class) is
-      AboutDialog: constant GObject := Get_Object(Object, "aboutdialog");
    begin
-      if Run(Gtk_Dialog(AboutDialog)) = Gtk_Response_Delete_Event then
-         Hide(Gtk_Widget(AboutDialog));
-      end if;
+      ShowAboutDialog(Gtk_Window(Get_Object(Object, "mainwindow")));
    end ShowAbout;
 
    procedure NewArchive(Object: access Gtkada_Builder_Record'Class) is

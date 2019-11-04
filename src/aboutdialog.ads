@@ -20,8 +20,21 @@
 
 with Gtk.Window; use Gtk.Window;
 
+-- ****h* AZipGtk/AboutDialog
+-- FUNCTION
+-- Provide code for About dialog
+-- SOURCE
 package AboutDialog is
+-- ****
 
+   -- ****f* AboutDialog/ShowAboutDialog
+   -- FUNCTION
+   -- Create and show About dialog to the user
+   -- PARAMETERS
+   -- Parent - Gtk_Window which will be parent for the dialog. Should be always
+   --          main window.
+   -- SOURCE
    procedure ShowAboutDialog(Parent: Gtk_Window);
+   -- ****
 
 end AboutDialog;

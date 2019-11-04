@@ -27,8 +27,19 @@ package body AboutDialog is
    procedure ShowAboutDialog(Parent: Gtk_Window) is
       AboutDialog: constant Gtk_About_Dialog := Gtk_About_Dialog_New;
    begin
+      -- Set parent for dialog
       Set_Transient_For(Gtk_Window(AboutDialog), Parent);
+      -- Set various information about the program (for more options, look at
+      -- documenation of Gtk.About_Dialog package)
       Set_Program_Name(AboutDialog, "AZip");
+      Set_License_Type(AboutDialog, License_Mit_X11);
+      Set_Copyright(AboutDialog, "(c) 2019 Gautier de Montmollin");
+      Set_Authors
+        (AboutDialog,
+         (new String'
+            ("Gautier de Montmollin <gautier.de.montmollin@gmail.com>"),
+          new String'("")));
+      -- Show dialog to the user
       if Run(Gtk_Dialog(AboutDialog)) = Gtk_Response_Delete_Event then
          Destroy(Gtk_Widget(AboutDialog));
       end if;

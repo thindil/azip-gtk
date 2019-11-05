@@ -20,8 +20,23 @@
 
 with Gtk.Window; use Gtk.Window;
 
+-- ****h* InfoDialog/is
+-- FUNCTION
+-- Provide code to show detailed information about selected archive
+-- SOURCE
 package InfoDialog is
+-- ****
 
+   -- ****f* InfoDialog/ShowInfoDialog
+   -- FUNCTION
+   -- Show detailed information about selected archive
+   -- PARAMETERS
+   -- Parent   - Gtk_Window which will be parent for the dialog. Should be
+   --            always main window
+   -- FileName - File name (best if with full path) of the archive which
+   --            information will be show
+   -- SOURCE
    procedure ShowInfoDialog(Parent: Gtk_Window; FileName: String);
+   -- ****
 
 end InfoDialog;

@@ -29,6 +29,7 @@ with Gtk.Grid; use Gtk.Grid;
 with Gtk.Label; use Gtk.Label;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
+with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Tree_View_Column; use Gtk.Tree_View_Column;
 with Gtk.Widget; use Gtk.Widget;
@@ -42,7 +43,7 @@ package body InfoDialog is
       Box: constant Gtk_Box := Get_Content_Area(Dialog);
       Grid: constant Gtk_Grid := Gtk_Grid_New;
       Label: Gtk_Label;
-      Labels: constant array(0 .. 5) of Unbounded_String :=
+      Labels: array(0 .. 5) of Unbounded_String :=
         (To_Unbounded_String("Uncompressed size:"),
          To_Unbounded_String("0 bytes"),
          To_Unbounded_String("Compressed size:"),
@@ -62,11 +63,27 @@ package body InfoDialog is
       Renderer: Gtk_Cell_Renderer_Text;
       TreeColumn: Gtk_Tree_View_Column;
       Scroll: Gtk_Scrolled_Window;
+      Iter: Gtk_Tree_Iter;
    begin
+      -- Just placeholder to put here code which will be read info from the
+      -- archive. Labels(1) is uncompressed size, Labels(3) is compressed
+      -- size, Labels(5) is amount of entries
       Ada.Text_IO.Put_Line("Showing info about file: " & FileName);
+      Labels(1) := To_Unbounded_String("10 bytes");
+      Labels(3) := To_Unbounded_String("2 bytes");
+      Labels(5) := To_Unbounded_String("1 entry");
+      -- Placeholder for adding data to list. Each entry must start with
+      -- Append then Set values for each column
+      Append(InfoList, Iter);
+      Set(InfoList, Iter, 0, "myformat");
+      Set(InfoList, Iter, 1, 2);
+      Set(InfoList, Iter, 2, "100 %");
+      Set(InfoList, Iter, 3, "1:2");
+      -- Add close button
       if Add_Button(Dialog, "OK", Gtk_Response_OK) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
       end if;
+      -- Add labels with information about archive to dialog
       Set_Column_Homogeneous(Grid, True);
       for Text of Labels loop
          Label := Gtk_Label_New(To_String(Text));
@@ -79,6 +96,7 @@ package body InfoDialog is
          end if;
       end loop;
       Add(Box, Grid);
+      -- Add Tree View with list information about archive to dialog
       Set_Headers_Clickable(InfoTree, True);
       for I in 0 .. 3 loop
          Gtk.Cell_Renderer_Text.Gtk_New(Renderer);
@@ -97,6 +115,7 @@ package body InfoDialog is
       Set_Min_Content_Height(Scroll, 200);
       Add(Gtk_Container(Scroll), Gtk_Widget(InfoTree));
       Add(Box, Scroll);
+      -- Show everything and run
       Show_All(Gtk_Widget(Box));
       if Run(Dialog) /= Gtk_Response_None then
          Destroy(Gtk_Widget(Dialog));

@@ -27,6 +27,7 @@ with Gtk.GEntry; use Gtk.GEntry;
 with Gtk.Label; use Gtk.Label;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Widget; use Gtk.Widget;
+with Glib; use Glib;
 
 package body FindDialog is
 
@@ -61,15 +62,19 @@ package body FindDialog is
       pragma Unreferenced(Path);
       -- ****
       FileName: constant String := Get_String(Model, Iter, 0);
+      Result: Gint := 0;
    begin
       -- Just a placeholder to show available data
       Ada.Text_IO.Put_Line("Looking inside: " & FileName);
       Ada.Text_IO.Put_Line("Content to search: " & To_String(SearchContent));
-      -- Search for the string in the current file name. If found, set result
-      -- column value to 1
+      -- Search for the string in the current file name.
       if Index(FileName, To_String(SearchName)) > 0 then
-         Gtk.List_Store.Set(-(Model), Iter, 11, 1);
+         Result := 1;
       end if;
+      -- Here is probably the best place to search content for SearchContent
+      -- string
+      -- Set Result value to list, to show it to the user
+      Gtk.List_Store.Set(-(Model), Iter, 11, Result);
       return False;
    end SearchItems;
 

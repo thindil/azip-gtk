@@ -20,7 +20,7 @@
 
 with Gtk.Window; use Gtk.Window;
 
--- ****h* InfoDialog/is
+-- ****h* AZipGtk/InfoDialog
 -- FUNCTION
 -- Provide code to show detailed information about selected archive
 -- SOURCE

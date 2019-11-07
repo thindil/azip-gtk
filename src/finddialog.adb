@@ -30,19 +30,45 @@ with Gtk.Widget; use Gtk.Widget;
 
 package body FindDialog is
 
+   -- ****iv* FindDialog/SearchName
+   -- FUNCTION
+   -- String to search in the files names in the archive
+   -- SOURCE
    SearchName: Unbounded_String;
-   SearchContent: Unbounded_String;
+   -- ****
 
+   -- ****iv* FindDialog/SearchContent
+   -- FUNCTION
+   -- String to search in the content of the files in the archive
+   -- SOURCE
+   SearchContent: Unbounded_String;
+   -- ****
+
+   -- ****if* FindDialog/SearchItems
+   -- FUNCTION
+   -- Search inside files names and their contents for selected strings
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model which contains names of files in selected archive
+   -- Path  - Gtk_Tree_Path to the current file name (Unused)
+   -- Iter  - Gtk_Tree_Iter to the current file name in selected archive
+   -- RESULT
+   -- This function always returns False, so we can iterate by all element of
+   -- the list
+   -- SOURCE
    function SearchItems
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
       return Boolean is
       pragma Unreferenced(Path);
+      -- ****
       FileName: constant String := Get_String(Model, Iter, 0);
    begin
+      -- Just a placeholder to show available data
       Ada.Text_IO.Put_Line("Looking inside: " & FileName);
       Ada.Text_IO.Put_Line("Content to search: " & To_String(SearchContent));
+      -- Search for the string in the current file name. If found, set result
+      -- column value to 1
       if Index(FileName, To_String(SearchName)) > 0 then
-         Gtk.List_Store.Set(-(Model), Iter, 11, "1");
+         Gtk.List_Store.Set(-(Model), Iter, 11, 1);
       end if;
       return False;
    end SearchItems;
@@ -54,20 +80,24 @@ package body FindDialog is
       NameEntry: constant Gtk_Entry := Gtk_Entry_New;
       ContentEntry: constant Gtk_Entry := Gtk_Entry_New;
    begin
+      -- Add buttons to the dialog
       if Add_Button(Dialog, "Search", Gtk_Response_OK) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
       end if;
       if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
       end if;
+      -- Add labels and text entries for searching to the dialog
       Label := Gtk_Label_New("Entry name (if empty: all names):");
       Add(Box, Label);
       Add(Box, NameEntry);
       Label := Gtk_Label_New("Content (if empty: all content):");
       Add(Box, Label);
       Add(Box, ContentEntry);
+      -- Show everything and run
       Show_All(Gtk_Widget(Box));
       if Run(Dialog) = Gtk_Response_OK then
+         -- If the user press button Search, set everthing and start searching
          SearchName := To_Unbounded_String(Get_Text(NameEntry));
          SearchContent := To_Unbounded_String(Get_Text(ContentEntry));
          Gtk.List_Store.Foreach(-(Model), SearchItems'Access);

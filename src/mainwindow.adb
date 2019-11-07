@@ -117,7 +117,7 @@ package body MainWindow is
            Gtk_List_Store_Newv
              ((GType_String, GType_String, GType_String, GType_String,
                GType_String, GType_String, GType_String, GType_String,
-               GType_String, GType_String, GType_String, GType_String));
+               GType_String, GType_String, GType_String, GType_Int));
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(List));
          CellNames: constant array(Positive range <>) of Unbounded_String :=
            (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
@@ -212,7 +212,11 @@ package body MainWindow is
       for I in 0 .. 11 loop
          Append(List, Iter);
          for J in 0 .. 11 loop
-            Set(List, Iter, Gint(J), Integer'Image(I));
+            if J < 11 then
+               Set(List, Iter, Gint(J), Integer'Image(I));
+            else
+               Set(List, Iter, Gint(J), Gint(I));
+            end if;
          end loop;
       end loop;
    end OpenFile;

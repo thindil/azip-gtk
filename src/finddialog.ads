@@ -21,8 +21,22 @@
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Window; use Gtk.Window;
 
+-- ****h* AzipGtk/FindDialog
+-- FUNCTION
+-- Provide code to show find dialog and search inside files
+-- SOURCE
 package FindDialog is
+-- ****
 
+   -- ****f* FindDialog/ShowFindDialog
+   -- FUNCTION
+   -- Show Find dialog to the user and search in selected archive
+   -- PARAMETERS
+   -- Parent - Gtk_Window which will be parent for the dialog. Should be always
+   --          main window.
+   -- Model  - Gtk_Tree_Model with files names from the selected archive
+   -- SOURCE
    procedure ShowFindDialog(Parent: Gtk_Window; Model: Gtk_Tree_Model);
+   -- ****
 
 end FindDialog;

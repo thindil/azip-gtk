@@ -19,7 +19,6 @@
 -- SOFTWARE.
 
 with Ada.Directories; use Ada.Directories;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Gtk.Bin; use Gtk.Bin;
@@ -34,7 +33,6 @@ with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Chooser_Widget; use Gtk.File_Chooser_Widget;
 with Gtk.File_Filter; use Gtk.File_Filter;
-with Gtk.GEntry; use Gtk.GEntry;
 with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
@@ -54,6 +52,7 @@ with Glib.Error; use Glib.Error;
 with Glib.Object; use Glib.Object;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
 with AboutDialog; use AboutDialog;
+with FindDialog; use FindDialog;
 with InfoDialog; use InfoDialog;
 
 package body MainWindow is
@@ -322,35 +321,15 @@ package body MainWindow is
       end if;
    end TestArchive;
 
-   function SearchItems
-     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
-      return Boolean is
-      pragma Unreferenced(Path);
-      FileName: constant String := Get_String(Model, Iter, 0);
-   begin
-      Ada.Text_IO.Put_Line("Looking inside: " & FileName);
-      if Index
-          (FileName, Get_Text(Gtk_GEntry(Get_Object(Builder, "edtname")))) >
-        0 then
-         Gtk.List_Store.Set(-(Model), Iter, 11, "1");
-      end if;
-      return False;
-   end SearchItems;
-
    procedure Find(Object: access Gtkada_Builder_Record'Class) is
-      FindDialog: constant Gtk_Dialog :=
-        Gtk_Dialog(Get_Object(Object, "finddialog"));
    begin
       MChild := Get_Focus_Child(MWindow);
-      if Run(FindDialog) = Gtk_Response_OK then
-         Gtk.List_Store.Foreach
-           (-(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            SearchItems'Access);
-      end if;
-      Hide(FindDialog);
+      ShowFindDialog
+        (Gtk_Window(Get_Object(Object, "mainwindow")),
+         Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end Find;
 
    procedure UpdateArchive(Object: access Gtkada_Builder_Record'Class) is
@@ -433,7 +412,8 @@ package body MainWindow is
    procedure ShowInfo(Object: access Gtkada_Builder_Record'Class) is
    begin
       MChild := Get_Focus_Child(MWindow);
-      ShowInfoDialog(Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
+      ShowInfoDialog
+        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ShowInfo;
 
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is

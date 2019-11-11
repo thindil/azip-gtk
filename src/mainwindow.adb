@@ -168,34 +168,19 @@ package body MainWindow is
       Set_Filter(Gtk_File_Chooser_Dialog(User_Data), FileFilter);
    end ApplyFilter;
 
-   procedure OpenDialog(User_Data: access GObject_Record'Class) is
-   begin
-      if User_Data = Get_Object(Builder, "filedialog") or
-        User_Data = Get_Object(Builder, "savedialog") then
-         ApplyFilter(User_Data);
-      end if;
-      if Run(Gtk_Dialog(User_Data)) = Gtk_Response_Delete_Event then
-         Hide(Gtk_Widget(User_Data));
-      end if;
-   end OpenDialog;
-
-   procedure OpenFile(Object: access Gtkada_Builder_Record'Class) is
-      FileDialog: constant GObject := Get_Object(Object, "filedialog");
-      FileName: constant String :=
-        Get_Filename(Gtk_File_Chooser_Dialog(FileDialog));
+   procedure OpenFile(FileName: String) is
       Iter: Gtk_Tree_Iter;
       List: Gtk_List_Store;
       Tree: Gtk_Tree_Store;
    begin
-      if FileName'Length = 0 then
+      if FileName = "" then
          return;
       end if;
-      Hide(Gtk_Widget(FileDialog));
       MChild := Get_Focus_Child(MWindow);
       if MChild /= null and then Get_Title(MChild) = "New Archive" then
          Close_Child(MChild, True);
       end if;
-      NewArchive(Object);
+      NewArchive(Builder);
       Set_Title(MChild, FileName);
       Tree :=
         -(Get_Model
@@ -221,6 +206,21 @@ package body MainWindow is
          end loop;
       end loop;
    end OpenFile;
+
+   procedure OpenDialog(User_Data: access GObject_Record'Class) is
+   begin
+      if User_Data = Get_Object(Builder, "savedialog") then
+         ApplyFilter(User_Data);
+      end if;
+      if User_Data = Get_Object(Builder, "btnopen") then
+         OpenFile
+           (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      else
+         if Run(Gtk_Dialog(User_Data)) = Gtk_Response_Delete_Event then
+            Hide(Gtk_Widget(User_Data));
+         end if;
+      end if;
+   end OpenDialog;
 
    procedure CloseDialog(User_Data: access GObject_Record'Class) is
    begin
@@ -433,7 +433,6 @@ package body MainWindow is
       Register_Handler(Builder, "Main_Quit", Quit'Access);
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
       Register_Handler(Builder, "New_Archive", NewArchive'Access);
-      Register_Handler(Builder, "Open_File", OpenFile'Access);
       Register_Handler(Builder, "Apply_Filter", ApplyFilter'Access);
       Register_Handler(Builder, "Extract_Archive", ExtractArchive'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);

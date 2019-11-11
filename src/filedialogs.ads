@@ -34,4 +34,17 @@ package FileDialogs is
    procedure ShowDirectoryDialog(Parent: Gtk_Window; Archive: String);
    -- ****
 
+   -- ****f* FileDialogs/ShowFileDialog
+   -- FUNCTION
+   -- Show select file dialog.
+   -- PARAMETERS
+   -- Parent - Gtk_Window which will be parent for the dialog. Should be
+   --          always main window
+   -- RESULT
+   -- Full path to the selected file or empty string if dialog closed
+   -- without selection
+   -- SOURCE
+   function ShowFileDialog(Parent: Gtk_Window) return String;
+   -- ****
+
 end FileDialogs;

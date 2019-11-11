@@ -156,7 +156,7 @@ THE SOFTWARE.
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <signal name="activate" handler="Open_Dialog" object="filedialog" swapped="no"/>
+                        <signal name="activate" handler="Open_Dialog" object="btnopen" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -609,7 +609,7 @@ THE SOFTWARE.
                 <property name="label" translatable="yes">Open archive</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">imgopen</property>
-                <signal name="clicked" handler="Open_Dialog" object="filedialog" swapped="no"/>
+                <signal name="clicked" handler="Open_Dialog" object="btnopen" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -836,91 +836,6 @@ THE SOFTWARE.
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkFileChooserDialog" id="filedialog">
-    <property name="can_focus">False</property>
-    <property name="modal">True</property>
-    <property name="window_position">center</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <property name="transient_for">mainwindow</property>
-    <property name="create_folders">False</property>
-    <property name="preview_widget_active">False</property>
-    <property name="use_preview_label">False</property>
-    <child>
-      <placeholder/>
-    </child>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="btnfileabort">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <signal name="clicked" handler="Close_Dialog" object="filedialog" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="btnfileopen">
-                <property name="label">gtk-open</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <signal name="clicked" handler="Open_File" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="cmbfile">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">end</property>
-            <property name="active">0</property>
-            <items>
-              <item id="*.zip" translatable="yes">Zip files</item>
-              <item id="*.jar" translatable="yes">Java files</item>
-              <item id="*" translatable="yes">All files</item>
-            </items>
-            <signal name="changed" handler="Apply_Filter" object="filedialog" swapped="no"/>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">btnfileabort</action-widget>
-    </action-widgets>
   </object>
   <object class="GtkDialog" id="filedialog2">
     <property name="can_focus">False</property>

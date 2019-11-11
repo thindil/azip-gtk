@@ -71,11 +71,10 @@ package body FileDialogs is
    end ApplyFilter;
 
    function ShowFileDialog(Parent: Gtk_Window) return String is
-      Dialog: constant Gtk_File_Chooser_Dialog :=
-        Gtk_File_Chooser_Dialog_New("Select archive", Parent, Action_Open);
       FilterCombo: constant Gtk_Combo_Box_Text := Gtk_Combo_Box_Text_New;
    begin
-      CurrentDialog := Dialog;
+      CurrentDialog :=
+        Gtk_File_Chooser_Dialog_New("Select archive", Parent, Action_Open);
       -- Add list of file filters
       Append(FilterCombo, "*.zip", "Zip files");
       Append(FilterCombo, "*.jar", "Java files");
@@ -83,26 +82,26 @@ package body FileDialogs is
       On_Changed(FilterCombo, ApplyFilter'Access);
       Set_Active(FilterCombo, 0);
       Set_Halign(Gtk_Widget(FilterCombo), Align_End);
-      Add(Get_Content_Area(Dialog), Gtk_Widget(FilterCombo));
-      Show_All(Gtk_Widget(Get_Content_Area(Dialog)));
+      Add(Get_Content_Area(CurrentDialog), Gtk_Widget(FilterCombo));
+      Show_All(Gtk_Widget(Get_Content_Area(CurrentDialog)));
       -- Add Cancel button
-      if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
+      if Add_Button(CurrentDialog, "Cancel", Gtk_Response_Cancel) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
       end if;
       -- Add Ok button
-      if Add_Button(Dialog, "OK", Gtk_Response_OK) = null then
+      if Add_Button(CurrentDialog, "OK", Gtk_Response_OK) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
       end if;
       -- Show dialog to the user
-      if Run(Dialog) = Gtk_Response_OK then
+      if Run(CurrentDialog) = Gtk_Response_OK then
          declare
-            ArchiveName: constant String := Get_Filename(Dialog);
+            ArchiveName: constant String := Get_Filename(CurrentDialog);
          begin
-            Destroy(Dialog);
+            Destroy(CurrentDialog);
             return ArchiveName;
          end;
       end if;
-      Destroy(Dialog);
+      Destroy(CurrentDialog);
       return "";
    end ShowFileDialog;
 

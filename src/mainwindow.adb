@@ -26,13 +26,11 @@ with Gtk.Box; use Gtk.Box;
 with Gtk.Cell_Area_Box; use Gtk.Cell_Area_Box;
 with Gtk.Cell_Renderer_Text; use Gtk.Cell_Renderer_Text;
 with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
-with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
 with Gtk.Container; use Gtk.Container;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Chooser_Widget; use Gtk.File_Chooser_Widget;
-with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
@@ -153,21 +151,6 @@ package body MainWindow is
       Set_Focus_Child(MChild);
    end NewArchive;
 
-   procedure ApplyFilter(User_Data: access GObject_Record'Class) is
-      FileFilter: constant Gtk_File_Filter := Gtk_File_Filter_New;
-   begin
-      if User_Data = Get_Object(Builder, "filedialog") then
-         Add_Pattern
-           (FileFilter,
-            Get_Active_Id(Gtk_Combo_Box_Text(Get_Object(Builder, "cmbfile"))));
-      else
-         Add_Pattern
-           (FileFilter,
-            Get_Active_Id(Gtk_Combo_Box_Text(Get_Object(Builder, "cmbsave"))));
-      end if;
-      Set_Filter(Gtk_File_Chooser_Dialog(User_Data), FileFilter);
-   end ApplyFilter;
-
    procedure OpenFile(FileName: String) is
       Iter: Gtk_Tree_Iter;
       List: Gtk_List_Store;
@@ -209,12 +192,13 @@ package body MainWindow is
 
    procedure OpenDialog(User_Data: access GObject_Record'Class) is
    begin
-      if User_Data = Get_Object(Builder, "savedialog") then
-         ApplyFilter(User_Data);
-      end if;
+      MChild := Get_Focus_Child(MWindow);
       if User_Data = Get_Object(Builder, "btnopen") then
          OpenFile
            (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      elsif User_Data = Get_Object(Builder, "menusaveas") then
+         ShowSaveDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
       else
          if Run(Gtk_Dialog(User_Data)) = Gtk_Response_Delete_Event then
             Hide(Gtk_Widget(User_Data));
@@ -433,7 +417,6 @@ package body MainWindow is
       Register_Handler(Builder, "Main_Quit", Quit'Access);
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
       Register_Handler(Builder, "New_Archive", NewArchive'Access);
-      Register_Handler(Builder, "Apply_Filter", ApplyFilter'Access);
       Register_Handler(Builder, "Extract_Archive", ExtractArchive'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);

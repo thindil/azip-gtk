@@ -160,13 +160,13 @@ THE SOFTWARE.
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem">
+                      <object class="GtkImageMenuItem" id="menusaveas">
                         <property name="label">gtk-save-as</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <signal name="activate" handler="Open_Dialog" object="savedialog" swapped="no"/>
+                        <signal name="activate" handler="Open_Dialog" object="menusaveas" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -911,89 +911,6 @@ THE SOFTWARE.
     <action-widgets>
       <action-widget response="-6">button1</action-widget>
       <action-widget response="-5">button2</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkFileChooserDialog" id="savedialog">
-    <property name="can_focus">False</property>
-    <property name="window_position">center</property>
-    <property name="type_hint">dialog</property>
-    <property name="transient_for">mainwindow</property>
-    <property name="action">save</property>
-    <property name="do_overwrite_confirmation">True</property>
-    <child>
-      <placeholder/>
-    </child>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="btnsaveabort">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <signal name="clicked" handler="Close_Dialog" object="savedialog" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="btnfilesave">
-                <property name="label">gtk-save</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <signal name="clicked" handler="Save_File" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="cmbsave">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">end</property>
-            <property name="active">0</property>
-            <items>
-              <item id="*.zip" translatable="yes">Zip files</item>
-              <item id="*.jar" translatable="yes">Java files</item>
-              <item id="*" translatable="yes">All files</item>
-            </items>
-            <signal name="changed" handler="Apply_Filter" object="savedialog" swapped="no"/>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">btnsaveabort</action-widget>
-      <action-widget response="-5">btnfilesave</action-widget>
     </action-widgets>
   </object>
 </interface>

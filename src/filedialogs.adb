@@ -70,11 +70,14 @@ package body FileDialogs is
       Set_Filter(CurrentDialog, FileFilter);
    end ApplyFilter;
 
-   function ShowFileDialog(Parent: Gtk_Window) return String is
+   -- ****if* FileDialogs/AddFilter
+   -- FUNCTION
+   -- Add UI for file filter in file dialogs
+   -- SOURCE
+   procedure AddFilter is
+      -- ****
       FilterCombo: constant Gtk_Combo_Box_Text := Gtk_Combo_Box_Text_New;
    begin
-      CurrentDialog :=
-        Gtk_File_Chooser_Dialog_New("Select archive", Parent, Action_Open);
       -- Add list of file filters
       Append(FilterCombo, "*.zip", "Zip files");
       Append(FilterCombo, "*.jar", "Java files");
@@ -84,6 +87,13 @@ package body FileDialogs is
       Set_Halign(Gtk_Widget(FilterCombo), Align_End);
       Add(Get_Content_Area(CurrentDialog), Gtk_Widget(FilterCombo));
       Show_All(Gtk_Widget(Get_Content_Area(CurrentDialog)));
+   end AddFilter;
+
+   function ShowFileDialog(Parent: Gtk_Window) return String is
+   begin
+      CurrentDialog :=
+        Gtk_File_Chooser_Dialog_New("Select archive", Parent, Action_Open);
+      AddFilter;
       -- Add Cancel button
       if Add_Button(CurrentDialog, "Cancel", Gtk_Response_Cancel) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
@@ -104,5 +114,31 @@ package body FileDialogs is
       Destroy(CurrentDialog);
       return "";
    end ShowFileDialog;
+
+   procedure ShowSaveDialog(Parent: Gtk_Window; Archive: String) is
+   begin
+      CurrentDialog :=
+        Gtk_File_Chooser_Dialog_New("Save archive as", Parent, Action_Save);
+      Set_Do_Overwrite_Confirmation(CurrentDialog, True);
+      Set_Create_Folders(CurrentDialog, True);
+      AddFilter;
+      -- Add Cancel button
+      if Add_Button(CurrentDialog, "Cancel", Gtk_Response_Cancel) = null then
+         Ada.Text_IO.Put_Line("Can't add button to dialog.");
+      end if;
+      -- Add Ok button
+      if Add_Button(CurrentDialog, "OK", Gtk_Response_OK) = null then
+         Ada.Text_IO.Put_Line("Can't add button to dialog.");
+      end if;
+      -- Show dialog to the user
+      if Run(CurrentDialog) = Gtk_Response_OK then
+         -- If button Ok was pressed, save selected archive to selected
+         -- directory This code is a placeholder, probably whole compress
+         -- or move code should go here.
+         Put_Line("New full path: " & Get_Filename(CurrentDialog));
+         Put_Line("Archive to save: " & Archive);
+      end if;
+      Destroy(CurrentDialog);
+   end ShowSaveDialog;
 
 end FileDialogs;

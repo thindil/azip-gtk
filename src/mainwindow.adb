@@ -52,6 +52,7 @@ with Glib.Error; use Glib.Error;
 with Glib.Object; use Glib.Object;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
 with AboutDialog; use AboutDialog;
+with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with InfoDialog; use InfoDialog;
 
@@ -227,15 +228,10 @@ package body MainWindow is
    end CloseDialog;
 
    procedure ExtractArchive(Object: access Gtkada_Builder_Record'Class) is
-      DirectoryDialog: constant Gtk_File_Chooser_Dialog :=
-        Gtk_File_Chooser_Dialog(Get_Object(Object, "directorydialog"));
    begin
       MChild := Get_Focus_Child(MWindow);
-      if Run(DirectoryDialog) = Gtk_Response_OK then
-         Ada.Text_IO.Put_Line(Get_Title(MChild));
-         Ada.Text_IO.Put_Line(Get_Filename(DirectoryDialog));
-      end if;
-      Hide(Gtk_Widget(DirectoryDialog));
+      ShowDirectoryDialog
+        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ExtractArchive;
 
    procedure ToggleView(Object: access Gtkada_Builder_Record'Class) is

@@ -18,10 +18,13 @@ with Gtk.Box; use Gtk.Box;
 with Gtk.Combo_Box; use Gtk.Combo_Box;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
 with Gtk.Dialog; use Gtk.Dialog;
+with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser; use Gtk.File_Chooser;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
+with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Widget; use Gtk.Widget;
+with Glib; use Glib;
 
 package body FileDialogs is
 
@@ -140,5 +143,49 @@ package body FileDialogs is
       end if;
       Destroy(CurrentDialog);
    end ShowSaveDialog;
+
+   procedure ShowAddFileDialog
+     (Parent: Gtk_Window; FilesList: Gtk_List_Store;
+      Encrypted: Boolean := False) is
+      Dialog: Gtk_File_Chooser_Dialog;
+      FilesNames: String_SList.GSlist;
+      Iter: Gtk_Tree_Iter;
+   begin
+      -- Create dialog with proper title depending if files will be encrypted
+      -- or not
+      if not Encrypted then
+         Dialog :=
+           Gtk_File_Chooser_Dialog_New("Add file", Parent, Action_Open);
+      else
+         Dialog :=
+           Gtk_File_Chooser_Dialog_New
+             ("Add file with encryption", Parent, Action_Open);
+      end if;
+      Set_Select_Multiple(Dialog, True);
+      -- Add Cancel button
+      if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
+         Ada.Text_IO.Put_Line("Can't add button to dialog.");
+      end if;
+      -- Add Ok button
+      if Add_Button(Dialog, "OK", Gtk_Response_OK) = null then
+         Ada.Text_IO.Put_Line("Can't add button to dialog.");
+      end if;
+      -- Show dialog to the user
+      if Run(Dialog) = Gtk_Response_OK then
+         FilesNames := Get_Filenames(Dialog);
+         -- Whole adding files code probably should go here,
+         -- String_SList.Nth_Data(FilesNames, I) is full path to the file
+         -- which will be added
+         for I in 0 .. String_SList.Length(FilesNames) - 1 loop
+            Append(FilesList, Iter);
+            Set(FilesList, Iter, 0, String_SList.Nth_Data(FilesNames, I));
+            -- This code is placeholder for fill selected file information
+            for J in 1 .. 11 loop
+               Set(FilesList, Iter, Gint(J), Guint'Image(I));
+            end loop;
+         end loop;
+      end if;
+      Destroy(Dialog);
+   end ShowAddFileDialog;
 
 end FileDialogs;

@@ -30,7 +30,6 @@ with Gtk.Container; use Gtk.Container;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
-with Gtk.File_Chooser_Widget; use Gtk.File_Chooser_Widget;
 with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
@@ -231,36 +230,24 @@ package body MainWindow is
    end ToggleView;
 
    procedure AddFile(User_Data: access GObject_Record'Class) is
-      FileDialog: constant Gtk_Dialog :=
-        Gtk_Dialog(Get_Object(Builder, "filedialog2"));
-      FileChooser: constant Gtk_File_Chooser_Widget :=
-        Gtk_File_Chooser_Widget(Get_Object(Builder, "filechooser"));
-      FilesNames: Gtk.Enums.String_SList.GSlist;
-      List: Gtk_List_Store;
-      Iter: Gtk_Tree_Iter;
    begin
       MChild := Get_Focus_Child(MWindow);
-      if Run(FileDialog) = Gtk_Response_OK then
-         FilesNames := Get_Filenames(FileChooser);
-         List :=
-           -(Get_Model
-              (Gtk_Tree_View
-                 (Get_Child
-                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
-         for I in 0 .. Gtk.Enums.String_SList.Length(FilesNames) - 1 loop
-            Append(List, Iter);
-            Set(List, Iter, 0, Gtk.Enums.String_SList.Nth_Data(FilesNames, I));
-            for J in 1 .. 11 loop
-               Set(List, Iter, Gint(J), Guint'Image(I));
-            end loop;
-         end loop;
-         if User_Data = Get_Object(Builder, "btnadd") then
-            Ada.Text_IO.Put_Line("Adding files");
-         else
-            Ada.Text_IO.Put_Line("Adding files with encryption");
-         end if;
+      if User_Data = Get_Object(Builder, "btnadd") then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
+      else
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True);
       end if;
-      Hide(Gtk_Widget(FileDialog));
    end AddFile;
 
    procedure DeleteItems

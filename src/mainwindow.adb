@@ -57,7 +57,7 @@ package body MainWindow is
 
    Builder: Gtkada_Builder;
    MWindow: MDI_Window;
-   MChild: MDI_Child;
+   Orientation: Gtk_Orientation := Orientation_Vertical;
 
    procedure Quit(Object: access Gtkada_Builder_Record'Class) is
    begin
@@ -80,6 +80,7 @@ package body MainWindow is
       Iter: Gtk_Tree_Iter;
       Area: Gtk_Cell_Area_Box;
       Renderer: Gtk_Cell_Renderer_Text;
+      MChild: MDI_Child;
    begin
       Set_Position
         (ArchivePaned,
@@ -146,7 +147,7 @@ package body MainWindow is
       Gtk_New(MChild, Gtk_Widget(ArchivePaned));
       Set_Title(MChild, "New Archive");
       Put(MWindow, MChild);
-      Split(MWindow, Orientation_Vertical, MChild);
+      Split(MWindow, Orientation, MChild);
       Set_Focus_Child(MChild);
    end NewArchive;
 
@@ -154,6 +155,7 @@ package body MainWindow is
       Iter: Gtk_Tree_Iter;
       List: Gtk_List_Store;
       Tree: Gtk_Tree_Store;
+      MChild: MDI_Child;
    begin
       if FileName = "" then
          return;
@@ -190,8 +192,8 @@ package body MainWindow is
    end OpenFile;
 
    procedure OpenDialog(User_Data: access GObject_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if User_Data = Get_Object(Builder, "btnopen") then
          OpenFile
            (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
@@ -206,8 +208,8 @@ package body MainWindow is
    end OpenDialog;
 
    procedure ExtractArchive(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       ShowDirectoryDialog
         (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ExtractArchive;
@@ -225,8 +227,8 @@ package body MainWindow is
    end ToggleView;
 
    procedure AddFile(User_Data: access GObject_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if User_Data = Get_Object(Builder, "btnadd") then
          ShowAddFileDialog
            (Gtk_Window(Get_Object(Builder, "mainwindow")),
@@ -276,8 +278,8 @@ package body MainWindow is
           (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if Run(MessageDialog) = Gtk_Response_Yes then
          Selected_Foreach
            (Get_Selection
@@ -294,8 +296,8 @@ package body MainWindow is
         Gtk_Message_Dialog_New
           (Gtk_Window(Get_Object(Object, "mainwindow")), Modal, Message_Info,
            Buttons_Close, "");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       Set_Markup
         (MessageDialog, "Here is result of test of " & Get_Title(MChild));
       if Run(MessageDialog) = Gtk_Response_Close then
@@ -304,8 +306,8 @@ package body MainWindow is
    end TestArchive;
 
    procedure Find(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       ShowFindDialog
         (Gtk_Window(Get_Object(Object, "mainwindow")),
          Get_Model
@@ -320,8 +322,8 @@ package body MainWindow is
           (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if Run(MessageDialog) = Gtk_Response_Yes then
          Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
       end if;
@@ -334,8 +336,8 @@ package body MainWindow is
           (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if Run(MessageDialog) = Gtk_Response_Yes then
          Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
       end if;
@@ -346,26 +348,25 @@ package body MainWindow is
       SaveDialog: constant GObject := Get_Object(Object, "savedialog");
       FileName: constant String :=
         Get_Current_Name(Gtk_File_Chooser_Dialog(SaveDialog));
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       Hide(Gtk_Widget(SaveDialog));
       Put_Line("Saving " & Get_Title(MChild) & " as " & FileName);
    end SaveFile;
 
    procedure CloseArchive(Object: access Gtkada_Builder_Record'Class) is
       pragma Unreferenced(Object);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       if MChild = null then
          return;
       end if;
       Close_Child(MChild);
-      MChild := Get_Focus_Child(MWindow);
    end CloseArchive;
 
    procedure ChangeView(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       Set_Visible
         (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
          Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
@@ -373,6 +374,7 @@ package body MainWindow is
 
    procedure CloseAll(Object: access Gtkada_Builder_Record'Class) is
       pragma Unreferenced(Object);
+      MChild: MDI_Child;
    begin
       loop
          MChild := Get_Focus_Child(MWindow);
@@ -383,17 +385,17 @@ package body MainWindow is
 
    procedure SplitWindow(User_Data: access GObject_Record'Class) is
    begin
-      MChild := Get_Focus_Child(MWindow);
       if User_Data = Get_Object(Builder, "splithorizontalitem") then
-         Split(MWindow, Orientation_Horizontal);
+         Orientation := Orientation_Horizontal;
       else
-         Split(MWindow, Orientation_Vertical);
+         Orientation := Orientation_Vertical;
       end if;
+      Split(MWindow, Orientation);
    end SplitWindow;
 
    procedure ShowInfo(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      MChild := Get_Focus_Child(MWindow);
       ShowInfoDialog
         (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ShowInfo;

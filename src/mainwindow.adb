@@ -383,9 +383,9 @@ package body MainWindow is
       end loop;
    end CloseAll;
 
-   procedure SplitWindow(User_Data: access GObject_Record'Class) is
+   procedure SplitWindow(Object: access Gtkada_Builder_Record'Class) is
    begin
-      if User_Data = Get_Object(Builder, "splithorizontalitem") then
+      if Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "splithorizontalitem"))) then
          Orientation := Orientation_Horizontal;
       else
          Orientation := Orientation_Vertical;

@@ -488,21 +488,32 @@ THE SOFTWARE.
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkMenuItem" id="splithorizontalitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Tile _Horizontal</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="Split_Window" object="splithorizontalitem" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="splitverticalitem">
+                      <object class="GtkRadioMenuItem" id="splitverticalitem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Tile _Vertical</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="Split_Window" object="splitverticalitem" swapped="no"/>
+                        <property name="active">True</property>
+                        <property name="draw_as_radio">True</property>
+                        <property name="group">splithorizontalitem</property>
+                        <signal name="activate" handler="Split_Window" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkRadioMenuItem" id="splithorizontalitem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Tile _Horizontal</property>
+                        <property name="use_underline">True</property>
+                        <property name="draw_as_radio">True</property>
+                        <property name="group">splitverticalitem</property>
+                        <signal name="activate" handler="Split_Window" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                       </object>
                     </child>
                     <child>
@@ -512,12 +523,6 @@ THE SOFTWARE.
                         <property name="label" translatable="yes">_Close all</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="Close_All" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                       </object>
                     </child>
                   </object>

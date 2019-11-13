@@ -234,7 +234,7 @@ package body MainWindow is
                (Gtk_Tree_View
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
-      else
+      elsif User_Data = Get_Object(Builder, "btnadd2") then
          ShowAddFileDialog
            (Gtk_Window(Get_Object(Builder, "mainwindow")),
             -(Get_Model
@@ -242,6 +242,22 @@ package body MainWindow is
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
             True);
+      elsif User_Data = Get_Object(Builder, "menuaddfolder") then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            False, True);
+      else
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True, True);
       end if;
    end AddFile;
 

@@ -146,20 +146,32 @@ package body FileDialogs is
 
    procedure ShowAddFileDialog
      (Parent: Gtk_Window; FilesList: Gtk_List_Store;
-      Encrypted: Boolean := False) is
+      Encrypted: Boolean := False; Directory: Boolean := False) is
       Dialog: Gtk_File_Chooser_Dialog;
       FilesNames: String_SList.GSlist;
       Iter: Gtk_Tree_Iter;
    begin
       -- Create dialog with proper title depending if files will be encrypted
       -- or not
-      if not Encrypted then
-         Dialog :=
-           Gtk_File_Chooser_Dialog_New("Add file", Parent, Action_Open);
+      if not Directory then
+         if not Encrypted then
+            Dialog :=
+              Gtk_File_Chooser_Dialog_New("Add file", Parent, Action_Open);
+         else
+            Dialog :=
+              Gtk_File_Chooser_Dialog_New
+                ("Add file with encryption", Parent, Action_Open);
+         end if;
       else
-         Dialog :=
-           Gtk_File_Chooser_Dialog_New
-             ("Add file with encryption", Parent, Action_Open);
+         if not Encrypted then
+            Dialog :=
+              Gtk_File_Chooser_Dialog_New
+                ("Add folder", Parent, Action_Select_Folder);
+         else
+            Dialog :=
+              Gtk_File_Chooser_Dialog_New
+                ("Add folder with encryption", Parent, Action_Select_Folder);
+         end if;
       end if;
       Set_Select_Multiple(Dialog, True);
       -- Add Cancel button

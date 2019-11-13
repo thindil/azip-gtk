@@ -67,10 +67,11 @@ package FileDialogs is
    --             always main window
    -- FilesList - List of files which will be updated with new file(s)
    -- Encrypted - If True, add file(s) with encryption. Default is False.
+   -- Directory - If True, add directory instead file(s). Default is False.
    -- SOURCE
    procedure ShowAddFileDialog
      (Parent: Gtk_Window; FilesList: Gtk_List_Store;
-      Encrypted: Boolean := False);
+      Encrypted: Boolean := False; Directory: Boolean := False);
    -- ****
 
 end FileDialogs;

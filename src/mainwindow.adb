@@ -205,11 +205,6 @@ package body MainWindow is
       end if;
    end OpenDialog;
 
-   procedure CloseDialog(User_Data: access GObject_Record'Class) is
-   begin
-      Hide(Gtk_Widget(User_Data));
-   end CloseDialog;
-
    procedure ExtractArchive(Object: access Gtkada_Builder_Record'Class) is
    begin
       MChild := Get_Focus_Child(MWindow);
@@ -407,7 +402,6 @@ package body MainWindow is
       Register_Handler(Builder, "Extract_Archive", ExtractArchive'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
-      Register_Handler(Builder, "Close_Dialog", CloseDialog'Access);
       Register_Handler(Builder, "Add_File", AddFile'Access);
       Register_Handler(Builder, "Delete_Files", DeleteFiles'Access);
       Register_Handler(Builder, "Test_Archive", TestArchive'Access);

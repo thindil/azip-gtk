@@ -36,7 +36,10 @@ with Gtk.Main; use Gtk.Main;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
+with Gtk.Separator_Tool_Item; use Gtk.Separator_Tool_Item;
 with Gtk.Status_Bar; use Gtk.Status_Bar;
+with Gtk.Tool_Button; use Gtk.Tool_Button;
+with Gtk.Toolbar; use Gtk.Toolbar;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_Store; use Gtk.Tree_Store;
@@ -71,7 +74,8 @@ package body MainWindow is
       ShowAboutDialog(Gtk_Window(Get_Object(Object, "mainwindow")));
    end ShowAbout;
 
-   procedure NewArchive(Object: access Gtkada_Builder_Record'Class) is
+   procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       ArchivePaned: constant Gtk_Paned :=
         Gtk_Paned_New(Orientation_Horizontal);
       Scroll: Gtk_Scrolled_Window;
@@ -88,7 +92,7 @@ package body MainWindow is
          Gint
            (Float
               (Get_Allocated_Width
-                 (Gtk_Widget(Get_Object(Object, "mainwindow")))) *
+                 (Gtk_Widget(Get_Object(Builder, "mainwindow")))) *
             0.3));
       -- Tree view
       Append(Tree, Iter, Null_Iter);
@@ -165,7 +169,8 @@ package body MainWindow is
       if MChild /= null and then Get_Title(MChild) = "New Archive" then
          Close_Child(MChild, True);
       end if;
-      NewArchive(Builder);
+      NewArchive(null);
+      MChild := Get_Focus_Child(MWindow);
       Set_Title(MChild, FileName);
       Tree :=
         -(Get_Model
@@ -195,7 +200,7 @@ package body MainWindow is
    procedure OpenDialog(User_Data: access GObject_Record'Class) is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if User_Data = Get_Object(Builder, "btnopen") then
+      if User_Data = Get_Object(Builder, "menuopen") then
          OpenFile
            (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
       elsif User_Data = Get_Object(Builder, "menusaveas") then
@@ -208,11 +213,12 @@ package body MainWindow is
       end if;
    end OpenDialog;
 
-   procedure ExtractArchive(Object: access Gtkada_Builder_Record'Class) is
+   procedure ExtractArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowDirectoryDialog
-        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
+        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
    end ExtractArchive;
 
    procedure ToggleView(Object: access Gtkada_Builder_Record'Class) is
@@ -402,24 +408,42 @@ package body MainWindow is
         (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ShowInfo;
 
+   procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+   end OpenArchive;
+
+   procedure NewArchivetemp(Object: access Gtkada_Builder_Record'Class) is
+      pragma Unreferenced(Object);
+   begin
+      NewArchive(null);
+   end NewArchivetemp;
+
+   procedure ExtractArchivetemp(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowDirectoryDialog
+        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
+   end ExtractArchivetemp;
+
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
-      ToolsIcons, Icon: Gdk_Pixbuf;
-      StartX: Gint := 0;
-      ImagesNames: constant array(Positive range <>) of Unbounded_String :=
-        (To_Unbounded_String("imgadd"), To_Unbounded_String("imgdelete"),
-         To_Unbounded_String("imgextract"), To_Unbounded_String("imgfind"),
-         To_Unbounded_String("imgtest"), To_Unbounded_String("imgupdate"),
-         To_Unbounded_String("imgadd2"), To_Unbounded_String("imgproperties"),
-         Null_Unbounded_String, To_Unbounded_String("imgrecompress"),
-         To_Unbounded_String("imgnew"), To_Unbounded_String("imgopen"),
-         To_Unbounded_String("imgview"));
+      ToolsIcons: Gdk_Pixbuf;
+--      ImagesNames: constant array(Positive range <>) of Unbounded_String :=
+--        (To_Unbounded_String("imgadd"), To_Unbounded_String("imgdelete"),
+--         To_Unbounded_String("imgextract"), To_Unbounded_String("imgfind"),
+--         To_Unbounded_String("imgtest"), To_Unbounded_String("imgupdate"),
+--         To_Unbounded_String("imgadd2"), To_Unbounded_String("imgproperties"),
+--         Null_Unbounded_String, To_Unbounded_String("imgrecompress"),
+--         To_Unbounded_String("imgnew"), To_Unbounded_String("imgopen"),
+--         To_Unbounded_String("imgview"));
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
-      Register_Handler(Builder, "New_Archive", NewArchive'Access);
-      Register_Handler(Builder, "Extract_Archive", ExtractArchive'Access);
+      Register_Handler(Builder, "New_Archive", NewArchivetemp'Access);
+      Register_Handler(Builder, "Extract_Archive", ExtractArchivetemp'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
       Register_Handler(Builder, "Add_File", AddFile'Access);
@@ -443,23 +467,44 @@ package body MainWindow is
          return;
       end if;
       ToolsIcons := Add_Alpha(ToolsIcons, True, 163, 73, 164);
-      for ImageName of ImagesNames loop
-         if ImageName /= Null_Unbounded_String then
-            Icon := Gdk_New_Subpixbuf(ToolsIcons, StartX, 0, 32, 32);
-            Set(Gtk_Image(Get_Object(Builder, To_String(ImageName))), Icon);
-         end if;
-         StartX := StartX + 32;
-      end loop;
       declare
          WindowBox: constant Gtk_Box :=
            Gtk_Box(Get_Object(Builder, "windowbox"));
+         Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
+         Button: Gtk_Tool_Button;
       begin
          Gtk_New(MWindow, null);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 320, 0, 32, 32))),
+              "New archive");
+         On_Clicked(Button, NewArchive'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 352, 0, 32, 32))),
+              "Open archive");
+         On_Clicked(Button, OpenArchive'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 64, 0, 32, 32))),
+              "Extract archive");
+         On_Clicked(Button, ExtractArchive'Access);
+         Add(Toolbar, Button);
+         Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));
          Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);
       end;
       Show_All(Gtk_Widget(Get_Object(Builder, "mainwindow")));
-      NewArchive(Builder);
+      NewArchive(null);
    end CreateMainWindow;
 
 end MainWindow;

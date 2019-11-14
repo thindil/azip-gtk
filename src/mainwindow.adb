@@ -449,8 +449,9 @@ package body MainWindow is
          StartX := StartX + 32;
       end loop;
       Gtk_New(MWindow, null);
-      Pack_Start
-        (Gtk_Box(Get_Object(Builder, "archivesbox")), Gtk_Widget(MWindow));
+      Pack_End
+        (Gtk_Box(Get_Object(Builder, "windowbox")), Gtk_Widget(MWindow));
+      Reorder_Child(Gtk_Box(Get_Object(Builder, "windowbox")), Gtk_Widget(MWindow), 3);
       Show_All(Gtk_Widget(Get_Object(Builder, "mainwindow")));
       NewArchive(Builder);
    end CreateMainWindow;

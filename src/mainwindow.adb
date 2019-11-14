@@ -36,6 +36,7 @@ with Gtk.Main; use Gtk.Main;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
+with Gtk.Status_Bar; use Gtk.Status_Bar;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_Store; use Gtk.Tree_Store;
@@ -385,7 +386,8 @@ package body MainWindow is
 
    procedure SplitWindow(Object: access Gtkada_Builder_Record'Class) is
    begin
-      if Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "splithorizontalitem"))) then
+      if Get_Active
+          (Gtk_Check_Menu_Item(Get_Object(Object, "splithorizontalitem"))) then
          Orientation := Orientation_Horizontal;
       else
          Orientation := Orientation_Vertical;
@@ -448,10 +450,14 @@ package body MainWindow is
          end if;
          StartX := StartX + 32;
       end loop;
-      Gtk_New(MWindow, null);
-      Pack_End
-        (Gtk_Box(Get_Object(Builder, "windowbox")), Gtk_Widget(MWindow));
-      Reorder_Child(Gtk_Box(Get_Object(Builder, "windowbox")), Gtk_Widget(MWindow), 3);
+      declare
+         WindowBox: constant Gtk_Box :=
+           Gtk_Box(Get_Object(Builder, "windowbox"));
+      begin
+         Gtk_New(MWindow, null);
+         Pack_Start(WindowBox, Gtk_Widget(MWindow));
+         Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);
+      end;
       Show_All(Gtk_Widget(Get_Object(Builder, "mainwindow")));
       NewArchive(Builder);
    end CreateMainWindow;

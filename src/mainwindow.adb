@@ -540,7 +540,9 @@ package body MainWindow is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
-      procedure AddButton(IconStarts: Gint; Label: String; Subprogram: Cb_Gtk_Tool_Button_Void) is
+      procedure AddButton
+        (IconStarts: Gint; Label: String;
+         Subprogram: Cb_Gtk_Tool_Button_Void) is
          Button: Gtk_Tool_Button;
       begin
          Button :=

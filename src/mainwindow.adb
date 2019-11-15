@@ -552,6 +552,7 @@ package body MainWindow is
                    (Gdk_New_Subpixbuf(ToolsIcons, IconStarts, 0, 32, 32))),
               Label);
          On_Clicked(Button, Subprogram);
+         Set_Tooltip_Text(Gtk_Widget(Button), Label);
          Add(Toolbar, Button);
       end AddButton;
    begin

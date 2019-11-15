@@ -539,6 +539,19 @@ package body MainWindow is
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
+      Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
+      procedure AddButton(IconStarts: Gint; Label: String; Subprogram: Cb_Gtk_Tool_Button_Void) is
+         Button: Gtk_Tool_Button;
+      begin
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, IconStarts, 0, 32, 32))),
+              Label);
+         On_Clicked(Button, Subprogram);
+         Add(Toolbar, Button);
+      end AddButton;
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
@@ -570,111 +583,25 @@ package body MainWindow is
       declare
          WindowBox: constant Gtk_Box :=
            Gtk_Box(Get_Object(Builder, "windowbox"));
-         Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
-         Button: Gtk_Tool_Button;
       begin
          Gtk_New(MWindow, null);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 320, 0, 32, 32))),
-              "New archive");
-         On_Clicked(Button, NewArchive'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 352, 0, 32, 32))),
-              "Open archive");
-         On_Clicked(Button, OpenArchive'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 64, 0, 32, 32))),
-              "Extract archive");
-         On_Clicked(Button, ExtractArchive'Access);
-         Add(Toolbar, Button);
+         AddButton(320, "New archive", NewArchive'Access);
+         AddButton(352, "Open archive", OpenArchive'Access);
+         AddButton(64, "Extract archive", ExtractArchive'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 0, 0, 32, 32))),
-              "Add files...");
-         On_Clicked(Button, AddFile'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 192, 0, 32, 32))),
-              "Add files with encryption...");
-         On_Clicked(Button, AddFile'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 32, 0, 32, 32))),
-              "Delete entries");
-         On_Clicked(Button, DeleteFiles'Access);
-         Add(Toolbar, Button);
+         AddButton(0, "Add files...", AddFile'Access);
+         AddButton(192, "Add files with encryption...", AddFile'Access);
+         AddButton(32, "Delete entries", DeleteFiles'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 128, 0, 32, 32))),
-              "Test archive");
-         On_Clicked(Button, TestArchive'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 96, 0, 32, 32))),
-              "Find in archive...");
-         On_Clicked(Button, Find'Access);
-         Add(Toolbar, Button);
+         AddButton(128, "Test archive", TestArchive'Access);
+         AddButton(96, "Find in archive...", Find'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 160, 0, 32, 32))),
-              "Update archive");
-         On_Clicked(Button, UpdateArchive'Access);
-         Add(Toolbar, Button);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 288, 0, 32, 32))),
-              "Recompress archive");
-         On_Clicked(Button, RecompressArchive'Access);
-         Add(Toolbar, Button);
+         AddButton(160, "Update archive", UpdateArchive'Access);
+         AddButton(288, "Recompress archive", RecompressArchive'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 384, 0, 32, 32))),
-              "Toggle flat/tree view");
-         On_Clicked(Button, ChangeView'Access);
-         Add(Toolbar, Button);
+         AddButton(384, "Toggle flat/tree view", ChangeView'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         Button :=
-           Gtk_Tool_Button_New
-             (Gtk_Widget
-                (Gtk_Image_New_From_Pixbuf
-                   (Gdk_New_Subpixbuf(ToolsIcons, 224, 0, 32, 32))),
-              "Properties");
-         On_Clicked(Button, ShowInfo'Access);
-         Add(Toolbar, Button);
+         AddButton(224, "Properties", ShowInfo'Access);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));
          Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);

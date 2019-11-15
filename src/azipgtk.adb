@@ -28,7 +28,6 @@ with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with Gtk.Main; use Gtk.Main;
 with Gtkada.Builder; use Gtkada.Builder;
-with Gtkada.Intl; use Gtkada.Intl;
 with Glib; use Glib;
 with Glib.Error; use Glib.Error;
 with MainWindow; use MainWindow;
@@ -43,10 +42,6 @@ begin
         ("The program can be run only via 'run.sh' script. Please don't run binary directly.");
       return;
    end if;
-   -- Start Gettext internationalization
-   Setlocale;
-   Bind_Text_Domain("hunter", Value("LOCALESDIR"));
-   Text_Domain("hunter");
    -- Start GTK
    Init;
    Gtk_New(Builder);

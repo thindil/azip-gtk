@@ -233,17 +233,17 @@ package body MainWindow is
       end if;
    end ToggleView;
 
-   procedure AddFile(User_Data: access GObject_Record'Class) is
+   procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if User_Data = Get_Object(Builder, "btnadd") then
+      if Get_Label(Self) = "Add files..." then
          ShowAddFileDialog
            (Gtk_Window(Get_Object(Builder, "mainwindow")),
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
-      elsif User_Data = Get_Object(Builder, "btnadd2") then
+      elsif Get_Label(Self) = "Add files with encryption..." then
          ShowAddFileDialog
            (Gtk_Window(Get_Object(Builder, "mainwindow")),
             -(Get_Model
@@ -251,22 +251,6 @@ package body MainWindow is
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
             True);
-      elsif User_Data = Get_Object(Builder, "menuaddfolder") then
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            False, True);
-      else
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True, True);
       end if;
    end AddFile;
 
@@ -279,10 +263,11 @@ package body MainWindow is
       Gtk.List_Store.Remove(-(Model), NewIter);
    end DeleteItems;
 
-   procedure DeleteFiles(Object: access Gtkada_Builder_Record'Class) is
+   procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -298,10 +283,11 @@ package body MainWindow is
       Destroy(MessageDialog);
    end DeleteFiles;
 
-   procedure TestArchive(Object: access Gtkada_Builder_Record'Class) is
+   procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal, Message_Info,
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal, Message_Info,
            Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -312,21 +298,23 @@ package body MainWindow is
       end if;
    end TestArchive;
 
-   procedure Find(Object: access Gtkada_Builder_Record'Class) is
+   procedure Find(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowFindDialog
-        (Gtk_Window(Get_Object(Object, "mainwindow")),
+        (Gtk_Window(Get_Object(Builder, "mainwindow")),
          Get_Model
            (Gtk_Tree_View
               (Get_Child
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end Find;
 
-   procedure UpdateArchive(Object: access Gtkada_Builder_Record'Class) is
+   procedure UpdateArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -337,10 +325,11 @@ package body MainWindow is
       Destroy(MessageDialog);
    end UpdateArchive;
 
-   procedure RecompressArchive(Object: access Gtkada_Builder_Record'Class) is
+   procedure RecompressArchive(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -371,12 +360,13 @@ package body MainWindow is
       Close_Child(MChild);
    end CloseArchive;
 
-   procedure ChangeView(Object: access Gtkada_Builder_Record'Class) is
+   procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Set_Visible
         (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
-         Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
+         not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
    end ChangeView;
 
    procedure CloseAll(Object: access Gtkada_Builder_Record'Class) is
@@ -401,11 +391,12 @@ package body MainWindow is
       Split(MWindow, Orientation);
    end SplitWindow;
 
-   procedure ShowInfo(Object: access Gtkada_Builder_Record'Class) is
+   procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowInfoDialog
-        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
+        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
    end ShowInfo;
 
    procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
@@ -427,17 +418,127 @@ package body MainWindow is
         (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
    end ExtractArchivetemp;
 
+   procedure AddFiletemp(User_Data: access GObject_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if User_Data = Get_Object(Builder, "menuaddfile") then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
+      elsif User_Data = Get_Object(Builder, "menuaddfile2") then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True);
+      elsif User_Data = Get_Object(Builder, "menuaddfolder") then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            False, True);
+      else
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True, True);
+      end if;
+   end AddFiletemp;
+
+   procedure DeleteFilestemp(Object: access Gtkada_Builder_Record'Class) is
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "Do you want to delete selected item(s)?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Selected_Foreach
+           (Get_Selection
+              (Gtk_Tree_View
+                 (Get_Child
+                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))),
+            DeleteItems'Access);
+      end if;
+      Destroy(MessageDialog);
+   end DeleteFilestemp;
+
+   procedure TestArchivetemp(Object: access Gtkada_Builder_Record'Class) is
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal, Message_Info,
+           Buttons_Close, "");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      Set_Markup
+        (MessageDialog, "Here is result of test of " & Get_Title(MChild));
+      if Run(MessageDialog) = Gtk_Response_Close then
+         Destroy(MessageDialog);
+      end if;
+   end TestArchivetemp;
+
+   procedure Findtemp(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowFindDialog
+        (Gtk_Window(Get_Object(Object, "mainwindow")),
+         Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+   end Findtemp;
+
+   procedure UpdateArchivetemp(Object: access Gtkada_Builder_Record'Class) is
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
+      end if;
+      Destroy(MessageDialog);
+   end UpdateArchivetemp;
+
+   procedure RecompressArchivetemp
+     (Object: access Gtkada_Builder_Record'Class) is
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
+      end if;
+      Destroy(MessageDialog);
+   end RecompressArchivetemp;
+
+   procedure ChangeViewtemp(Object: access Gtkada_Builder_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      Set_Visible
+        (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
+         Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
+   end ChangeViewtemp;
+
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
---      ImagesNames: constant array(Positive range <>) of Unbounded_String :=
---        (To_Unbounded_String("imgadd"), To_Unbounded_String("imgdelete"),
---         To_Unbounded_String("imgextract"), To_Unbounded_String("imgfind"),
---         To_Unbounded_String("imgtest"), To_Unbounded_String("imgupdate"),
---         To_Unbounded_String("imgadd2"), To_Unbounded_String("imgproperties"),
---         Null_Unbounded_String, To_Unbounded_String("imgrecompress"),
---         To_Unbounded_String("imgnew"), To_Unbounded_String("imgopen"),
---         To_Unbounded_String("imgview"));
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
@@ -446,19 +547,18 @@ package body MainWindow is
       Register_Handler(Builder, "Extract_Archive", ExtractArchivetemp'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
-      Register_Handler(Builder, "Add_File", AddFile'Access);
-      Register_Handler(Builder, "Delete_Files", DeleteFiles'Access);
-      Register_Handler(Builder, "Test_Archive", TestArchive'Access);
-      Register_Handler(Builder, "Find", Find'Access);
-      Register_Handler(Builder, "Update_Archive", UpdateArchive'Access);
+      Register_Handler(Builder, "Add_File", AddFiletemp'Access);
+      Register_Handler(Builder, "Delete_Files", DeleteFilestemp'Access);
+      Register_Handler(Builder, "Test_Archive", TestArchivetemp'Access);
+      Register_Handler(Builder, "Find", Findtemp'Access);
+      Register_Handler(Builder, "Update_Archive", UpdateArchivetemp'Access);
       Register_Handler
-        (Builder, "Recompress_Archive", RecompressArchive'Access);
+        (Builder, "Recompress_Archive", RecompressArchivetemp'Access);
       Register_Handler(Builder, "Save_File", SaveFile'Access);
       Register_Handler(Builder, "Close_Archive", CloseArchive'Access);
-      Register_Handler(Builder, "Change_View", ChangeView'Access);
+      Register_Handler(Builder, "Change_View", ChangeViewtemp'Access);
       Register_Handler(Builder, "Close_All", CloseAll'Access);
       Register_Handler(Builder, "Split_Window", SplitWindow'Access);
-      Register_Handler(Builder, "Show_Info", ShowInfo'Access);
       Do_Connect(Builder);
       Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
       if Error /= null then
@@ -499,6 +599,82 @@ package body MainWindow is
          On_Clicked(Button, ExtractArchive'Access);
          Add(Toolbar, Button);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 0, 0, 32, 32))),
+              "Add files...");
+         On_Clicked(Button, AddFile'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 192, 0, 32, 32))),
+              "Add files with encryption...");
+         On_Clicked(Button, AddFile'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 32, 0, 32, 32))),
+              "Delete entries");
+         On_Clicked(Button, DeleteFiles'Access);
+         Add(Toolbar, Button);
+         Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 128, 0, 32, 32))),
+              "Test archive");
+         On_Clicked(Button, TestArchive'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 96, 0, 32, 32))),
+              "Find in archive...");
+         On_Clicked(Button, Find'Access);
+         Add(Toolbar, Button);
+         Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 160, 0, 32, 32))),
+              "Update archive");
+         On_Clicked(Button, UpdateArchive'Access);
+         Add(Toolbar, Button);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 288, 0, 32, 32))),
+              "Recompress archive");
+         On_Clicked(Button, RecompressArchive'Access);
+         Add(Toolbar, Button);
+         Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 384, 0, 32, 32))),
+              "Toggle flat/tree view");
+         On_Clicked(Button, ChangeView'Access);
+         Add(Toolbar, Button);
+         Add(Toolbar, Gtk_Separator_Tool_Item_New);
+         Button :=
+           Gtk_Tool_Button_New
+             (Gtk_Widget
+                (Gtk_Image_New_From_Pixbuf
+                   (Gdk_New_Subpixbuf(ToolsIcons, 224, 0, 32, 32))),
+              "Properties");
+         On_Clicked(Button, ShowInfo'Access);
+         Add(Toolbar, Button);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));
          Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);

@@ -354,16 +354,6 @@ package body MainWindow is
       Put_Line("Saving " & Get_Title(MChild) & " as " & FileName);
    end SaveFile;
 
-   procedure CloseArchive(Object: access Gtkada_Builder_Record'Class) is
-      pragma Unreferenced(Object);
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if MChild = null then
-         return;
-      end if;
-      Close_Child(MChild);
-   end CloseArchive;
-
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -408,12 +398,6 @@ package body MainWindow is
    begin
       OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
    end OpenArchive;
-
-   procedure NewArchivetemp(Object: access Gtkada_Builder_Record'Class) is
-      pragma Unreferenced(Object);
-   begin
-      NewArchive(null);
-   end NewArchivetemp;
 
    procedure ExtractArchivetemp(Object: access Gtkada_Builder_Record'Class) is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -540,11 +524,32 @@ package body MainWindow is
          Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
    end ChangeViewtemp;
 
+   procedure MenuCallback(Self: access Gtk_Menu_Item_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Get_Label(Self) = "_New" then
+         NewArchive(null);
+      elsif Get_Label(Self) = "_Open" then
+         OpenFile
+           (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      elsif Get_Label(Self) = "Save _as" then
+         ShowSaveDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+      elsif Get_Label(Self) = "_Close" then
+         if MChild = null then
+            return;
+         end if;
+         Close_Child(MChild);
+      elsif Get_Label(Self) = "_Quit" then
+         Main_Quit;
+      end if;
+   end MenuCallback;
+
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
-      Menubar: constant Gtk_Menu_Bar :=  Gtk_Menu_Bar_New;
+      Menubar: constant Gtk_Menu_Bar := Gtk_Menu_Bar_New;
       Menu: Gtk_Menu;
       procedure AddButton
         (IconStarts: Gint; Label: String;
@@ -561,21 +566,25 @@ package body MainWindow is
          Set_Tooltip_Text(Gtk_Widget(Button), Label);
          Add(Toolbar, Button);
       end AddButton;
-      procedure AddMenuItem(Label: String; SubMenu: Boolean := False) is
-         Item: constant Gtk_Menu_Item := Gtk_Menu_Item_New_With_Mnemonic(Label);
+      procedure AddSubmenu(Label: String) is
+         Item: constant Gtk_Menu_Item :=
+           Gtk_Menu_Item_New_With_Mnemonic(Label);
       begin
-         if SubMenu then
-            Set_Submenu(Item, Menu);
-            Append(Menubar, Item);
-            return;
-         end if;
+         Set_Submenu(Item, Menu);
+         Append(Menubar, Item);
+      end AddSubmenu;
+      procedure AddMenuItem
+        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void) is
+         Item: constant Gtk_Menu_Item :=
+           Gtk_Menu_Item_New_With_Mnemonic(Label);
+      begin
+         On_Activate(Item, Subprogram);
          Append(Menu, Item);
       end AddMenuItem;
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
-      Register_Handler(Builder, "New_Archive", NewArchivetemp'Access);
       Register_Handler(Builder, "Extract_Archive", ExtractArchivetemp'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
@@ -587,7 +596,6 @@ package body MainWindow is
       Register_Handler
         (Builder, "Recompress_Archive", RecompressArchivetemp'Access);
       Register_Handler(Builder, "Save_File", SaveFile'Access);
-      Register_Handler(Builder, "Close_Archive", CloseArchive'Access);
       Register_Handler(Builder, "Change_View", ChangeViewtemp'Access);
       Register_Handler(Builder, "Close_All", CloseAll'Access);
       Register_Handler(Builder, "Split_Window", SplitWindow'Access);
@@ -622,15 +630,15 @@ package body MainWindow is
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
          AddButton(224, "Properties", ShowInfo'Access);
          Menu := Gtk_Menu_New;
-         AddMenuItem("_File", True);
-         AddMenuItem("New");
-         AddMenuItem("Open");
-         AddMenuItem("Save as");
-         AddMenuItem("Close");
+         AddSubmenu("_File");
+         AddMenuItem("_New", MenuCallback'Access);
+         AddMenuItem("_Open", MenuCallback'Access);
+         AddMenuItem("Save _as", MenuCallback'Access);
+         AddMenuItem("_Close", MenuCallback'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("Recent");
+         AddMenuItem("_Recent", MenuCallback'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("Quit");
+         AddMenuItem("_Quit", MenuCallback'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

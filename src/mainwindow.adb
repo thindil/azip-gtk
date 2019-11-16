@@ -33,9 +33,13 @@ with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
+with Gtk.Menu; use Gtk.Menu;
+with Gtk.Menu_Bar; use Gtk.Menu_Bar;
+with Gtk.Menu_Item; use Gtk.Menu_Item;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
+with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 with Gtk.Separator_Tool_Item; use Gtk.Separator_Tool_Item;
 with Gtk.Status_Bar; use Gtk.Status_Bar;
 with Gtk.Tool_Button; use Gtk.Tool_Button;
@@ -540,6 +544,8 @@ package body MainWindow is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
+      Menubar: constant Gtk_Menu_Bar :=  Gtk_Menu_Bar_New;
+      Menu: Gtk_Menu;
       procedure AddButton
         (IconStarts: Gint; Label: String;
          Subprogram: Cb_Gtk_Tool_Button_Void) is
@@ -555,6 +561,16 @@ package body MainWindow is
          Set_Tooltip_Text(Gtk_Widget(Button), Label);
          Add(Toolbar, Button);
       end AddButton;
+      procedure AddMenuItem(Label: String; SubMenu: Boolean := False) is
+         Item: constant Gtk_Menu_Item := Gtk_Menu_Item_New_With_Mnemonic(Label);
+      begin
+         if SubMenu then
+            Set_Submenu(Item, Menu);
+            Append(Menubar, Item);
+            return;
+         end if;
+         Append(Menu, Item);
+      end AddMenuItem;
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
@@ -605,6 +621,17 @@ package body MainWindow is
          AddButton(384, "Toggle flat/tree view", ChangeView'Access);
          Add(Toolbar, Gtk_Separator_Tool_Item_New);
          AddButton(224, "Properties", ShowInfo'Access);
+         Menu := Gtk_Menu_New;
+         AddMenuItem("_File", True);
+         AddMenuItem("New");
+         AddMenuItem("Open");
+         AddMenuItem("Save as");
+         AddMenuItem("Close");
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("Recent");
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("Quit");
+         Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));
          Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);

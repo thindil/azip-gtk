@@ -399,69 +399,6 @@ package body MainWindow is
       OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
    end OpenArchive;
 
-   procedure ExtractArchivetemp(Object: access Gtkada_Builder_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      ShowDirectoryDialog
-        (Gtk_Window(Get_Object(Object, "mainwindow")), Get_Title(MChild));
-   end ExtractArchivetemp;
-
-   procedure AddFiletemp(User_Data: access GObject_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if User_Data = Get_Object(Builder, "menuaddfile") then
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
-      elsif User_Data = Get_Object(Builder, "menuaddfile2") then
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True);
-      elsif User_Data = Get_Object(Builder, "menuaddfolder") then
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            False, True);
-      else
-         ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True, True);
-      end if;
-   end AddFiletemp;
-
-   procedure DeleteFilestemp(Object: access Gtkada_Builder_Record'Class) is
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
-           Message_Question, Buttons_Yes_No,
-           "Do you want to delete selected item(s)?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Selected_Foreach
-           (Get_Selection
-              (Gtk_Tree_View
-                 (Get_Child
-                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))),
-            DeleteItems'Access);
-      end if;
-      Destroy(MessageDialog);
-   end DeleteFilestemp;
-
    procedure TestArchivetemp(Object: access Gtkada_Builder_Record'Class) is
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
@@ -561,6 +498,77 @@ package body MainWindow is
       Main_Quit;
    end QuitMenu;
 
+   procedure ExtractArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowDirectoryDialog
+        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+   end ExtractArchiveMenu;
+
+   procedure DeleteFiles(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "Do you want to delete selected item(s)?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Selected_Foreach
+           (Get_Selection
+              (Gtk_Tree_View
+                 (Get_Child
+                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))),
+            DeleteItems'Access);
+      end if;
+      Destroy(MessageDialog);
+   end DeleteFiles;
+
+   procedure AddFileMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Get_Label(Self) = "A_dd files..." then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
+      elsif Get_Label(Self) = "Add files with encr_yption..." then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True);
+      elsif Get_Label(Self) = "Add folder..." then
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            False, True);
+      else
+         ShowAddFileDialog
+           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+            -(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            True, True);
+      end if;
+   end AddFileMenu;
+
+   procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      null;
+   end EmptyMenu;
+
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
@@ -601,11 +609,8 @@ package body MainWindow is
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
-      Register_Handler(Builder, "Extract_Archive", ExtractArchivetemp'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
-      Register_Handler(Builder, "Add_File", AddFiletemp'Access);
-      Register_Handler(Builder, "Delete_Files", DeleteFilestemp'Access);
       Register_Handler(Builder, "Test_Archive", TestArchivetemp'Access);
       Register_Handler(Builder, "Find", Findtemp'Access);
       Register_Handler(Builder, "Update_Archive", UpdateArchivetemp'Access);
@@ -652,9 +657,20 @@ package body MainWindow is
          AddMenuItem("Save _as", SaveArchiveMenu'Access);
          AddMenuItem("_Close", CloseArchiveMenu'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
-         Append(Menu, Gtk_Menu_Item_New_With_Mnemonic("_Recent"));
+         AddMenuItem("_Recent", EmptyMenu'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
          AddMenuItem("_Quit", QuitMenu'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_Edit");
+         AddMenuItem("Select _all", EmptyMenu'Access);
+         AddMenuItem("_Unselect all", EmptyMenu'Access);
+         AddMenuItem("_Extract", ExtractArchiveMenu'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("Delete entries", DeleteFiles'Access);
+         AddMenuItem("A_dd files...", AddFileMenu'Access);
+         AddMenuItem("Add files with encr_yption...", AddFileMenu'Access);
+         AddMenuItem("Add folder...", AddFileMenu'Access);
+         AddMenuItem("Add folder with encryption...", AddFileMenu'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

@@ -399,60 +399,6 @@ package body MainWindow is
       OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
    end OpenArchive;
 
-   procedure TestArchivetemp(Object: access Gtkada_Builder_Record'Class) is
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal, Message_Info,
-           Buttons_Close, "");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      Set_Markup
-        (MessageDialog, "Here is result of test of " & Get_Title(MChild));
-      if Run(MessageDialog) = Gtk_Response_Close then
-         Destroy(MessageDialog);
-      end if;
-   end TestArchivetemp;
-
-   procedure Findtemp(Object: access Gtkada_Builder_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      ShowFindDialog
-        (Gtk_Window(Get_Object(Object, "mainwindow")),
-         Get_Model
-           (Gtk_Tree_View
-              (Get_Child
-                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
-   end Findtemp;
-
-   procedure UpdateArchivetemp(Object: access Gtkada_Builder_Record'Class) is
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
-           Message_Question, Buttons_Yes_No,
-           "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
-      end if;
-      Destroy(MessageDialog);
-   end UpdateArchivetemp;
-
-   procedure RecompressArchivetemp
-     (Object: access Gtkada_Builder_Record'Class) is
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Object, "mainwindow")), Modal,
-           Message_Question, Buttons_Yes_No,
-           "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
-      end if;
-      Destroy(MessageDialog);
-   end RecompressArchivetemp;
-
    procedure ChangeViewtemp(Object: access Gtkada_Builder_Record'Class) is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -470,26 +416,25 @@ package body MainWindow is
    procedure OpenArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      OpenFile
-         (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
    end OpenArchiveMenu;
 
    procedure SaveArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-         ShowSaveDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+      ShowSaveDialog
+        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
    end SaveArchiveMenu;
 
    procedure CloseArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-         if MChild = null then
-            return;
-         end if;
-         Close_Child(MChild);
+      if MChild = null then
+         return;
+      end if;
+      Close_Child(MChild);
    end CloseArchiveMenu;
 
    procedure QuitMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -563,6 +508,63 @@ package body MainWindow is
       end if;
    end AddFileMenu;
 
+   procedure TestArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal, Message_Info,
+           Buttons_Close, "");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      Set_Markup
+        (MessageDialog, "Here is result of test of " & Get_Title(MChild));
+      if Run(MessageDialog) = Gtk_Response_Close then
+         Destroy(MessageDialog);
+      end if;
+   end TestArchiveMenu;
+
+   procedure FindMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowFindDialog
+        (Gtk_Window(Get_Object(Builder, "mainwindow")),
+         Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+   end FindMenu;
+
+   procedure UpdateArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
+      end if;
+      Destroy(MessageDialog);
+   end UpdateArchiveMenu;
+
+   procedure RecompressArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+           Message_Question, Buttons_Yes_No,
+           "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
+      end if;
+      Destroy(MessageDialog);
+   end RecompressArchiveMenu;
+
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -611,11 +613,6 @@ package body MainWindow is
       Register_Handler(Builder, "Show_About", ShowAbout'Access);
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
-      Register_Handler(Builder, "Test_Archive", TestArchivetemp'Access);
-      Register_Handler(Builder, "Find", Findtemp'Access);
-      Register_Handler(Builder, "Update_Archive", UpdateArchivetemp'Access);
-      Register_Handler
-        (Builder, "Recompress_Archive", RecompressArchivetemp'Access);
       Register_Handler(Builder, "Save_File", SaveFile'Access);
       Register_Handler(Builder, "Change_View", ChangeViewtemp'Access);
       Register_Handler(Builder, "Close_All", CloseAll'Access);
@@ -671,6 +668,18 @@ package body MainWindow is
          AddMenuItem("Add files with encr_yption...", AddFileMenu'Access);
          AddMenuItem("Add folder...", AddFileMenu'Access);
          AddMenuItem("Add folder with encryption...", AddFileMenu'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_Tools");
+         AddMenuItem("_Test archive", TestArchiveMenu'Access);
+         AddMenuItem("_Find in archive...", FindMenu'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("_Update archive", UpdateArchiveMenu'Access);
+         AddMenuItem("_Recompress archive", RecompressArchiveMenu'Access);
+         AddMenuItem("_Touch time stamps", EmptyMenu'Access);
+         AddMenuItem("Encr_ypt archive", EmptyMenu'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("_Compare archives", EmptyMenu'Access);
+         AddMenuItem("_Merge archives", EmptyMenu'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

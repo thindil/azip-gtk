@@ -524,26 +524,42 @@ package body MainWindow is
          Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
    end ChangeViewtemp;
 
-   procedure MenuCallback(Self: access Gtk_Menu_Item_Record'Class) is
+   procedure NewArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      NewArchive(null);
+   end NewArchiveMenu;
+
+   procedure OpenArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      OpenFile
+         (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+   end OpenArchiveMenu;
+
+   procedure SaveArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Get_Label(Self) = "_New" then
-         NewArchive(null);
-      elsif Get_Label(Self) = "_Open" then
-         OpenFile
-           (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
-      elsif Get_Label(Self) = "Save _as" then
          ShowSaveDialog
            (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
-      elsif Get_Label(Self) = "_Close" then
+   end SaveArchiveMenu;
+
+   procedure CloseArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
          if MChild = null then
             return;
          end if;
          Close_Child(MChild);
-      elsif Get_Label(Self) = "_Quit" then
-         Main_Quit;
-      end if;
-   end MenuCallback;
+   end CloseArchiveMenu;
+
+   procedure QuitMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      Main_Quit;
+   end QuitMenu;
 
    procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
       Error: GError;
@@ -631,14 +647,14 @@ package body MainWindow is
          AddButton(224, "Properties", ShowInfo'Access);
          Menu := Gtk_Menu_New;
          AddSubmenu("_File");
-         AddMenuItem("_New", MenuCallback'Access);
-         AddMenuItem("_Open", MenuCallback'Access);
-         AddMenuItem("Save _as", MenuCallback'Access);
-         AddMenuItem("_Close", MenuCallback'Access);
+         AddMenuItem("_New", NewArchiveMenu'Access);
+         AddMenuItem("_Open", OpenArchiveMenu'Access);
+         AddMenuItem("Save _as", SaveArchiveMenu'Access);
+         AddMenuItem("_Close", CloseArchiveMenu'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Recent", MenuCallback'Access);
+         Append(Menu, Gtk_Menu_Item_New_With_Mnemonic("_Recent"));
          Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Quit", MenuCallback'Access);
+         AddMenuItem("_Quit", QuitMenu'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

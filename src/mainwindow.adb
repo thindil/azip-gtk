@@ -700,6 +700,9 @@ package body MainWindow is
          Append(Menu, Gtk_Separator_Menu_Item_New);
          AddMenuItem("_No sorting", EmptyMenu'Access);
          AddMenuItem("_Select columns", EmptyMenu'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_Options");
+         AddMenuItem("_General options", EmptyMenu'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

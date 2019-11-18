@@ -38,6 +38,7 @@ with Gtk.Menu_Bar; use Gtk.Menu_Bar;
 with Gtk.Menu_Item; use Gtk.Menu_Item;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
+with Gtk.Radio_Menu_Item; use Gtk.Radio_Menu_Item;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 with Gtk.Separator_Tool_Item; use Gtk.Separator_Tool_Item;
@@ -399,14 +400,6 @@ package body MainWindow is
       OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
    end OpenArchive;
 
-   procedure ChangeViewtemp(Object: access Gtkada_Builder_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      Set_Visible
-        (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
-         Get_Active(Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))));
-   end ChangeViewtemp;
-
    procedure NewArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -565,6 +558,16 @@ package body MainWindow is
       Destroy(MessageDialog);
    end RecompressArchiveMenu;
 
+   procedure ChangeViewMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      if Get_Label(Self) = "Tree view" then
+         Show_All(Get_Child1(Gtk_Paned(Get_Widget(MChild))));
+      else
+         Hide(Get_Child1(Gtk_Paned(Get_Widget(MChild))));
+      end if;
+   end ChangeViewMenu;
+
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -577,6 +580,7 @@ package body MainWindow is
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
       Menubar: constant Gtk_Menu_Bar := Gtk_Menu_Bar_New;
       Menu: Gtk_Menu;
+      RadioGroup: Widget_SList.GSlist;
       procedure AddButton
         (IconStarts: Gint; Label: String;
          Subprogram: Cb_Gtk_Tool_Button_Void) is
@@ -607,6 +611,16 @@ package body MainWindow is
          On_Activate(Item, Subprogram);
          Append(Menu, Item);
       end AddMenuItem;
+      procedure AddRadioMenuItem
+        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void; Active: Boolean := False) is
+         Item: constant Gtk_Radio_Menu_Item :=
+           Gtk_Radio_Menu_Item_New_With_Mnemonic(RadioGroup, Label);
+      begin
+         RadioGroup := Get_Group(Item);
+         Set_Active(Item, Active);
+         On_Activate(Item, Subprogram);
+         Append(Menu, Item);
+      end AddRadioMenuItem;
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
@@ -614,7 +628,6 @@ package body MainWindow is
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
       Register_Handler(Builder, "Save_File", SaveFile'Access);
-      Register_Handler(Builder, "Change_View", ChangeViewtemp'Access);
       Register_Handler(Builder, "Close_All", CloseAll'Access);
       Register_Handler(Builder, "Split_Window", SplitWindow'Access);
       Do_Connect(Builder);
@@ -680,6 +693,13 @@ package body MainWindow is
          Append(Menu, Gtk_Separator_Menu_Item_New);
          AddMenuItem("_Compare archives", EmptyMenu'Access);
          AddMenuItem("_Merge archives", EmptyMenu'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_View");
+         AddRadioMenuItem("Tree view", ChangeViewMenu'Access, True);
+         AddRadioMenuItem("Flat view", ChangeViewMenu'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("_No sorting", EmptyMenu'Access);
+         AddMenuItem("_Select columns", EmptyMenu'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

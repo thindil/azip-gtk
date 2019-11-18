@@ -364,28 +364,6 @@ package body MainWindow is
          not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
    end ChangeView;
 
-   procedure CloseAll(Object: access Gtkada_Builder_Record'Class) is
-      pragma Unreferenced(Object);
-      MChild: MDI_Child;
-   begin
-      loop
-         MChild := Get_Focus_Child(MWindow);
-         exit when MChild = null;
-         Close_Child(MChild);
-      end loop;
-   end CloseAll;
-
-   procedure SplitWindow(Object: access Gtkada_Builder_Record'Class) is
-   begin
-      if Get_Active
-          (Gtk_Check_Menu_Item(Get_Object(Object, "splithorizontalitem"))) then
-         Orientation := Orientation_Horizontal;
-      else
-         Orientation := Orientation_Vertical;
-      end if;
-      Split(MWindow, Orientation);
-   end SplitWindow;
-
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -568,6 +546,27 @@ package body MainWindow is
       end if;
    end ChangeViewMenu;
 
+   procedure SplitWindow(Self: access Gtk_Menu_Item_Record'Class) is
+   begin
+      if Get_Label(Self) = "Tile _Horizontal" then
+         Orientation := Orientation_Horizontal;
+      else
+         Orientation := Orientation_Vertical;
+      end if;
+      Split(MWindow, Orientation);
+   end SplitWindow;
+
+   procedure CloseAll(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: MDI_Child;
+   begin
+      loop
+         MChild := Get_Focus_Child(MWindow);
+         exit when MChild = null;
+         Close_Child(MChild);
+      end loop;
+   end CloseAll;
+
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -612,7 +611,8 @@ package body MainWindow is
          Append(Menu, Item);
       end AddMenuItem;
       procedure AddRadioMenuItem
-        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void; Active: Boolean := False) is
+        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void;
+         Active: Boolean := False) is
          Item: constant Gtk_Radio_Menu_Item :=
            Gtk_Radio_Menu_Item_New_With_Mnemonic(RadioGroup, Label);
       begin
@@ -628,8 +628,6 @@ package body MainWindow is
       Register_Handler(Builder, "Toggle_View", ToggleView'Access);
       Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
       Register_Handler(Builder, "Save_File", SaveFile'Access);
-      Register_Handler(Builder, "Close_All", CloseAll'Access);
-      Register_Handler(Builder, "Split_Window", SplitWindow'Access);
       Do_Connect(Builder);
       Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
       if Error /= null then
@@ -703,6 +701,13 @@ package body MainWindow is
          Menu := Gtk_Menu_New;
          AddSubmenu("_Options");
          AddMenuItem("_General options", EmptyMenu'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_Window");
+         RadioGroup := Widget_SList.Null_List;
+         AddRadioMenuItem("Tile _Vertical", SplitWindow'Access, True);
+         AddRadioMenuItem("Tile _Horizontal", SplitWindow'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("_Close all", CloseAll'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

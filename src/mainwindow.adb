@@ -25,11 +25,9 @@ with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Cell_Area_Box; use Gtk.Cell_Area_Box;
 with Gtk.Cell_Renderer_Text; use Gtk.Cell_Renderer_Text;
-with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
 with Gtk.Container; use Gtk.Container;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
-with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.Image; use Gtk.Image;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
@@ -73,11 +71,6 @@ package body MainWindow is
       Unref(Object);
       Main_Quit;
    end Quit;
-
-   procedure ShowAbout(Object: access Gtkada_Builder_Record'Class) is
-   begin
-      ShowAboutDialog(Gtk_Window(Get_Object(Object, "mainwindow")));
-   end ShowAbout;
 
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
@@ -202,22 +195,6 @@ package body MainWindow is
       end loop;
    end OpenFile;
 
-   procedure OpenDialog(User_Data: access GObject_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      if User_Data = Get_Object(Builder, "menuopen") then
-         OpenFile
-           (ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
-      elsif User_Data = Get_Object(Builder, "menusaveas") then
-         ShowSaveDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
-      else
-         if Run(Gtk_Dialog(User_Data)) = Gtk_Response_Delete_Event then
-            Hide(Gtk_Widget(User_Data));
-         end if;
-      end if;
-   end OpenDialog;
-
    procedure ExtractArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -225,18 +202,6 @@ package body MainWindow is
       ShowDirectoryDialog
         (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
    end ExtractArchive;
-
-   procedure ToggleView(Object: access Gtkada_Builder_Record'Class) is
-   begin
-      if Get_Active
-          (Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem"))) then
-         Set_Active
-           (Gtk_Check_Menu_Item(Get_Object(Object, "flatviewitem")), True);
-      else
-         Set_Active
-           (Gtk_Check_Menu_Item(Get_Object(Object, "treeviewitem")), True);
-      end if;
-   end ToggleView;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -344,16 +309,6 @@ package body MainWindow is
       end if;
       Destroy(MessageDialog);
    end RecompressArchive;
-
-   procedure SaveFile(Object: access Gtkada_Builder_Record'Class) is
-      SaveDialog: constant GObject := Get_Object(Object, "savedialog");
-      FileName: constant String :=
-        Get_Current_Name(Gtk_File_Chooser_Dialog(SaveDialog));
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-   begin
-      Hide(Gtk_Widget(SaveDialog));
-      Put_Line("Saving " & Get_Title(MChild) & " as " & FileName);
-   end SaveFile;
 
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
@@ -567,6 +522,12 @@ package body MainWindow is
       end loop;
    end CloseAll;
 
+   procedure ShowAbout(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      ShowAboutDialog(Gtk_Window(Get_Object(Builder, "mainwindow")));
+   end ShowAbout;
+
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -624,10 +585,6 @@ package body MainWindow is
    begin
       Builder := NewBuilder;
       Register_Handler(Builder, "Main_Quit", Quit'Access);
-      Register_Handler(Builder, "Show_About", ShowAbout'Access);
-      Register_Handler(Builder, "Toggle_View", ToggleView'Access);
-      Register_Handler(Builder, "Open_Dialog", OpenDialog'Access);
-      Register_Handler(Builder, "Save_File", SaveFile'Access);
       Do_Connect(Builder);
       Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
       if Error /= null then
@@ -708,6 +665,13 @@ package body MainWindow is
          AddRadioMenuItem("Tile _Horizontal", SplitWindow'Access);
          Append(Menu, Gtk_Separator_Menu_Item_New);
          AddMenuItem("_Close all", CloseAll'Access);
+         Menu := Gtk_Menu_New;
+         AddSubmenu("_Help");
+         AddMenuItem("_Quick help", EmptyMenu'Access);
+         AddMenuItem("AZip _Webpage (contact, support)", EmptyMenu'Access);
+         AddMenuItem("Azip _news", EmptyMenu'Access);
+         Append(Menu, Gtk_Separator_Menu_Item_New);
+         AddMenuItem("_About AZip", ShowAbout'Access);
          Pack_Start(WindowBox, Menubar, False);
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));

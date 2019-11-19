@@ -18,21 +18,13 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Gtk.Tool_Button; use Gtk.Tool_Button;
-with Gtk.Tree_Model; use Gtk.Tree_Model;
-with Gtk.Window; use Gtk.Window;
-with Gtkada.MDI; use Gtkada.MDI;
+with Gtk.Box; use Gtk.Box;
+with Gtk.Enums; use Gtk.Enums;
 
-package MainWindow is
+package Menu is
 
-   Window: Gtk_Window;
-   MWindow: MDI_Window;
+   Orientation: Gtk_Orientation := Orientation_Vertical;
 
+   procedure CreateMenu(WindowBox: Gtk_VBox);
 
-   procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class);
-   procedure OpenFile(FileName: String);
-   procedure DeleteItems
-     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter);
-   procedure CreateMainWindow;
-
-end MainWindow;
+end Menu;

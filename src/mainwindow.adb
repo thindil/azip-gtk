@@ -377,41 +377,56 @@ package body MainWindow is
    end DeleteFiles;
 
    procedure AddFileMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Get_Label(Self) = "A_dd files..." then
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
-      elsif Get_Label(Self) = "Add files with encr_yption..." then
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True);
-      elsif Get_Label(Self) = "Add folder..." then
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            False, True);
-      else
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True, True);
-      end if;
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
    end AddFileMenu;
+
+   procedure AddFileEncryptionMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+         True);
+   end AddFileEncryptionMenu;
+
+   procedure AddFolderMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+         False, True);
+   end AddFolderMenu;
+
+   procedure AddFolderEncryptionMenu
+     (Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+         True, True);
+   end AddFolderEncryptionMenu;
 
    procedure TestArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
@@ -612,9 +627,11 @@ package body MainWindow is
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("Delete entries", DeleteFiles'Access);
       AddMenuItem("A_dd files...", AddFileMenu'Access);
-      AddMenuItem("Add files with encr_yption...", AddFileMenu'Access);
-      AddMenuItem("Add folder...", AddFileMenu'Access);
-      AddMenuItem("Add folder with encryption...", AddFileMenu'Access);
+      AddMenuItem
+        ("Add files with encr_yption...", AddFileEncryptionMenu'Access);
+      AddMenuItem("Add folder...", AddFolderMenu'Access);
+      AddMenuItem
+        ("Add folder with encryption...", AddFolderEncryptionMenu'Access);
       Menu := Gtk_Menu_New;
       AddSubmenu("_Tools");
       AddMenuItem("_Test archive", TestArchiveMenu'Access);

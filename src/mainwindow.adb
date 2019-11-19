@@ -80,11 +80,7 @@ package body MainWindow is
    begin
       Set_Position
         (ArchivePaned,
-         Gint
-           (Float
-              (Get_Allocated_Width
-                 (Gtk_Widget(Window))) *
-            0.3));
+         Gint(Float(Get_Allocated_Width(Gtk_Widget(Window))) * 0.3));
       -- Tree view
       Append(Tree, Iter, Null_Iter);
       Set(Tree, Iter, 0, "New archive");
@@ -192,8 +188,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowDirectoryDialog
-        (Window, Get_Title(MChild));
+      ShowDirectoryDialog(Window, Get_Title(MChild));
    end ExtractArchive;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
@@ -230,8 +225,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -249,9 +243,7 @@ package body MainWindow is
    procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Window, Modal, Message_Info,
-           Buttons_Close, "");
+        Gtk_Message_Dialog_New(Window, Modal, Message_Info, Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Set_Markup
@@ -277,8 +269,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -292,8 +283,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -316,8 +306,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowInfoDialog
-        (Window, Get_Title(MChild));
+      ShowInfoDialog(Window, Get_Title(MChild));
    end ShowInfo;
 
    procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
@@ -342,8 +331,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowSaveDialog
-        (Window, Get_Title(MChild));
+      ShowSaveDialog(Window, Get_Title(MChild));
    end SaveArchiveMenu;
 
    procedure CloseArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -366,16 +354,14 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowDirectoryDialog
-        (Window, Get_Title(MChild));
+      ShowDirectoryDialog(Window, Get_Title(MChild));
    end ExtractArchiveMenu;
 
    procedure DeleteFiles(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -430,9 +416,7 @@ package body MainWindow is
    procedure TestArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Window, Modal, Message_Info,
-           Buttons_Close, "");
+        Gtk_Message_Dialog_New(Window, Modal, Message_Info, Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Set_Markup
@@ -458,8 +442,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -473,8 +456,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Window, Modal,
-           Message_Question, Buttons_Yes_No,
+          (Window, Modal, Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -521,7 +503,7 @@ package body MainWindow is
       ShowAboutDialog(Window);
    end ShowAbout;
 
-   procedure ProgramQuit(Self : access Gtk_Widget_Record'Class) is
+   procedure ProgramQuit(Self: access Gtk_Widget_Record'Class) is
       pragma Unreferenced(Self);
    begin
       Main_Quit;
@@ -540,7 +522,7 @@ package body MainWindow is
       Menubar: constant Gtk_Menu_Bar := Gtk_Menu_Bar_New;
       Menu: Gtk_Menu;
       RadioGroup: Widget_SList.GSlist;
-      WindowBox: constant Gtk_VBox := Gtk_Vbox_New;
+      WindowBox: constant Gtk_Vbox := Gtk_Vbox_New;
       procedure AddButton
         (IconStarts: Gint; Label: String;
          Subprogram: Cb_Gtk_Tool_Button_Void) is
@@ -594,86 +576,86 @@ package body MainWindow is
          return;
       end if;
       ToolsIcons := Add_Alpha(ToolsIcons, True, 163, 73, 164);
-         Gtk_New(MWindow, null);
-         AddButton(320, "New archive", NewArchive'Access);
-         AddButton(352, "Open archive", OpenArchive'Access);
-         AddButton(64, "Extract archive", ExtractArchive'Access);
-         Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         AddButton(0, "Add files...", AddFile'Access);
-         AddButton(192, "Add files with encryption...", AddFile'Access);
-         AddButton(32, "Delete entries", DeleteFiles'Access);
-         Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         AddButton(128, "Test archive", TestArchive'Access);
-         AddButton(96, "Find in archive...", Find'Access);
-         Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         AddButton(160, "Update archive", UpdateArchive'Access);
-         AddButton(288, "Recompress archive", RecompressArchive'Access);
-         Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         AddButton(384, "Toggle flat/tree view", ChangeView'Access);
-         Add(Toolbar, Gtk_Separator_Tool_Item_New);
-         AddButton(224, "Properties", ShowInfo'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_File");
-         AddMenuItem("_New", NewArchiveMenu'Access);
-         AddMenuItem("_Open", OpenArchiveMenu'Access);
-         AddMenuItem("Save _as", SaveArchiveMenu'Access);
-         AddMenuItem("_Close", CloseArchiveMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Recent", EmptyMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Quit", QuitMenu'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_Edit");
-         AddMenuItem("Select _all", EmptyMenu'Access);
-         AddMenuItem("_Unselect all", EmptyMenu'Access);
-         AddMenuItem("_Extract", ExtractArchiveMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("Delete entries", DeleteFiles'Access);
-         AddMenuItem("A_dd files...", AddFileMenu'Access);
-         AddMenuItem("Add files with encr_yption...", AddFileMenu'Access);
-         AddMenuItem("Add folder...", AddFileMenu'Access);
-         AddMenuItem("Add folder with encryption...", AddFileMenu'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_Tools");
-         AddMenuItem("_Test archive", TestArchiveMenu'Access);
-         AddMenuItem("_Find in archive...", FindMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Update archive", UpdateArchiveMenu'Access);
-         AddMenuItem("_Recompress archive", RecompressArchiveMenu'Access);
-         AddMenuItem("_Touch time stamps", EmptyMenu'Access);
-         AddMenuItem("Encr_ypt archive", EmptyMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Compare archives", EmptyMenu'Access);
-         AddMenuItem("_Merge archives", EmptyMenu'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_View");
-         AddRadioMenuItem("Tree view", ChangeViewMenu'Access, True);
-         AddRadioMenuItem("Flat view", ChangeViewMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_No sorting", EmptyMenu'Access);
-         AddMenuItem("_Select columns", EmptyMenu'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_Options");
-         AddMenuItem("_General options", EmptyMenu'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_Window");
-         RadioGroup := Widget_SList.Null_List;
-         AddRadioMenuItem("Tile _Vertical", SplitWindow'Access, True);
-         AddRadioMenuItem("Tile _Horizontal", SplitWindow'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_Close all", CloseAll'Access);
-         Menu := Gtk_Menu_New;
-         AddSubmenu("_Help");
-         AddMenuItem("_Quick help", EmptyMenu'Access);
-         AddMenuItem("AZip _Webpage (contact, support)", EmptyMenu'Access);
-         AddMenuItem("Azip _news", EmptyMenu'Access);
-         Append(Menu, Gtk_Separator_Menu_Item_New);
-         AddMenuItem("_About AZip", ShowAbout'Access);
-         Pack_Start(WindowBox, Menubar, False);
-         Pack_Start(WindowBox, Toolbar, False);
-         Pack_Start(WindowBox, Gtk_Widget(MWindow));
-         Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);
-         Add(Gtk_Container(Window), Gtk_Widget(WindowBox));
+      Gtk_New(MWindow, null);
+      AddButton(320, "New archive", NewArchive'Access);
+      AddButton(352, "Open archive", OpenArchive'Access);
+      AddButton(64, "Extract archive", ExtractArchive'Access);
+      Add(Toolbar, Gtk_Separator_Tool_Item_New);
+      AddButton(0, "Add files...", AddFile'Access);
+      AddButton(192, "Add files with encryption...", AddFile'Access);
+      AddButton(32, "Delete entries", DeleteFiles'Access);
+      Add(Toolbar, Gtk_Separator_Tool_Item_New);
+      AddButton(128, "Test archive", TestArchive'Access);
+      AddButton(96, "Find in archive...", Find'Access);
+      Add(Toolbar, Gtk_Separator_Tool_Item_New);
+      AddButton(160, "Update archive", UpdateArchive'Access);
+      AddButton(288, "Recompress archive", RecompressArchive'Access);
+      Add(Toolbar, Gtk_Separator_Tool_Item_New);
+      AddButton(384, "Toggle flat/tree view", ChangeView'Access);
+      Add(Toolbar, Gtk_Separator_Tool_Item_New);
+      AddButton(224, "Properties", ShowInfo'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_File");
+      AddMenuItem("_New", NewArchiveMenu'Access);
+      AddMenuItem("_Open", OpenArchiveMenu'Access);
+      AddMenuItem("Save _as", SaveArchiveMenu'Access);
+      AddMenuItem("_Close", CloseArchiveMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Recent", EmptyMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Quit", QuitMenu'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_Edit");
+      AddMenuItem("Select _all", EmptyMenu'Access);
+      AddMenuItem("_Unselect all", EmptyMenu'Access);
+      AddMenuItem("_Extract", ExtractArchiveMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("Delete entries", DeleteFiles'Access);
+      AddMenuItem("A_dd files...", AddFileMenu'Access);
+      AddMenuItem("Add files with encr_yption...", AddFileMenu'Access);
+      AddMenuItem("Add folder...", AddFileMenu'Access);
+      AddMenuItem("Add folder with encryption...", AddFileMenu'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_Tools");
+      AddMenuItem("_Test archive", TestArchiveMenu'Access);
+      AddMenuItem("_Find in archive...", FindMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Update archive", UpdateArchiveMenu'Access);
+      AddMenuItem("_Recompress archive", RecompressArchiveMenu'Access);
+      AddMenuItem("_Touch time stamps", EmptyMenu'Access);
+      AddMenuItem("Encr_ypt archive", EmptyMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Compare archives", EmptyMenu'Access);
+      AddMenuItem("_Merge archives", EmptyMenu'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_View");
+      AddRadioMenuItem("Tree view", ChangeViewMenu'Access, True);
+      AddRadioMenuItem("Flat view", ChangeViewMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_No sorting", EmptyMenu'Access);
+      AddMenuItem("_Select columns", EmptyMenu'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_Options");
+      AddMenuItem("_General options", EmptyMenu'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_Window");
+      RadioGroup := Widget_SList.Null_List;
+      AddRadioMenuItem("Tile _Vertical", SplitWindow'Access, True);
+      AddRadioMenuItem("Tile _Horizontal", SplitWindow'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Close all", CloseAll'Access);
+      Menu := Gtk_Menu_New;
+      AddSubmenu("_Help");
+      AddMenuItem("_Quick help", EmptyMenu'Access);
+      AddMenuItem("AZip _Webpage (contact, support)", EmptyMenu'Access);
+      AddMenuItem("Azip _news", EmptyMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_About AZip", ShowAbout'Access);
+      Pack_Start(WindowBox, Menubar, False);
+      Pack_Start(WindowBox, Toolbar, False);
+      Pack_Start(WindowBox, Gtk_Widget(MWindow));
+      Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);
+      Add(Gtk_Container(Window), Gtk_Widget(WindowBox));
       Show_All(Gtk_Widget(Window));
       NewArchive(null);
    end CreateMainWindow;

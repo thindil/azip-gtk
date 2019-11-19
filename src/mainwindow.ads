@@ -18,10 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Gtkada.Builder; use Gtkada.Builder;
-
 package MainWindow is
 
-   procedure CreateMainWindow(NewBuilder: Gtkada_Builder);
+   procedure CreateMainWindow;
 
 end MainWindow;

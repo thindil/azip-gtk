@@ -53,7 +53,6 @@ with Gtk.Window; use Gtk.Window;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
 with Glib.Error; use Glib.Error;
-with Glib.Object; use Glib.Object;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
 with AboutDialog; use AboutDialog;
 with FileDialogs; use FileDialogs;
@@ -62,15 +61,9 @@ with InfoDialog; use InfoDialog;
 
 package body MainWindow is
 
-   Builder: Gtkada_Builder;
    MWindow: MDI_Window;
    Orientation: Gtk_Orientation := Orientation_Vertical;
-
-   procedure Quit(Object: access Gtkada_Builder_Record'Class) is
-   begin
-      Unref(Object);
-      Main_Quit;
-   end Quit;
+   Window: Gtk_Window;
 
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
@@ -90,7 +83,7 @@ package body MainWindow is
          Gint
            (Float
               (Get_Allocated_Width
-                 (Gtk_Widget(Get_Object(Builder, "mainwindow")))) *
+                 (Gtk_Widget(Window))) *
             0.3));
       -- Tree view
       Append(Tree, Iter, Null_Iter);
@@ -200,7 +193,7 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowDirectoryDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+        (Window, Get_Title(MChild));
    end ExtractArchive;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
@@ -208,14 +201,14 @@ package body MainWindow is
    begin
       if Get_Label(Self) = "Add files..." then
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
       elsif Get_Label(Self) = "Add files with encryption..." then
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
@@ -237,7 +230,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -257,7 +250,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal, Message_Info,
+          (Window, Modal, Message_Info,
            Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -273,7 +266,7 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowFindDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")),
+        (Window,
          Get_Model
            (Gtk_Tree_View
               (Get_Child
@@ -284,7 +277,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -299,7 +292,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -324,13 +317,13 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowInfoDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+        (Window, Get_Title(MChild));
    end ShowInfo;
 
    procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      OpenFile(ShowFileDialog(Window));
    end OpenArchive;
 
    procedure NewArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -342,7 +335,7 @@ package body MainWindow is
    procedure OpenArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      OpenFile(ShowFileDialog(Gtk_Window(Get_Object(Builder, "mainwindow"))));
+      OpenFile(ShowFileDialog(Window));
    end OpenArchiveMenu;
 
    procedure SaveArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -350,7 +343,7 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowSaveDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+        (Window, Get_Title(MChild));
    end SaveArchiveMenu;
 
    procedure CloseArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -374,14 +367,14 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowDirectoryDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")), Get_Title(MChild));
+        (Window, Get_Title(MChild));
    end ExtractArchiveMenu;
 
    procedure DeleteFiles(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -402,14 +395,14 @@ package body MainWindow is
    begin
       if Get_Label(Self) = "A_dd files..." then
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
       elsif Get_Label(Self) = "Add files with encr_yption..." then
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
@@ -417,7 +410,7 @@ package body MainWindow is
             True);
       elsif Get_Label(Self) = "Add folder..." then
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
@@ -425,7 +418,7 @@ package body MainWindow is
             False, True);
       else
          ShowAddFileDialog
-           (Gtk_Window(Get_Object(Builder, "mainwindow")),
+           (Window,
             -(Get_Model
                (Gtk_Tree_View
                   (Get_Child
@@ -438,7 +431,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal, Message_Info,
+          (Window, Modal, Message_Info,
            Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
@@ -454,7 +447,7 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowFindDialog
-        (Gtk_Window(Get_Object(Builder, "mainwindow")),
+        (Window,
          Get_Model
            (Gtk_Tree_View
               (Get_Child
@@ -465,7 +458,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -480,7 +473,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
-          (Gtk_Window(Get_Object(Builder, "mainwindow")), Modal,
+          (Window, Modal,
            Message_Question, Buttons_Yes_No,
            "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -525,8 +518,14 @@ package body MainWindow is
    procedure ShowAbout(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      ShowAboutDialog(Gtk_Window(Get_Object(Builder, "mainwindow")));
+      ShowAboutDialog(Window);
    end ShowAbout;
+
+   procedure ProgramQuit(Self : access Gtk_Widget_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      Main_Quit;
+   end ProgramQuit;
 
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
@@ -534,13 +533,14 @@ package body MainWindow is
       null;
    end EmptyMenu;
 
-   procedure CreateMainWindow(NewBuilder: Gtkada_Builder) is
+   procedure CreateMainWindow is
       Error: GError;
       ToolsIcons: Gdk_Pixbuf;
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
       Menubar: constant Gtk_Menu_Bar := Gtk_Menu_Bar_New;
       Menu: Gtk_Menu;
       RadioGroup: Widget_SList.GSlist;
+      WindowBox: constant Gtk_VBox := Gtk_Vbox_New;
       procedure AddButton
         (IconStarts: Gint; Label: String;
          Subprogram: Cb_Gtk_Tool_Button_Void) is
@@ -583,20 +583,17 @@ package body MainWindow is
          Append(Menu, Item);
       end AddRadioMenuItem;
    begin
-      Builder := NewBuilder;
-      Register_Handler(Builder, "Main_Quit", Quit'Access);
-      Do_Connect(Builder);
+      Window := Gtk_Window_New;
+      Set_Title(Window, "AZip");
+      Set_Position(Window, Win_Pos_Center);
+      Set_Default_Size(Window, 800, 600);
+      On_Destroy(Gtk_Widget(Window), ProgramQuit'Access);
       Gdk_New_From_File(ToolsIcons, "az_tools.bmp", Error);
       if Error /= null then
-         Quit(Builder);
          Put_Line(Get_Message(Error));
          return;
       end if;
       ToolsIcons := Add_Alpha(ToolsIcons, True, 163, 73, 164);
-      declare
-         WindowBox: constant Gtk_Box :=
-           Gtk_Box(Get_Object(Builder, "windowbox"));
-      begin
          Gtk_New(MWindow, null);
          AddButton(320, "New archive", NewArchive'Access);
          AddButton(352, "Open archive", OpenArchive'Access);
@@ -676,8 +673,8 @@ package body MainWindow is
          Pack_Start(WindowBox, Toolbar, False);
          Pack_Start(WindowBox, Gtk_Widget(MWindow));
          Pack_Start(WindowBox, Gtk_Widget(Gtk_Status_Bar_New), False);
-      end;
-      Show_All(Gtk_Widget(Get_Object(Builder, "mainwindow")));
+         Add(Gtk_Container(Window), Gtk_Widget(WindowBox));
+      Show_All(Gtk_Widget(Window));
       NewArchive(null);
    end CreateMainWindow;
 

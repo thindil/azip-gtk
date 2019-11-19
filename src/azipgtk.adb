@@ -27,14 +27,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with Gtk.Main; use Gtk.Main;
-with Gtkada.Builder; use Gtkada.Builder;
-with Glib; use Glib;
-with Glib.Error; use Glib.Error;
 with MainWindow; use MainWindow;
 
 procedure AZipGtk is
-   Builder: Gtkada_Builder;
-   Error: aliased GError;
 begin
    if not Ada.Environment_Variables.Exists("RUNFROMSCRIPT") and
      Dir_Separator = '/' then
@@ -44,12 +39,7 @@ begin
    end if;
    -- Start GTK
    Init;
-   Gtk_New(Builder);
-   if Add_From_File(Builder, "azip.glade", Error'Access) = Guint(0) then
-      Put_Line("Error : " & Get_Message(Error));
-      return;
-   end if;
-   CreateMainWindow(Builder);
+   CreateMainWindow;
    Clear("LD_LIBRARY_PATH");
    Clear("GDK_PIXBUF_MODULE_FILE");
    Clear("GDK_PIXBUF_MODULEDIR");

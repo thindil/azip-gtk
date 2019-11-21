@@ -65,10 +65,11 @@ package body MainWindow is
       Renderer: Gtk_Cell_Renderer_Text;
       MChild: MDI_Child;
    begin
+      -- Split archive window on 1/3 for tree and rest for list.
       Set_Position
         (ArchivePaned,
          Gint(Float(Get_Allocated_Width(Gtk_Widget(Window))) * 0.3));
-      -- Tree view
+      -- Add tree view with directory tree for the archive
       Append(Tree, Iter, Null_Iter);
       Set(Tree, Iter, 0, "New archive");
       declare
@@ -89,7 +90,7 @@ package body MainWindow is
          Pack1(ArchivePaned, Gtk_Widget(Scroll));
          Set_Cursor(View, Gtk_Tree_Path_New_From_String("0"), null, False);
       end;
-      -- Flat view
+      -- Add flat list for content of the archive
       declare
          List: constant Gtk_List_Store :=
            Gtk_List_Store_Newv
@@ -123,6 +124,7 @@ package body MainWindow is
          Add(Gtk_Container(Scroll), Gtk_Widget(View));
          Pack2(ArchivePaned, Gtk_Widget(Scroll));
       end;
+      -- Add archive window to the main window
       Gtk_New(MChild, Gtk_Widget(ArchivePaned));
       Set_Title(MChild, "New Archive");
       Put(MWindow, MChild);

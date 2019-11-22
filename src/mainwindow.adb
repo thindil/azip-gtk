@@ -157,7 +157,10 @@ package body MainWindow is
            (Gtk_Tree_View
               (Get_Child
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
-      -- Some test data
+      -- Placeholder code. Here should go all data read from the selected
+      -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
+      -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
+      -- All values except Result are Strings and Result is Gint.
       for I in 0 .. 11 loop
          Append(List, Iter);
          for J in 0 .. 11 loop
@@ -170,8 +173,15 @@ package body MainWindow is
       end loop;
    end OpenFile;
 
+   -- ****if* MainWindow/ExtractArchive
+   -- FUNCTION
+   -- Show extract archive dialog on press the proper tool button.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure ExtractArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowDirectoryDialog(Window, Get_Title(MChild));

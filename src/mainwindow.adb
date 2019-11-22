@@ -187,8 +187,15 @@ package body MainWindow is
       ShowDirectoryDialog(Window, Get_Title(MChild));
    end ExtractArchive;
 
+   -- ****if* MainWindow/AddFile
+   -- FUNCTION
+   -- Show add file dialog on press the tool button.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -199,8 +206,15 @@ package body MainWindow is
                   (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
    end AddFile;
 
+   -- ****if* MainWindow/AddFileEncrypted
+   -- FUNCTION
+   -- Show add file with encryption dialog on press the tool button.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -212,13 +226,25 @@ package body MainWindow is
          True);
    end AddFileEncrypted;
 
+   -- ****if* MainWindow/DeleteItems
+   -- FUNCTION
+   -- Delete selected file or directory from the archive.
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with list of all files and directories in the
+   --         selected archive.
+   -- Path  - Gtk_Tree_Path to the selected file or directory. Unused.
+   -- Iter  - Gtk_Tree_Iter in Model to selected file or directory.
+   -- SOURCE
    procedure DeleteItems
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter) is
       pragma Unreferenced(Path);
+      -- ****
       NewIter: Gtk_Tree_Iter := Iter;
    begin
-      Ada.Text_IO.Put_Line("Deleting: " & Get_String(Model, Iter, 0));
       Gtk.List_Store.Remove(-(Model), NewIter);
+      -- This is placeholder code. Probably all code to remove files or
+      -- directories from the archive should go here.
+      Ada.Text_IO.Put_Line("Deleting: " & Get_String(Model, Iter, 0));
    end DeleteItems;
 
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is

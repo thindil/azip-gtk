@@ -188,25 +188,29 @@ package body MainWindow is
    end ExtractArchive;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Get_Label(Self) = "Add files..." then
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
-      elsif Get_Label(Self) = "Add files with encryption..." then
-         ShowAddFileDialog
-           (Window,
-            -(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-            True);
-      end if;
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
    end AddFile;
+
+   procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
+      pragma Unreferenced(Self);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      ShowAddFileDialog
+        (Window,
+         -(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+         True);
+   end AddFileEncrypted;
 
    procedure DeleteItems
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter) is
@@ -355,7 +359,7 @@ package body MainWindow is
       AddButton(64, "Extract archive", ExtractArchive'Access);
       Add(Toolbar, Gtk_Separator_Tool_Item_New);
       AddButton(0, "Add files...", AddFile'Access);
-      AddButton(192, "Add files with encryption...", AddFile'Access);
+      AddButton(192, "Add files with encryption...", AddFileEncrypted'Access);
       AddButton(32, "Delete entries", DeleteFiles'Access);
       Add(Toolbar, Gtk_Separator_Tool_Item_New);
       AddButton(128, "Test archive", TestArchive'Access);

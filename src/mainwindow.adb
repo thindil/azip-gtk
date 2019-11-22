@@ -247,8 +247,16 @@ package body MainWindow is
       Ada.Text_IO.Put_Line("Deleting: " & Get_String(Model, Iter, 0));
    end DeleteItems;
 
+   -- ****if* MainWindow/DeleteFiles
+   -- FUNCTION
+   -- Show delete files confirmation dialog and start deleting them on press
+   -- the toolbar button
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,

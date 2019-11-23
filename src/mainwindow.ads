@@ -59,8 +59,7 @@ package MainWindow is
    -- PARAMETERS
    -- FileName - Full path to the archive which should be open.
    -- SOURCE
-   procedure OpenFile(FileName: String) with
-      Pre => FileName /= "";
+   procedure OpenFile(FileName: String);
       -- ****
 
       -- ****f* MainWindow/DeleteItems

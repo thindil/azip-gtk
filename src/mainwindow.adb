@@ -138,6 +138,9 @@ package body MainWindow is
       Tree: Gtk_Tree_Store;
       MChild: MDI_Child;
    begin
+      if FileName = "" then
+         return;
+      end if;
       MChild := Get_Focus_Child(MWindow);
       if MChild /= null and then Get_Title(MChild) = "New Archive" then
          Close_Child(MChild, True);

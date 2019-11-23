@@ -74,7 +74,7 @@ package body FindDialog is
       -- Here is probably the best place to search content for SearchContent
       -- string
       -- Set Result value to list, to show it to the user
-      Gtk.List_Store.Set(-(Model), Iter, 11, Result);
+      Gtk.List_Store.Set(-(Model), Iter, 11, Gint'Image(Result));
       return False;
    end SearchItems;
 

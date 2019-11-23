@@ -96,7 +96,7 @@ package body MainWindow is
            Gtk_List_Store_Newv
              ((GType_String, GType_String, GType_String, GType_String,
                GType_String, GType_String, GType_String, GType_String,
-               GType_String, GType_String, GType_String, GType_Int));
+               GType_String, GType_String, GType_String, GType_String));
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(List));
          CellNames: constant array(Positive range <>) of Unbounded_String :=
            (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
@@ -160,15 +160,11 @@ package body MainWindow is
       -- Placeholder code. Here should go all data read from the selected
       -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
       -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
-      -- All values except Result are Strings and Result is Gint.
+      -- All values are Strings.
       for I in 0 .. 11 loop
          Append(List, Iter);
          for J in 0 .. 11 loop
-            if J < 11 then
-               Set(List, Iter, Gint(J), Integer'Image(I));
-            else
-               Set(List, Iter, Gint(J), Gint(I));
-            end if;
+            Set(List, Iter, Gint(J), Integer'Image(I));
          end loop;
       end loop;
    end OpenFile;

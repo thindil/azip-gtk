@@ -25,6 +25,6 @@ package Menu is
 
    Orientation: Gtk_Orientation := Orientation_Vertical;
 
-   procedure CreateMenu(WindowBox: Gtk_VBox);
+   procedure CreateMenu(WindowBox: Gtk_Vbox);
 
 end Menu;

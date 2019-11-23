@@ -60,16 +60,16 @@ package MainWindow is
    -- FileName - Full path to the archive which should be open.
    -- SOURCE
    procedure OpenFile(FileName: String);
-      -- ****
+   -- ****
 
-      -- ****f* MainWindow/DeleteItems
-      -- FUNCTION
-      -- Remove selected file or directory from selected archive.
-      -- PARAMETERS
-      -- Model - Gtk_Tree_Model with names of all files and directories in
-      --         selected archive
+   -- ****f* MainWindow/DeleteItems
+   -- FUNCTION
+   -- Remove selected file or directory from selected archive.
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with names of all files and directories in
+   --         selected archive
    -- Path  - Gtk_Tree_Path to selected file or directory in selected archive.
-      --         Unused.
+   --         Unused.
    -- Iter  - Gtk_Tree_Iter to selected fiel or directory in selected archive.
    -- SOURCE
    procedure DeleteItems

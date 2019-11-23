@@ -75,6 +75,7 @@ package body FindDialog is
       -- string
       -- Set Result value to list, to show it to the user
       Gtk.List_Store.Set(-(Model), Iter, 11, Gint'Image(Result));
+      Gtk.List_Store.Set(-(Model), Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
       return False;
    end SearchItems;
 

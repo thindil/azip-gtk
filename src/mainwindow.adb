@@ -96,7 +96,8 @@ package body MainWindow is
            Gtk_List_Store_Newv
              ((GType_String, GType_String, GType_String, GType_String,
                GType_String, GType_String, GType_String, GType_String,
-               GType_String, GType_String, GType_String, GType_String));
+               GType_String, GType_String, GType_String, GType_String,
+               GType_String));
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(List));
          CellNames: constant array(Positive range <>) of Unbounded_String :=
            (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
@@ -113,6 +114,9 @@ package body MainWindow is
             Area := Gtk_Cell_Area_Box_New;
             Pack_Start(Area, Renderer, True);
             Add_Attribute(Area, Renderer, "text", Gint(I));
+            if I = 11 then
+               Add_Attribute(Area, Renderer, "background", 12);
+            end if;
             Column := Gtk_Tree_View_Column_New_With_Area(Area);
             Set_Sort_Column_Id(Column, Gint(I));
             Set_Title(Column, To_String(CellNames(I + 1)));
@@ -163,7 +167,8 @@ package body MainWindow is
       -- Placeholder code. Here should go all data read from the selected
       -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
       -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
-      -- All values are Strings.
+      -- Last value is value of color (name, rgb, rgba) which will be used as
+      -- background for Result cell. All values are Strings.
       for I in 0 .. 11 loop
          Append(List, Iter);
          for J in 0 .. 11 loop
@@ -273,14 +278,78 @@ package body MainWindow is
       Destroy(MessageDialog);
    end DeleteFiles;
 
+   ValidArchive: Boolean := True;
+
+   -- ****if* MainWindow/ValidateArchive
+   -- FUNCTION
+   -- Validate each file and directory in the archive
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model which contains names of files in selected archive
+   -- Path  - Gtk_Tree_Path to the current file name (Unused)
+   -- Iter  - Gtk_Tree_Iter to the current file name in selected archive
+   -- RESULT
+   -- This function always returns False, so we can iterate by all element of
+   -- the list
+   -- SOURCE
+   function ValidateArchive
+     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
+      return Boolean is
+      pragma Unreferenced(Path);
+      FileName: constant String := Get_String(Model, Iter, 0);
+      Valid: Boolean;
+   begin
+      -- Here probably should go all code to test/validate archive entries.
+      -- If entry is invalid, set Valid to False. Below is some placeholder
+      -- code for silencing warnings.
+      Put_Line("Testing entry: " & FileName);
+      if FileName(1 .. 2) = " 1" then
+         Valid := False;
+      else
+         Valid := True;
+      end if;
+      -- Set fields in archive entries list to proper values, depending on
+      -- validation result.
+      if Valid then
+         Gtk.List_Store.Set(-(Model), Iter, 11, "OK");
+         Gtk.List_Store.Set(-(Model), Iter, 12, "#00ff00");
+      else
+         Gtk.List_Store.Set(-(Model), Iter, 11, "Bad");
+         Gtk.List_Store.Set(-(Model), Iter, 12, "#ff0000");
+         ValidArchive := False;
+      end if;
+      return False;
+   end ValidateArchive;
+
+   -- ****if* MainWindow/TestArchive
+   -- FUNCTION
+   -- Test archive and show it result to the user.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New(Window, Modal, Message_Info, Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      Set_Markup
-        (MessageDialog, "Here is result of test of " & Get_Title(MChild));
+      Gtk.List_Store.Foreach
+        (-(Get_Model
+            (Gtk_Tree_View
+               (Get_Child
+                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+         ValidateArchive'Access);
+      -- Set text to show to the user
+      if ValidArchive then
+         Set_Markup
+           (MessageDialog,
+            "All entries in archive " & Get_Title(MChild) & " are OK.");
+      else
+         Set_Markup
+           (MessageDialog,
+            "Some entries in archive " & Get_Title(MChild) & " are broken.");
+      end if;
+      -- Show dialog to the user
       if Run(MessageDialog) = Gtk_Response_Close then
          Destroy(MessageDialog);
       end if;

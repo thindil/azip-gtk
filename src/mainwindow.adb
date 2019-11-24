@@ -439,8 +439,15 @@ package body MainWindow is
       Destroy(MessageDialog);
    end UpdateArchive;
 
+   -- ****if* MainWindow/RecompressArchive
+   -- FUNCTION
+   -- Ask if recompress archive and if user answer "yes", recompress it.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure RecompressArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
@@ -448,13 +455,22 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       if Run(MessageDialog) = Gtk_Response_Yes then
+         -- Here probably should go all the code related to the recopressing.
+         -- This is just a placeholder code.
          Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
       end if;
       Destroy(MessageDialog);
    end RecompressArchive;
 
+   -- ****if* MainWindow/ChangeView
+   -- FUNCTION
+   -- Show or hide directory tree view in selected archive view
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Set_Visible
@@ -462,19 +478,39 @@ package body MainWindow is
          not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
    end ChangeView;
 
+   -- ****if* MainWindow/ShowInfo
+   -- FUNCTION
+   -- Show information about selected archive
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowInfoDialog(Window, Get_Title(MChild));
    end ShowInfo;
 
+   -- ****if* MainWindow/OpenArchive
+   -- FUNCTION
+   -- Show file dialog and open selected archive
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       OpenFile(ShowFileDialog(Window));
    end OpenArchive;
 
+   -- ****if* MainWindow/ProgramQuit
+   -- FUNCTION
+   -- Quit from the program and close main GTK loop
+   -- PARAMETERS
+   -- Self - Gtk_Widget which called this procedure. Ununsed.
+   -- SOURCE
    procedure ProgramQuit(Self: access Gtk_Widget_Record'Class) is
       pragma Unreferenced(Self);
    begin

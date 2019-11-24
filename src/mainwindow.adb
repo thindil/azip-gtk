@@ -297,10 +297,12 @@ package body MainWindow is
       pragma Unreferenced(Path);
       FileName: constant String := Get_String(Model, Iter, 0);
       Valid: Boolean;
+      ArchiveName: constant String := Get_Title(Get_Focus_Child(MWindow));
    begin
       -- Here probably should go all code to test/validate archive entries.
       -- If entry is invalid, set Valid to False. Below is some placeholder
       -- code for silencing warnings.
+      Put_Line("Archive name: " & ArchiveName);
       Put_Line("Testing entry: " & FileName);
       if FileName(1 .. 2) = " 1" then
          Valid := False;

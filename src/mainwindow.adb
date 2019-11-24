@@ -355,8 +355,15 @@ package body MainWindow is
       end if;
    end TestArchive;
 
+   -- ****if* MainWindow/Find
+   -- FUNCTION
+   -- Show find dialog and after, update archive listing with result of search
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure Find(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowFindDialog
@@ -367,8 +374,15 @@ package body MainWindow is
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end Find;
 
+   -- ****if* MainWindow/UpdateArchive
+   -- FUNCTION
+   -- Ask if update archive and if user answer "yes", update it
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
    procedure UpdateArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,

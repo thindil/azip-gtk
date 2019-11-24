@@ -376,6 +376,41 @@ package body MainWindow is
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end Find;
 
+   -- ****if* MainWindow/UpdateSelectedArchive
+   -- FUNCTION
+   -- Update each file and directory in the selected archive
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model which contains names of files in selected archive
+   -- Path  - Gtk_Tree_Path to the current file name (Unused)
+   -- Iter  - Gtk_Tree_Iter to the current file name in selected archive
+   -- RESULT
+   -- This function always returns False, so we can iterate by all element of
+   -- the list
+   -- SOURCE
+   function UpdateSelectedArchive
+     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
+      return Boolean is
+      pragma Unreferenced(Path);
+      -- ****
+      FileName: constant String := Get_String(Model, Iter, 0);
+      ArchiveName: constant String := Get_Title(Get_Focus_Child(MWindow));
+   begin
+      -- Here probably should go all code to update each file and directory
+      -- in the selected archive. Below is some placeholder code.
+      Put_Line("Archive name: " & ArchiveName);
+      Put_Line("Updating entry: " & FileName);
+      -- Placeholder code. Here should go all updates for the archive listing.
+      -- Columns from 0 to 11: Name, Type, Modified, Attributes, Size, Packed,
+      -- Ratio, Format, CRC 32, Path, Name encoding, Result.
+      -- Last value is value of color (name, rgb, rgba) which will be used as
+      -- background for Result cell. All values are Strings.
+      for I in 0 .. 11 loop
+         Gtk.List_Store.Set(-(Model), Iter, Gint(I), Integer'Image(I));
+      end loop;
+      Gtk.List_Store.Set(-(Model), Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
+      return False;
+   end UpdateSelectedArchive;
+
    -- ****if* MainWindow/UpdateArchive
    -- FUNCTION
    -- Ask if update archive and if user answer "yes", update it
@@ -392,7 +427,14 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       if Run(MessageDialog) = Gtk_Response_Yes then
-         Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
+         Gtk.List_Store.Foreach
+           (-(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            UpdateSelectedArchive'Access);
+         -- If you need to do something with archive after upgrading, here
+         -- is probably best place to do.
       end if;
       Destroy(MessageDialog);
    end UpdateArchive;

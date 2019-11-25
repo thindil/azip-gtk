@@ -37,27 +37,56 @@ with MainWindow; use MainWindow;
 
 package body Menu is
 
+   -- ****if* Menu/NewArchiveMenu
+   -- FUNCTION
+   -- Create new archive view.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure NewArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       NewArchive(null);
    end NewArchiveMenu;
 
+   -- ****if* Menu/OpenArchiveMenu
+   -- FUNCTION
+   -- Show open archive dialog and show selected archive to the user.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure OpenArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       OpenFile(ShowFileDialog(Window));
    end OpenArchiveMenu;
 
+   -- ****if* Menu/SaveArchiveMenu
+   -- FUNCTION
+   -- Show save selected archive dialog and then save it with new name (or
+   -- old, if user want).
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure SaveArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowSaveDialog(Window, Get_Title(MChild));
    end SaveArchiveMenu;
 
+   -- ****if* Menu/CloseArchiveMenu
+   -- FUNCTION
+   -- Close selected archive view.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure CloseArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       if MChild = null then
@@ -66,27 +95,55 @@ package body Menu is
       Close_Child(MChild);
    end CloseArchiveMenu;
 
+   -- ****if* Menu/QuitMenu
+   -- FUNCTION
+   -- Quit from the program.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure QuitMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       Main_Quit;
    end QuitMenu;
 
+   -- ****if* Menu/ExtractArchiveMenu
+   -- FUNCTION
+   -- Extract selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure ExtractArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowDirectoryDialog(Window, Get_Title(MChild));
    end ExtractArchiveMenu;
 
+   -- ****if* Menu/DeleteFiles
+   -- FUNCTION
+   -- Delete selected files from the archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure DeleteFiles(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       MainWindow.DeleteFiles(null);
    end DeleteFiles;
 
+   -- ****if* Menu/AddFileMenu
+   -- FUNCTION
+   -- Show add file dialog and add selected file(s) to the archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure AddFileMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -97,8 +154,16 @@ package body Menu is
                   (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
    end AddFileMenu;
 
+   -- ****if* Menu/AddFileEncryptionMenu
+   -- FUNCTION
+   -- Show add file dialog and add selected file(s) to the archive with
+   -- encryption.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure AddFileEncryptionMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog

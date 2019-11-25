@@ -21,10 +21,28 @@
 with Gtk.Box; use Gtk.Box;
 with Gtk.Enums; use Gtk.Enums;
 
+-- ****h* AZipGtk/Menu
+-- FUNCTION
+-- Provide code for the program main menu
+-- SOURCE
 package Menu is
+-- ****
 
+   -- ****v* Menu/Orientation
+   -- FUNCTION
+   -- Direction in which MDI window with archives lists will be split. Default
+   -- is vertical.
+   -- SOURCE
    Orientation: Gtk_Orientation := Orientation_Vertical;
+   -- ****
 
+   -- ****f* Menu/CreateMenu
+   -- FUNCTION
+   -- Create main menu bar and add it to the window.
+   -- PARAMETERS
+   -- WindowBox - Gtk_Vbox which will be contains the menu bar
+   -- SOURCE
    procedure CreateMenu(WindowBox: Gtk_Vbox);
+   -- ****
 
 end Menu;

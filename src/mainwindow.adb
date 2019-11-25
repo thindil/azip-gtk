@@ -174,6 +174,7 @@ package body MainWindow is
          for J in 0 .. 11 loop
             Set(List, Iter, Gint(J), Integer'Image(I));
          end loop;
+         Set(List, Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
       end loop;
    end OpenFile;
 

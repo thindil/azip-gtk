@@ -251,16 +251,8 @@ package body MainWindow is
       Ada.Text_IO.Put_Line("Deleting: " & Get_String(Model, Iter, 0));
    end DeleteItems;
 
-   -- ****if* MainWindow/DeleteFiles
-   -- FUNCTION
-   -- Show delete files confirmation dialog and start deleting them on press
-   -- the toolbar button
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
@@ -322,15 +314,8 @@ package body MainWindow is
       return False;
    end ValidateArchive;
 
-   -- ****if* MainWindow/TestArchive
-   -- FUNCTION
-   -- Test archive and show it result to the user.
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New(Window, Modal, Message_Info, Buttons_Close, "");
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -411,15 +396,8 @@ package body MainWindow is
       return False;
    end UpdateSelectedArchive;
 
-   -- ****if* MainWindow/UpdateArchive
-   -- FUNCTION
-   -- Ask if update archive and if user answer "yes", update it
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure UpdateArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
@@ -439,15 +417,8 @@ package body MainWindow is
       Destroy(MessageDialog);
    end UpdateArchive;
 
-   -- ****if* MainWindow/RecompressArchive
-   -- FUNCTION
-   -- Ask if recompress archive and if user answer "yes", recompress it.
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure RecompressArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
@@ -462,15 +433,8 @@ package body MainWindow is
       Destroy(MessageDialog);
    end RecompressArchive;
 
-   -- ****if* MainWindow/ChangeView
-   -- FUNCTION
-   -- Show or hide directory tree view in selected archive view
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Set_Visible

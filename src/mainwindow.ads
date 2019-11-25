@@ -62,18 +62,50 @@ package MainWindow is
    procedure OpenFile(FileName: String);
    -- ****
 
-   -- ****f* MainWindow/DeleteItems
+   -- ****f* MainWindow/DeleteFiles
    -- FUNCTION
-   -- Remove selected file or directory from selected archive.
-   -- PARAMETERS
-   -- Model - Gtk_Tree_Model with names of all files and directories in
-   --         selected archive
-   -- Path  - Gtk_Tree_Path to selected file or directory in selected archive.
-   --         Unused.
-   -- Iter  - Gtk_Tree_Iter to selected fiel or directory in selected archive.
+   -- Show delete files confirmation dialog and start deleting them on press
+   -- the toolbar button
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
-   procedure DeleteItems
-     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter);
+   procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
+   -- ****f* MainWindow/TestArchive
+   -- FUNCTION
+   -- Test archive and show it result to the user.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
+   -- ****f* MainWindow/UpdateArchive
+   -- FUNCTION
+   -- Ask if update archive and if user answer "yes", update it
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure UpdateArchive(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
+   -- ****f* MainWindow/RecompressArchive
+   -- FUNCTION
+   -- Ask if recompress archive and if user answer "yes", recompress it.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure RecompressArchive(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
+   -- ****f* MainWindow/ChangeView
+   -- FUNCTION
+   -- Show or hide directory tree view in selected archive view
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class);
    -- ****
 
    -- ****f* MainWindow/CreateMainWindow

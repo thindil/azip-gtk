@@ -18,19 +18,15 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Ada.Text_IO;
 with Gtk.Bin; use Gtk.Bin;
-with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
 with Gtk.Menu; use Gtk.Menu;
 with Gtk.Menu_Bar; use Gtk.Menu_Bar;
 with Gtk.Menu_Item; use Gtk.Menu_Item;
-with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Radio_Menu_Item; use Gtk.Radio_Menu_Item;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
-with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
@@ -85,21 +81,8 @@ package body Menu is
 
    procedure DeleteFiles(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Window, Modal, Message_Question, Buttons_Yes_No,
-           "Do you want to delete selected item(s)?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Selected_Foreach
-           (Get_Selection
-              (Gtk_Tree_View
-                 (Get_Child
-                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))),
-            DeleteItems'Access);
-      end if;
-      Destroy(MessageDialog);
+      MainWindow.DeleteFiles(null);
    end DeleteFiles;
 
    procedure AddFileMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -156,15 +139,8 @@ package body Menu is
 
    procedure TestArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New(Window, Modal, Message_Info, Buttons_Close, "");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      Set_Markup
-        (MessageDialog, "Here is result of test of " & Get_Title(MChild));
-      if Run(MessageDialog) = Gtk_Response_Close then
-         Destroy(MessageDialog);
-      end if;
+      TestArchive(null);
    end TestArchiveMenu;
 
    procedure FindMenu(Self: access Gtk_Menu_Item_Record'Class) is
@@ -181,40 +157,20 @@ package body Menu is
 
    procedure UpdateArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Window, Modal, Message_Question, Buttons_Yes_No,
-           "You are about to start an archive update. Files that are newer and different (according to their CRC32 code) will replace those in the archive. Proceed?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Ada.Text_IO.Put_Line("Updating: " & Get_Title(MChild));
-      end if;
-      Destroy(MessageDialog);
+      UpdateArchive(null);
    end UpdateArchiveMenu;
 
    procedure RecompressArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
-      MessageDialog: constant Gtk_Message_Dialog :=
-        Gtk_Message_Dialog_New
-          (Window, Modal, Message_Question, Buttons_Yes_No,
-           "You are about to recompress this archive. Contents will remain identical, but data compression may be better. This operation can take a long time depending on data size and content. Proceed?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      if Run(MessageDialog) = Gtk_Response_Yes then
-         Ada.Text_IO.Put_Line("Recompressing: " & Get_Title(MChild));
-      end if;
-      Destroy(MessageDialog);
+      RecompressArchive(null);
    end RecompressArchiveMenu;
 
    procedure ChangeViewMenu(Self: access Gtk_Menu_Item_Record'Class) is
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      pragma Unreferenced(Self);
    begin
-      if Get_Label(Self) = "Tree view" then
-         Show_All(Get_Child1(Gtk_Paned(Get_Widget(MChild))));
-      else
-         Hide(Get_Child1(Gtk_Paned(Get_Widget(MChild))));
-      end if;
+      ChangeView(null);
    end ChangeViewMenu;
 
    procedure SplitWindow(Self: access Gtk_Menu_Item_Record'Class) is

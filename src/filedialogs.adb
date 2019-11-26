@@ -14,6 +14,8 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Text_IO; use Ada.Text_IO;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Combo_Box; use Gtk.Combo_Box;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
@@ -150,6 +152,41 @@ package body FileDialogs is
       Dialog: Gtk_File_Chooser_Dialog;
       FilesNames: String_SList.GSlist;
       Iter: Gtk_Tree_Iter;
+      procedure AddFile(FileName: String) is
+      begin
+         Append(FilesList, Iter);
+         -- Whole adding files code probably should go here,
+         -- FileName is full path to the file which will be added.
+         -- Columns from 0 to 11: Name, Type, Modified, Attributes,
+         -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
+         Set(FilesList, Iter, 0, FileName);
+         -- This code is placeholder for fill selected file information
+         for J in 1 .. 11 loop
+            Set(FilesList, Iter, Gint(J), Integer'Image(J));
+         end loop;
+      end AddFile;
+      procedure AddDirectory(Path: String) is
+         Directory: Dir_Type;
+         Last: Natural;
+         FileName: String(1 .. 1024);
+      begin
+         Open(Directory, Path);
+         loop
+            Read(Directory, FileName, Last);
+            exit when Last = 0;
+            if FileName(1 .. Last) in "." | ".." then
+               goto End_Of_Loop;
+            end if;
+            if Is_Directory
+                (Path & Directory_Separator & FileName(1 .. Last)) then
+               AddDirectory(Path & Directory_Separator & FileName(1 .. Last));
+            else
+               AddFile(Path & Directory_Separator & FileName(1 .. Last));
+            end if;
+            <<End_Of_Loop>>
+         end loop;
+         Close(Directory);
+      end AddDirectory;
    begin
       -- Create dialog with proper title depending if files will be encrypted
       -- or not
@@ -185,16 +222,14 @@ package body FileDialogs is
       -- Show dialog to the user
       if Run(Dialog) = Gtk_Response_OK then
          FilesNames := Get_Filenames(Dialog);
-         -- Whole adding files code probably should go here,
-         -- String_SList.Nth_Data(FilesNames, I) is full path to the file
-         -- which will be added
          for I in 0 .. String_SList.Length(FilesNames) - 1 loop
-            Append(FilesList, Iter);
-            Set(FilesList, Iter, 0, String_SList.Nth_Data(FilesNames, I));
-            -- This code is placeholder for fill selected file information
-            for J in 1 .. 11 loop
-               Set(FilesList, Iter, Gint(J), Guint'Image(I));
-            end loop;
+            -- If selected item is directory, add its content
+            if Is_Directory(String_SList.Nth_Data(FilesNames, I)) then
+               AddDirectory(String_SList.Nth_Data(FilesNames, I));
+               -- If selected item is file, add it
+            else
+               AddFile(String_SList.Nth_Data(FilesNames, I));
+            end if;
          end loop;
       end if;
       Destroy(Dialog);

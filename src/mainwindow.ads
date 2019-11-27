@@ -72,6 +72,24 @@ package MainWindow is
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class);
    -- ****
 
+   -- ****f* MainWindow/AddFile
+   -- FUNCTION
+   -- Show add file dialog on press the tool button.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure AddFile(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
+   -- ****f* MainWindow/AddFileEncrypted
+   -- FUNCTION
+   -- Show add file with encryption dialog on press the tool button.
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
    -- ****f* MainWindow/TestArchive
    -- FUNCTION
    -- Test archive and show it result to the user.

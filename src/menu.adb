@@ -144,14 +144,8 @@ package body Menu is
    procedure AddFileMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Get_Model
-            (Gtk_Tree_View
-               (Get_Child
-                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
+      AddFile(null);
    end AddFileMenu;
 
    -- ****if* Menu/AddFileEncryptionMenu
@@ -164,15 +158,8 @@ package body Menu is
    procedure AddFileEncryptionMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Get_Model
-            (Gtk_Tree_View
-               (Get_Child
-                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
-         True);
+      AddFileEncrypted(null);
    end AddFileEncryptionMenu;
 
    -- ****if* Menu/AddFolderMenu

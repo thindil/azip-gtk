@@ -192,15 +192,8 @@ package body MainWindow is
       ShowDirectoryDialog(Window, Get_Title(MChild));
    end ExtractArchive;
 
-   -- ****if* MainWindow/AddFile
-   -- FUNCTION
-   -- Show add file dialog on press the tool button.
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -211,15 +204,8 @@ package body MainWindow is
                   (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
    end AddFile;
 
-   -- ****if* MainWindow/AddFileEncrypted
-   -- FUNCTION
-   -- Show add file with encryption dialog on press the tool button.
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog

@@ -175,8 +175,16 @@ package body Menu is
          True);
    end AddFileEncryptionMenu;
 
+   -- ****if* Menu/AddFolderMenu
+   -- FUNCTION
+   -- Show add directory dialog and add selected directory content to the
+   -- archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure AddFolderMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -188,9 +196,17 @@ package body Menu is
          False, True);
    end AddFolderMenu;
 
+   -- ****if* Menu/AddFolderEncryptionMenu
+   -- FUNCTION
+   -- Show add directory dialog and add selected directory content with
+   -- encryption to the archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure AddFolderEncryptionMenu
      (Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowAddFileDialog
@@ -202,14 +218,28 @@ package body Menu is
          True, True);
    end AddFolderEncryptionMenu;
 
+   -- ****if* Menu/TestArchiveMenu
+   -- FUNCTION
+   -- Show result of test of the selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure TestArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       TestArchive(null);
    end TestArchiveMenu;
 
+   -- ****if* Menu/FindMenu
+   -- FUNCTION
+   -- Show find dialog and then result of searching in the archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure FindMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowFindDialog

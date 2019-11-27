@@ -370,6 +370,7 @@ package body Menu is
          Append(Menu, Item);
       end AddRadioMenuItem;
    begin
+      -- Add File menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_File");
       AddMenuItem("_New", NewArchiveMenu'Access);
@@ -380,6 +381,7 @@ package body Menu is
       AddMenuItem("_Recent", EmptyMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_Quit", QuitMenu'Access);
+      -- Add Edit menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Edit");
       AddMenuItem("Select _all", EmptyMenu'Access);
@@ -393,6 +395,7 @@ package body Menu is
       AddMenuItem("Add folder...", AddFolderMenu'Access);
       AddMenuItem
         ("Add folder with encryption...", AddFolderEncryptionMenu'Access);
+      -- Add Tools menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Tools");
       AddMenuItem("_Test archive", TestArchiveMenu'Access);
@@ -405,6 +408,7 @@ package body Menu is
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_Compare archives", EmptyMenu'Access);
       AddMenuItem("_Merge archives", EmptyMenu'Access);
+      -- Add View menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_View");
       AddRadioMenuItem("Tree view", ChangeViewMenu'Access, True);
@@ -412,9 +416,11 @@ package body Menu is
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_No sorting", EmptyMenu'Access);
       AddMenuItem("_Select columns", EmptyMenu'Access);
+      -- Add Options menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Options");
       AddMenuItem("_General options", EmptyMenu'Access);
+      -- Add Window menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Window");
       RadioGroup := Widget_SList.Null_List;
@@ -422,6 +428,7 @@ package body Menu is
       AddRadioMenuItem("Tile _Horizontal", SplitWindow'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_Close all", CloseAll'Access);
+      -- Add Help menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Help");
       AddMenuItem("_Quick help", EmptyMenu'Access);

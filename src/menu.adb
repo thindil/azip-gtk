@@ -237,25 +237,55 @@ package body Menu is
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end FindMenu;
 
+   -- ****if* Menu/UpdateArchiveMenu
+   -- FUNCTION
+   -- Update selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure UpdateArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       UpdateArchive(null);
    end UpdateArchiveMenu;
 
+   -- ****if* Menu/RecompressArchiveMenu
+   -- FUNCTION
+   -- Recompress selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure RecompressArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       RecompressArchive(null);
    end RecompressArchiveMenu;
 
+   -- ****if* Menu/ChangeViewMenu
+   -- FUNCTION
+   -- Show or hide tree view for the selected archive
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure ChangeViewMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       ChangeView(null);
    end ChangeViewMenu;
 
+   -- ****if* Menu/SplitWindow
+   -- FUNCTION
+   -- Set how to split archives view. All new archives will be show in that
+   -- orientation.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Used to determine how
+   -- view will be splitted
+   -- SOURCE
    procedure SplitWindow(Self: access Gtk_Menu_Item_Record'Class) is
+   -- ****
    begin
       if Get_Label(Self) = "Tile _Horizontal" then
          Orientation := Orientation_Horizontal;
@@ -265,8 +295,15 @@ package body Menu is
       Split(MWindow, Orientation);
    end SplitWindow;
 
+   -- ****if* Menu/CloseAll
+   -- FUNCTION
+   -- Close all open archives
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure CloseAll(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MChild: MDI_Child;
    begin
       loop
@@ -276,14 +313,28 @@ package body Menu is
       end loop;
    end CloseAll;
 
+   -- ****if* Menu/ShowAbout
+   -- FUNCTION
+   -- Show dialog with information about the program
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure ShowAbout(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       ShowAboutDialog(Window);
    end ShowAbout;
 
+   -- ****if* Menu/EmptyMenu
+   -- FUNCTION
+   -- Placeholder code, will be removed later
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       null;
    end EmptyMenu;

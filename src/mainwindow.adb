@@ -109,6 +109,7 @@ package body MainWindow is
             To_Unbounded_String("Result"));
       begin
          Set_Headers_Clickable(View, True);
+         Set_Mode(Get_Selection(View), Selection_Multiple);
          for I in 0 .. 11 loop
             Gtk.Cell_Renderer_Text.Gtk_New(Renderer);
             Area := Gtk_Cell_Area_Box_New;

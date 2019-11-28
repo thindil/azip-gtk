@@ -26,6 +26,9 @@ with Gtk.Menu_Bar; use Gtk.Menu_Bar;
 with Gtk.Menu_Item; use Gtk.Menu_Item;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Radio_Menu_Item; use Gtk.Radio_Menu_Item;
+with Gtk.Recent_Chooser; use Gtk.Recent_Chooser;
+with Gtk.Recent_Chooser_Menu; use Gtk.Recent_Chooser_Menu;
+with Gtk.Recent_Filter; use Gtk.Recent_Filter;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
@@ -326,6 +329,18 @@ package body Menu is
       ShowAboutDialog(Window);
    end ShowAbout;
 
+   -- ****if* Menu/OpenRecent
+   -- FUNCTION
+   -- Open selected in recent menu archive
+   -- Self - Menu with recently used archives
+   -- SOURCE
+   procedure OpenRecent(Self: Gtk_Recent_Chooser) is
+      -- ****
+      Uri: constant String := Get_Current_Uri(Self);
+   begin
+      OpenFile(Uri(8 .. Uri'Length));
+   end OpenRecent;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -378,7 +393,23 @@ package body Menu is
       AddMenuItem("Save _as", SaveArchiveMenu'Access);
       AddMenuItem("_Close", CloseArchiveMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_Recent", EmptyMenu'Access);
+      declare
+         Item: constant Gtk_Menu_Item :=
+           Gtk_Menu_Item_New_With_Mnemonic("_Recent");
+         RecentMenu: constant Gtk_Recent_Chooser_Menu :=
+           Gtk_Recent_Chooser_Menu_New;
+         Filter: constant Gtk_Recent_Filter := Gtk_Recent_Filter_New;
+      begin
+         Add_Pattern(Filter, "*.zip");
+         Add_Pattern(Filter, "*.java");
+         Set_Filter(RecentMenu, Filter);
+         Set_Limit(RecentMenu, 10);
+         Set_Show_Numbers(RecentMenu, True);
+         Set_Local_Only(RecentMenu, True);
+         Set_Submenu(Item, RecentMenu);
+         On_Item_Activated(+(RecentMenu), OpenRecent'Access);
+         Append(Menu, Item);
+      end;
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_Quit", QuitMenu'Access);
       -- Add Edit menu

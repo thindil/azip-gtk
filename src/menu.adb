@@ -401,7 +401,7 @@ package body Menu is
          Filter: constant Gtk_Recent_Filter := Gtk_Recent_Filter_New;
       begin
          Add_Pattern(Filter, "*.zip");
-         Add_Pattern(Filter, "*.java");
+         Add_Pattern(Filter, "*.jar");
          Set_Filter(RecentMenu, Filter);
          Set_Limit(RecentMenu, 10);
          Set_Show_Numbers(RecentMenu, True);

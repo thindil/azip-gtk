@@ -30,6 +30,7 @@ with Gtk.Recent_Chooser; use Gtk.Recent_Chooser;
 with Gtk.Recent_Chooser_Menu; use Gtk.Recent_Chooser_Menu;
 with Gtk.Recent_Filter; use Gtk.Recent_Filter;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
+with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
@@ -341,6 +342,42 @@ package body Menu is
       OpenFile(Uri(8 .. Uri'Length));
    end OpenRecent;
 
+   -- ****if* Menu/SelectAll
+   -- FUNCTION
+   -- Select all files in selected archive
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure SelectAll(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      Select_All
+        (Get_Selection
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+   end SelectAll;
+
+   -- ****if* Menu/UnselectAll
+   -- FUNCTION
+   -- Unselect all selected files in currently selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure UnselectAll(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+   begin
+      Unselect_All
+        (Get_Selection
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+   end UnselectAll;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -415,8 +452,8 @@ package body Menu is
       -- Add Edit menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Edit");
-      AddMenuItem("Select _all", EmptyMenu'Access);
-      AddMenuItem("_Unselect all", EmptyMenu'Access);
+      AddMenuItem("Select _all", SelectAll'Access);
+      AddMenuItem("_Unselect all", UnselectAll'Access);
       AddMenuItem("_Extract", ExtractArchiveMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("Delete entries", DeleteFiles'Access);

@@ -37,6 +37,7 @@ with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
 with Gtk.Separator_Tool_Item; use Gtk.Separator_Tool_Item;
 with Gtk.Status_Bar; use Gtk.Status_Bar;
 with Gtk.Toolbar; use Gtk.Toolbar;
+with Gtk.Tree_Model_Sort; use Gtk.Tree_Model_Sort;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_Store; use Gtk.Tree_Store;
 with Gtk.Tree_View; use Gtk.Tree_View;
@@ -98,7 +99,9 @@ package body MainWindow is
                GType_String, GType_String, GType_String, GType_String,
                GType_String, GType_String, GType_String, GType_String,
                GType_String));
-         View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(List));
+         Sort: constant Gtk_Tree_Model_Sort :=
+           Gtk_Tree_Model_Sort_Sort_New_With_Model(+(List));
+         View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Sort));
          CellNames: constant array(Positive range <>) of Unbounded_String :=
            (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
             To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
@@ -125,6 +128,9 @@ package body MainWindow is
                Ada.Text_IO.Put_Line("Error in adding columns.");
             end if;
          end loop;
+         if SortFiles then
+            Set_Sort_Column_Id(Sort, 0, Sort_Ascending);
+         end if;
          Scroll := Gtk_Scrolled_Window_New;
          Add(Gtk_Container(Scroll), Gtk_Widget(View));
          Pack2(ArchivePaned, Gtk_Widget(Scroll));
@@ -139,6 +145,7 @@ package body MainWindow is
 
    procedure OpenFile(FileName: String) is
       Iter: Gtk_Tree_Iter;
+      Sort: Gtk_Tree_Model_Sort;
       List: Gtk_List_Store;
       Tree: Gtk_Tree_Store;
       MChild: MDI_Child;
@@ -160,11 +167,12 @@ package body MainWindow is
                  (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
       Iter := Get_Iter_From_String(Tree, "0");
       Set(Tree, Iter, 0, Simple_Name(FileName));
-      List :=
+      Sort :=
         -(Get_Model
            (Gtk_Tree_View
               (Get_Child
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+      List := -(Get_Model(Sort));
       -- Placeholder code. Here should go all data read from the selected
       -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
       -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.

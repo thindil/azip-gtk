@@ -36,6 +36,14 @@ package Menu is
    Orientation: Gtk_Orientation := Orientation_Vertical;
    -- ****
 
+   -- ****v* Menu/SortFiles
+   -- FUNCTION
+   -- If true, all newly created or opened archives will have sorted entries
+   -- by their names. Default value is True.
+   -- SOURCE
+   SortFiles: Boolean := True;
+   -- ****
+
    -- ****f* Menu/CreateMenu
    -- FUNCTION
    -- Create main menu bar and add it to the window.

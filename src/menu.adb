@@ -19,11 +19,14 @@
 -- SOFTWARE.
 
 with Gtk.Bin; use Gtk.Bin;
+with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
+with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
 with Gtk.Menu; use Gtk.Menu;
 with Gtk.Menu_Bar; use Gtk.Menu_Bar;
 with Gtk.Menu_Item; use Gtk.Menu_Item;
+with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Radio_Menu_Item; use Gtk.Radio_Menu_Item;
 with Gtk.Recent_Chooser; use Gtk.Recent_Chooser;
@@ -391,6 +394,34 @@ package body Menu is
       ShowInfo(null);
    end PropertiesMenu;
 
+   -- ****if* Menu/SetSorting
+   -- FUNCTION
+   -- Set if new archives and newly opened archives should have sorted
+   -- list of entries or not
+   -- PARAMETERS
+   -- Self - Gtk_Check_Menu_Item which was activated. Used to set sorting.
+   -- SOURCE
+   procedure SetSorting(Self: access Gtk_Check_Menu_Item_Record'Class) is
+      -- ****
+      MessageDialog: Gtk_Message_Dialog;
+   begin
+      SortFiles := not Get_Active(Self);
+      if SortFiles then
+         MessageDialog :=
+           Gtk_Message_Dialog_New
+             (Window, Modal, Message_Info, Buttons_Ok,
+              "The list of newly opened archive windows will be sorted until you not disable it again.");
+      else
+         MessageDialog :=
+           Gtk_Message_Dialog_New
+             (Window, Modal, Message_Info, Buttons_Ok,
+              "The list of newly opened archive windows won't be sorted until one of following conditions are met (in any order):a) you enable it again, b) you restart AZip.");
+      end if;
+      if Run(MessageDialog) = Gtk_Response_OK then
+         Destroy(MessageDialog);
+      end if;
+   end SetSorting;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -436,6 +467,16 @@ package body Menu is
          On_Activate(Item, Subprogram);
          Append(Menu, Item);
       end AddRadioMenuItem;
+      procedure AddCheckMenuItem
+        (Label: String; Subprogram: Cb_Gtk_Check_Menu_Item_Void;
+         Active: Boolean := False) is
+         Item: constant Gtk_Check_Menu_Item :=
+           Gtk_Check_Menu_Item_New_With_Mnemonic(Label);
+      begin
+         Set_Active(Item, Active);
+         On_Toggled(Item, Subprogram);
+         Append(Menu, Item);
+      end AddCheckMenuItem;
    begin
       -- Add File menu
       Menu := Gtk_Menu_New;
@@ -499,7 +540,7 @@ package body Menu is
       AddRadioMenuItem("Tree view", ChangeViewMenu'Access, True);
       AddRadioMenuItem("Flat view", ChangeViewMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_No sorting", EmptyMenu'Access);
+      AddCheckMenuItem("_No sorting", SetSorting'Access);
       AddMenuItem("_Select columns", EmptyMenu'Access);
       -- Add Options menu
       Menu := Gtk_Menu_New;

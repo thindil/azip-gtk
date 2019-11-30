@@ -126,6 +126,15 @@ package MainWindow is
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class);
    -- ****
 
+   -- ****f* MainWindow/ShowInfo
+   -- FUNCTION
+   -- Show information about selected archive
+   -- PARAMERTERS
+   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
+   -- SOURCE
+   procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class);
+   -- ****
+
    -- ****f* MainWindow/CreateMainWindow
    -- FUNCTION
    -- Create main window of the program.

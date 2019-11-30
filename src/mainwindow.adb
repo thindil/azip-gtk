@@ -430,15 +430,8 @@ package body MainWindow is
          not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
    end ChangeView;
 
-   -- ****if* MainWindow/ShowInfo
-   -- FUNCTION
-   -- Show information about selected archive
-   -- PARAMERTERS
-   -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
-   -- SOURCE
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       ShowInfoDialog(Window, Get_Title(MChild));

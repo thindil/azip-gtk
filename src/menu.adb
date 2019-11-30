@@ -378,6 +378,19 @@ package body Menu is
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
    end UnselectAll;
 
+   -- ****if* Menu/PropertiesMenu
+   -- FUNCTION
+   -- Show information about selected archive
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure PropertiesMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowInfo(null);
+   end PropertiesMenu;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -403,7 +416,8 @@ package body Menu is
          Append(Menubar, Item);
       end AddSubmenu;
       procedure AddMenuItem
-        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void; Enabled: Boolean := True) is
+        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void;
+         Enabled: Boolean := True) is
          Item: constant Gtk_Menu_Item :=
            Gtk_Menu_Item_New_With_Mnemonic(Label);
       begin
@@ -430,6 +444,8 @@ package body Menu is
       AddMenuItem("_Open", OpenArchiveMenu'Access);
       AddMenuItem("Save _as", SaveArchiveMenu'Access);
       AddMenuItem("_Close", CloseArchiveMenu'Access);
+      Append(Menu, Gtk_Separator_Menu_Item_New);
+      AddMenuItem("_Properties", PropertiesMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       declare
          Item: constant Gtk_Menu_Item :=

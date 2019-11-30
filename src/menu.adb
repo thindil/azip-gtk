@@ -403,11 +403,12 @@ package body Menu is
          Append(Menubar, Item);
       end AddSubmenu;
       procedure AddMenuItem
-        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void) is
+        (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void; Enabled: Boolean := True) is
          Item: constant Gtk_Menu_Item :=
            Gtk_Menu_Item_New_With_Mnemonic(Label);
       begin
          On_Activate(Item, Subprogram);
+         Set_Sensitive(Item, Enabled);
          Append(Menu, Item);
       end AddMenuItem;
       procedure AddRadioMenuItem
@@ -471,11 +472,11 @@ package body Menu is
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_Update archive", UpdateArchiveMenu'Access);
       AddMenuItem("_Recompress archive", RecompressArchiveMenu'Access);
-      AddMenuItem("_Touch time stamps", EmptyMenu'Access);
-      AddMenuItem("Encr_ypt archive", EmptyMenu'Access);
+      AddMenuItem("_Touch time stamps", EmptyMenu'Access, False);
+      AddMenuItem("Encr_ypt archive", EmptyMenu'Access, False);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_Compare archives", EmptyMenu'Access);
-      AddMenuItem("_Merge archives", EmptyMenu'Access);
+      AddMenuItem("_Compare archives", EmptyMenu'Access, False);
+      AddMenuItem("_Merge archives", EmptyMenu'Access, False);
       -- Add View menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_View");

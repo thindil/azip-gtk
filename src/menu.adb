@@ -38,6 +38,7 @@ with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with AboutDialog; use AboutDialog;
+with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with MainWindow; use MainWindow;
@@ -422,6 +423,19 @@ package body Menu is
       end if;
    end SetSorting;
 
+   -- ****if* Menu/SetColumnsMenu
+   -- FUNCTION
+   -- Set visible columns for all opened archives
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure SetColumnsMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowColumnsDialog(Window);
+   end SetColumnsMenu;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -541,7 +555,7 @@ package body Menu is
       AddRadioMenuItem("Flat view", ChangeViewMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddCheckMenuItem("_No sorting", SetSorting'Access);
-      AddMenuItem("_Select columns", EmptyMenu'Access);
+      AddMenuItem("_Select columns", SetColumnsMenu'Access);
       -- Add Options menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Options");

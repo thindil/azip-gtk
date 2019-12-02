@@ -433,7 +433,7 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
    begin
-      ShowColumnsDialog(Window);
+      ShowColumnsDialog;
    end SetColumnsMenu;
 
    -- ****if* Menu/EmptyMenu

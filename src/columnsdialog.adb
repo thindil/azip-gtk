@@ -23,12 +23,13 @@ with Gtk.Check_Button; use Gtk.Check_Button;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.Widget; use Gtk.Widget;
+with MainWindow; use MainWindow;
 
 package body ColumnsDialog is
 
-   procedure ShowColumnsDialog(Parent: Gtk_Window) is
+   procedure ShowColumnsDialog is
       Dialog: constant Gtk_Dialog :=
-        Gtk_Dialog_New("Select displayed columns", Parent, Modal);
+        Gtk_Dialog_New("Select displayed columns", Window, Modal);
       Box: constant Gtk_Box := Get_Content_Area(Dialog);
       procedure AddButton(Label: String; Enabled: Boolean := True) is
          Button: constant Gtk_Check_Button :=

@@ -18,10 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Gtk.Window; use Gtk.Window;
-
 package ColumnsDialog is
 
-   procedure ShowColumnsDialog(Parent: Gtk_Window);
+   procedure ShowColumnsDialog;
 
 end ColumnsDialog;

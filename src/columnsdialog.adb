@@ -34,7 +34,14 @@ with MainWindow; use MainWindow;
 
 package body ColumnsDialog is
 
+   -- ****if* ColumnsDialog/SetVisibility
+   -- FUNCTION
+   -- Set visibility of selected column
+   -- PARAMETERS
+   -- Self - Gtk_Check_Button which was pressed
+   -- SOURCE
    procedure SetVisibility(Self: access Gtk_Toggle_Button_Record'Class) is
+      -- ****
       Iter: Child_Iterator := First_Child(MWindow);
       MChild: MDI_Child := Get(Iter);
       TreeView: Gtk_Tree_View :=
@@ -42,6 +49,7 @@ package body ColumnsDialog is
           (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
       Column: Gtk_Tree_View_Column;
    begin
+      -- FIXME: change it to array, may crash when no MDI children available
       for I in 0 .. 11 loop
          Column := Get_Column(TreeView, Gint(I));
          if Get_Title(Column) = Get_Label(Self) then
@@ -74,7 +82,10 @@ package body ColumnsDialog is
       Column: Gtk_Tree_View_Column;
       Button: Gtk_Check_Button;
    begin
+      -- Center dialog
       Set_Position(Dialog, Win_Pos_Center);
+      -- Set all buttons, based on columns in archive list
+      -- FIXME: change it to array
       for I in 0 .. 11 loop
          Column := Get_Column(TreeView, Gint(I));
          Button := Gtk_Check_Button_New_With_Label(Get_Title(Column));
@@ -86,9 +97,12 @@ package body ColumnsDialog is
          Add(Box, Button);
       end loop;
       Show_All(Box);
+      -- Add Ok button to dialog
       if Add_Button(Dialog, "Ok", Gtk_Response_None) = null then
          return;
       end if;
+      -- Show dialog to the user
+      -- FIXME: not working after close dialog with X button
       if Run(Dialog) = Gtk_Response_None then
          Destroy(Dialog);
       end if;

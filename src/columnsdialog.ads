@@ -20,6 +20,9 @@
 
 package ColumnsDialog is
 
+   VisibleColumns: array(0 .. 11) of Boolean :=
+     (True, True, True, True, True, True, True, True, True, False, True, True);
+
    procedure ShowColumnsDialog;
 
 end ColumnsDialog;

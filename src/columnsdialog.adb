@@ -18,29 +18,73 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Check_Button; use Gtk.Check_Button;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
+with Gtk.Paned; use Gtk.Paned;
+with Gtk.Toggle_Button; use Gtk.Toggle_Button;
+with Gtk.Tree_View; use Gtk.Tree_View;
+with Gtk.Tree_View_Column; use Gtk.Tree_View_Column;
 with Gtk.Widget; use Gtk.Widget;
+with Gtkada.MDI; use Gtkada.MDI;
+with Glib; use Glib;
 with MainWindow; use MainWindow;
 
 package body ColumnsDialog is
+
+   procedure SetVisibility(Self: access Gtk_Toggle_Button_Record'Class) is
+      Iter: Child_Iterator := First_Child(MWindow);
+      MChild: MDI_Child := Get(Iter);
+      TreeView: Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+      Column: Gtk_Tree_View_Column;
+   begin
+      for I in 0 .. 11 loop
+         Column := Get_Column(TreeView, Gint(I));
+         if Get_Title(Column) = Get_Label(Self) then
+            Set_Visible(Column, Get_Active(Self));
+            VisibleColumns(I) := Get_Active(Self);
+            loop
+               Next(Iter);
+               MChild := Get(Iter);
+               exit when MChild = null;
+               TreeView :=
+                 Gtk_Tree_View
+                   (Get_Child
+                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+               Column := Get_Column(TreeView, Gint(I));
+               Set_Visible(Column, Get_Active(Self));
+            end loop;
+            return;
+         end if;
+      end loop;
+   end SetVisibility;
 
    procedure ShowColumnsDialog is
       Dialog: constant Gtk_Dialog :=
         Gtk_Dialog_New("Select displayed columns", Window, Modal);
       Box: constant Gtk_Box := Get_Content_Area(Dialog);
-      procedure AddButton(Label: String; Enabled: Boolean := True) is
-         Button: constant Gtk_Check_Button :=
-           Gtk_Check_Button_New_With_Label(Label);
-      begin
-         Set_Sensitive(Button, Enabled);
-         Add(Box, Button);
-      end AddButton;
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      TreeView: constant Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+      Column: Gtk_Tree_View_Column;
+      Button: Gtk_Check_Button;
    begin
       Set_Position(Dialog, Win_Pos_Center);
-      AddButton("Name", False);
+      for I in 0 .. 11 loop
+         Column := Get_Column(TreeView, Gint(I));
+         Button := Gtk_Check_Button_New_With_Label(Get_Title(Column));
+         if I in 0 | 9 | 11 then
+            Set_Sensitive(Button, False);
+         end if;
+         Set_Active(Button, Get_Visible(Column));
+         On_Toggled(Button, SetVisibility'Access);
+         Add(Box, Button);
+      end loop;
       Show_All(Box);
       if Add_Button(Dialog, "Ok", Gtk_Response_None) = null then
          return;

@@ -46,6 +46,7 @@ with Gtk.Widget; use Gtk.Widget;
 with Glib; use Glib;
 with Glib.Error; use Glib.Error;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
+with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with InfoDialog; use InfoDialog;
@@ -124,10 +125,7 @@ package body MainWindow is
             Column := Gtk_Tree_View_Column_New_With_Area(Area);
             Set_Sort_Column_Id(Column, Gint(I));
             Set_Title(Column, To_String(CellNames(I + 1)));
-            -- We hide "Path" column for now
-            if I = 9 then
-               Set_Visible(Column, False);
-            end if;
+            Set_Visible(Column, VisibleColumns(I));
             if Append_Column(View, Column) < Gint(I) then
                Ada.Text_IO.Put_Line("Error in adding columns.");
             end if;

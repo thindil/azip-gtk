@@ -124,6 +124,10 @@ package body MainWindow is
             Column := Gtk_Tree_View_Column_New_With_Area(Area);
             Set_Sort_Column_Id(Column, Gint(I));
             Set_Title(Column, To_String(CellNames(I + 1)));
+            -- We hide "Path" column for now
+            if I = 9 then
+               Set_Visible(Column, False);
+            end if;
             if Append_Column(View, Column) < Gint(I) then
                Ada.Text_IO.Put_Line("Error in adding columns.");
             end if;

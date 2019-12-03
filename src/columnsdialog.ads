@@ -25,16 +25,6 @@
 package ColumnsDialog is
 -- ****
 
-   -- ****v* ColumnsDialog/VisibleColumns
-   -- FUNCTION
-   -- Store visibility of an archive columns list. Columns from 0 to 11: Name,
-   -- Type, Modified, Attributes, Size, Packed, Ratio, Format, CRC 32, Path,
-   -- Name encoding, Result.
-   -- SOURCE
-   VisibleColumns: array(0 .. 11) of Boolean :=
-     (True, True, True, True, True, True, True, True, True, False, True, True);
-   -- ****
-
    -- ****f* ColumnsDialog/ShowColumnsDialog
    -- FUNCTION
    -- Create and show setting columns visibility dialog to the user

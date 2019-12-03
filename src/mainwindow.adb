@@ -19,7 +19,6 @@
 -- SOFTWARE.
 
 with Ada.Directories; use Ada.Directories;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
@@ -46,7 +45,6 @@ with Gtk.Widget; use Gtk.Widget;
 with Glib; use Glib;
 with Glib.Error; use Glib.Error;
 with Gdk.Pixbuf; use Gdk.Pixbuf;
-with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with InfoDialog; use InfoDialog;
@@ -103,14 +101,6 @@ package body MainWindow is
          Sort: constant Gtk_Tree_Model_Sort :=
            Gtk_Tree_Model_Sort_Sort_New_With_Model(+(List));
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Sort));
-         CellNames: constant array(Positive range <>) of Unbounded_String :=
-           (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
-            To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
-            To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
-            To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
-            To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
-            To_Unbounded_String("Name encoding"),
-            To_Unbounded_String("Result"));
       begin
          Set_Headers_Clickable(View, True);
          Set_Mode(Get_Selection(View), Selection_Multiple);
@@ -124,8 +114,8 @@ package body MainWindow is
             end if;
             Column := Gtk_Tree_View_Column_New_With_Area(Area);
             Set_Sort_Column_Id(Column, Gint(I));
-            Set_Title(Column, To_String(CellNames(I + 1)));
-            Set_Visible(Column, VisibleColumns(I));
+            Set_Title(Column, To_String(Columns(I).Name));
+            Set_Visible(Column, Columns(I).Visible);
             if Append_Column(View, Column) < Gint(I) then
                Ada.Text_IO.Put_Line("Error in adding columns.");
             end if;

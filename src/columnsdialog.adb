@@ -54,7 +54,7 @@ package body ColumnsDialog is
          Column := Get_Column(TreeView, Gint(I));
          if Get_Title(Column) = Get_Label(Self) then
             Set_Visible(Column, Get_Active(Self));
-            VisibleColumns(I) := Get_Active(Self);
+            Columns(I).Visible := Get_Active(Self);
             loop
                Next(Iter);
                MChild := Get(Iter);

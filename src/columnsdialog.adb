@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Check_Button; use Gtk.Check_Button;
@@ -75,35 +76,28 @@ package body ColumnsDialog is
       Dialog: constant Gtk_Dialog :=
         Gtk_Dialog_New("Select displayed columns", Window, Modal);
       Box: constant Gtk_Box := Get_Content_Area(Dialog);
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-      TreeView: constant Gtk_Tree_View :=
-        Gtk_Tree_View
-          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
-      Column: Gtk_Tree_View_Column;
       Button: Gtk_Check_Button;
    begin
       -- Center dialog
       Set_Position(Dialog, Win_Pos_Center);
-      -- Set all buttons, based on columns in archive list
-      -- FIXME: change it to array
+      -- Set all buttons, based on columns data
       for I in 0 .. 11 loop
-         Column := Get_Column(TreeView, Gint(I));
-         Button := Gtk_Check_Button_New_With_Label(Get_Title(Column));
+         Button := Gtk_Check_Button_New_With_Label(To_String(Columns(I).Name));
          if I in 0 | 9 | 11 then
             Set_Sensitive(Button, False);
          end if;
-         Set_Active(Button, Get_Visible(Column));
+         Set_Active(Button, Columns(I).Visible);
          On_Toggled(Button, SetVisibility'Access);
          Add(Box, Button);
       end loop;
       Show_All(Box);
       -- Add Ok button to dialog
-      if Add_Button(Dialog, "Ok", Gtk_Response_None) = null then
+      if Add_Button(Dialog, "Ok", Gtk_Response_OK) = null then
          return;
       end if;
       -- Show dialog to the user
       -- FIXME: not working after close dialog with X button
-      if Run(Dialog) = Gtk_Response_None then
+      if Run(Dialog) /= Gtk_Response_Cancel then
          Destroy(Dialog);
       end if;
    end ShowColumnsDialog;

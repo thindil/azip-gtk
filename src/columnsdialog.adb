@@ -45,30 +45,40 @@ package body ColumnsDialog is
       -- ****
       Iter: Child_Iterator := First_Child(MWindow);
       MChild: MDI_Child := Get(Iter);
-      TreeView: Gtk_Tree_View :=
+      TreeView: Gtk_Tree_View;
+      Column: Gtk_Tree_View_Column;
+      Box: constant Gtk_Box := Gtk_Box(Get_Parent(Self));
+      Index: Natural;
+   begin
+      -- Get index of column, based on index of check button which was
+      -- (un)checked
+      for I in 0 .. 11 loop
+         if Get_Child(Box, Gint(I)) = Gtk_Widget(Self) then
+            Index := I;
+            exit;
+         end if;
+      end loop;
+      Columns(Index).Visible := Get_Active(Self);
+      -- If no achives listing, exit
+      if MChild = null then
+         return;
+      end if;
+      -- Update currently selected archive view
+      TreeView :=
         Gtk_Tree_View
           (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
-      Column: Gtk_Tree_View_Column;
-   begin
-      -- FIXME: change it to array, may crash when no MDI children available
-      for I in 0 .. 11 loop
-         Column := Get_Column(TreeView, Gint(I));
-         if Get_Title(Column) = Get_Label(Self) then
-            Set_Visible(Column, Get_Active(Self));
-            Columns(I).Visible := Get_Active(Self);
-            loop
-               Next(Iter);
-               MChild := Get(Iter);
-               exit when MChild = null;
-               TreeView :=
-                 Gtk_Tree_View
-                   (Get_Child
-                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
-               Column := Get_Column(TreeView, Gint(I));
-               Set_Visible(Column, Get_Active(Self));
-            end loop;
-            return;
-         end if;
+      Column := Get_Column(TreeView, Gint(Index));
+      Set_Visible(Column, Get_Active(Self));
+      -- Update all others archives views
+      loop
+         Next(Iter);
+         MChild := Get(Iter);
+         exit when MChild = null;
+         TreeView :=
+           Gtk_Tree_View
+             (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+         Column := Get_Column(TreeView, Gint(Index));
+         Set_Visible(Column, Get_Active(Self));
       end loop;
    end SetVisibility;
 
@@ -96,7 +106,6 @@ package body ColumnsDialog is
          return;
       end if;
       -- Show dialog to the user
-      -- FIXME: not working after close dialog with X button
       if Run(Dialog) /= Gtk_Response_Cancel then
          Destroy(Dialog);
       end if;

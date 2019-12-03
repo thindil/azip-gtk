@@ -42,6 +42,7 @@ with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with MainWindow; use MainWindow;
+with OptionsDialog; use OptionsDialog;
 
 package body Menu is
 
@@ -436,6 +437,19 @@ package body Menu is
       ShowColumnsDialog;
    end SetColumnsMenu;
 
+   -- ****if* Menu/OptionsMenu
+   -- FUNCTION
+   -- Set the program options
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure OptionsMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowOptionsDialog;
+   end OptionsMenu;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -559,7 +573,7 @@ package body Menu is
       -- Add Options menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Options");
-      AddMenuItem("_General options", EmptyMenu'Access);
+      AddMenuItem("_General options", OptionsMenu'Access);
       -- Add Window menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Window");

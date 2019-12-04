@@ -18,7 +18,12 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Gtk.Box; use Gtk.Box;
+with Gtk.Button; use Gtk.Button;
 with Gtk.Dialog; use Gtk.Dialog;
+with Gtk.Enums; use Gtk.Enums;
+with Gtk.Frame; use Gtk.Frame;
+with Gtk.GEntry; use Gtk.GEntry;
 with Gtk.Widget; use Gtk.Widget;
 with MainWindow; use MainWindow;
 
@@ -26,13 +31,31 @@ package body OptionsDialog is
 
    procedure ShowOptionsDialog is
       Dialog: constant Gtk_Dialog := Gtk_Dialog_New("Options", Window, Modal);
+      Box: constant Gtk_Box := Get_Content_Area(Dialog);
+      Frame: constant Gtk_Frame :=
+        Gtk_Frame_New
+          ("Directory suggested for archive extraction (if empty: archive's location)");
+      GEntry: constant Gtk_GEntry := Gtk_Entry_New;
+      Button: constant Gtk_Button := Gtk_Button_New_With_Label("Choose");
+      HBox: constant Gtk_Hbox := Gtk_Hbox_New;
    begin
+      -- Center dialog
+      Set_Position(Dialog, Win_Pos_Center);
+      Pack_Start(HBox, GEntry, True);
+      Pack_Start(HBox, Button, False);
+      Add(Frame, HBox);
+      Pack_Start(Box, Frame);
+      Show_All(Box);
       -- Add Ok button to dialog
       if Add_Button(Dialog, "Ok", Gtk_Response_OK) = null then
          return;
       end if;
+      -- Add Cancel button to dialog
+      if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
+         return;
+      end if;
       -- Show dialog to the user
-      if Run(Dialog) /= Gtk_Response_Cancel then
+      if Run(Dialog) /= Gtk_Response_Reject then
          Destroy(Dialog);
       end if;
    end ShowOptionsDialog;

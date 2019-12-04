@@ -41,6 +41,7 @@ with AboutDialog; use AboutDialog;
 with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
+with HelpDialog; use HelpDialog;
 with MainWindow; use MainWindow;
 with OptionsDialog; use OptionsDialog;
 
@@ -450,6 +451,19 @@ package body Menu is
       ShowOptionsDialog;
    end OptionsMenu;
 
+   -- ****if* Menu/HelpMenu
+   -- FUNCTION
+   -- Show the program help
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
+   procedure HelpMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowHelpDialog;
+   end HelpMenu;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -585,7 +599,7 @@ package body Menu is
       -- Add Help menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Help");
-      AddMenuItem("_Quick help", EmptyMenu'Access);
+      AddMenuItem("_Quick help", HelpMenu'Access);
       AddMenuItem("AZip _Webpage (contact, support)", EmptyMenu'Access);
       AddMenuItem("Azip _news", EmptyMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);

@@ -31,10 +31,24 @@ with MainWindow; use MainWindow;
 
 package body OptionsDialog is
 
+   -- ****iv* OptionsDialog/DirectoryEntry
+   -- FUNCTION
+   -- Gtk_GEntry with full path to default directory where archives will be
+   -- extracted
+   -- SOURCE
    DirectoryEntry: Gtk_GEntry;
+   -- ****
 
+   -- ****if* OptionsDialog/ShowDirectories
+   -- FUNCTION
+   -- Show dialog with directories to select as default directory and
+   -- set it if the user press Ok button
+   -- PARAMETERS
+   -- Self - Gtk_Button pressed. Unused. Can be null.
+   -- SOURCE
    procedure ShowDirectories(Self: access Gtk_Button_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       Dialog: constant Gtk_File_Chooser_Dialog :=
         Gtk_File_Chooser_Dialog_New
           ("Select directory", Window, Action_Create_Folder);

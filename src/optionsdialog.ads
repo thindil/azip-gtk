@@ -20,10 +20,26 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+-- ****h* AZipGtk/OptionsDialog
+-- FUNCTION
+-- Provides code for the program configuration
+-- SOURCE
 package OptionsDialog is
+-- ****
 
+   -- ****v* OptionsDialog/DefaultPath
+   -- FUNCTION
+   -- Default path to extract selected archive. If empty, the archive will
+   -- be extracted to this same directory where it is.
+   -- SOURCE
    DefaultPath: Unbounded_String;
+   -- ****
 
+   -- ****f* OptionsDialog/ShowOptionsDialog
+   -- FUNCTION
+   -- Show Options dialog to the user and set everything on press Ok button
+   -- SOURCE
    procedure ShowOptionsDialog;
+   -- ****
 
 end OptionsDialog;

@@ -49,6 +49,7 @@ with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;
 with InfoDialog; use InfoDialog;
 with Menu; use Menu;
+with OptionsDialog; use OptionsDialog;
 
 package body MainWindow is
 
@@ -519,6 +520,9 @@ package body MainWindow is
       Add(Gtk_Container(Window), Gtk_Widget(WindowBox));
       Show_All(Gtk_Widget(Window));
       NewArchive(null);
+      -- Here probably should go code to set the program settings from the
+      -- configuration file (like default path to where extract archives)
+      DefaultPath := Null_Unbounded_String;
    end CreateMainWindow;
 
 end MainWindow;

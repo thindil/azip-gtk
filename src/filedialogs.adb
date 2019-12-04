@@ -13,6 +13,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -27,6 +28,7 @@ with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Widget; use Gtk.Widget;
 with Glib; use Glib;
+with OptionsDialog; use OptionsDialog;
 
 package body FileDialogs is
 
@@ -49,6 +51,11 @@ package body FileDialogs is
       -- Add Ok button
       if Add_Button(Dialog, "OK", Gtk_Response_OK) = null then
          Ada.Text_IO.Put_Line("Can't add button to dialog.");
+      end if;
+      if DefaultPath /= Null_Unbounded_String
+        and then not Set_Current_Folder(Dialog, To_String(DefaultPath)) then
+         Ada.Text_IO.Put_Line
+           ("Can't set this directory as a current directory.");
       end if;
       -- Show dialog to the user
       if Run(Dialog) = Gtk_Response_OK then

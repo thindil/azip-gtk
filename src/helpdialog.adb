@@ -21,6 +21,7 @@
 with Gtk.Box; use Gtk.Box;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Frame; use Gtk.Frame;
+with Gtk.Image; use Gtk.Image;
 with Gtk.Label; use Gtk.Label;
 with Gtk.Notebook; use Gtk.Notebook;
 with Gtk.Widget; use Gtk.Widget;
@@ -38,11 +39,16 @@ package body HelpDialog is
       InstallationLabel: constant Gtk_Label :=
         Gtk_Label_New
           ("AZip doesn't require any installation. It can even run from a USB stick for instance.");
-      procedure AddFrame(Label, Text: String) is
+      procedure AddFrame(Label, Text, ImagePath: String) is
          Frame: constant Gtk_Frame := Gtk_Frame_New(Label);
          FrameBox: constant Gtk_Hbox := Gtk_Hbox_New;
          FrameLabel: constant Gtk_Label := Gtk_Label_New(Text);
+         FrameImage: Gtk_Image;
       begin
+         if Imagepath /= "" then
+            FrameImage := Gtk_Image_New_From_File(ImagePath);
+            Pack_Start(FrameBox, FrameImage, False);
+         end if;
          Set_Line_Wrap(FrameLabel, True);
          Set_Max_Width_Chars(FrameLabel, 80);
          Pack_Start(FrameBox, FrameLabel);
@@ -53,10 +59,10 @@ package body HelpDialog is
       Box := Gtk_Vbox_New;
       AddFrame
         ("Adding files and folders",
-         "You can add files, or individual folders through menu commands (+) or buttons. BUT: you can also do it easily via Drag && Drop, from a Windows Explorer window or the Desktop, onto an AZip archive window. Any mix of dragged folders and files is supported.");
+         "You can add files, or individual folders through menu commands (+) or buttons. BUT: you can also do it easily via Drag && Drop, from a Windows Explorer window or the Desktop, onto an AZip archive window. Any mix of dragged folders and files is supported.", "plus.ico");
       AddFrame
         ("Unpacking files",
-         "You can extract selected files, the selected folder, or the entire archive via the Extract command (Ctrl+E) or a button. BUT: you can also extract files via Drag && Drop to a Windows Explorer window or to the Desktop.");
+         "You can extract selected files, the selected folder, or the entire archive via the Extract command (Ctrl+E) or a button. BUT: you can also extract files via Drag && Drop to a Windows Explorer window or to the Desktop.", "drag_unpack.ico");
       Append_Page(Notebook, Box, Gtk_Label_New("User Interface"));
       Box := Gtk_Vbox_New;
       Set_Line_Wrap(InstallationLabel, True);
@@ -64,15 +70,15 @@ package body HelpDialog is
       Pack_Start(Box, InstallationLabel, False);
       AddFrame
         ("Using AZip as a portable software - stealth mode",
-         "For convenience, by default, AZip writes user settings in the registry, as standard Windows software does. If you want the registry NOT being written to, you can add a file, azip.cfg (can be empty), in the same directory as azip*.exe. User settings will be recorded there. If the file is read-only, it simply won't be changed, and settings won't be saved.");
+         "For convenience, by default, AZip writes user settings in the registry, as standard Windows software does. If you want the registry NOT being written to, you can add a file, azip.cfg (can be empty), in the same directory as azip*.exe. User settings will be recorded there. If the file is read-only, it simply won't be changed, and settings won't be saved.", "no_regedit.bmp");
       Append_Page(Notebook, Box, Gtk_Label_New("Installation"));
       Box := Gtk_Vbox_New;
       AddFrame
         ("Command-line parameters",
-         "The activation of AZip with command-line parameters for specific operations is under construction");
+         "The activation of AZip with command-line parameters for specific operations is under construction", "");
       AddFrame
         ("Command-line tools with console output",
-         "Pure command-line tools corresponding to AZip are located in the Zip-Ada project (zipada, unzipada, rezip, find_zip, comp_zip). Follow hyperlink in the About box for download.");
+         "Pure command-line tools corresponding to AZip are located in the Zip-Ada project (zipada, unzipada, rezip, find_zip, comp_zip). Follow hyperlink in the About box for download.", "za_console.bmp");
       Append_Page(Notebook, Box, Gtk_Label_New("Command-line"));
       Pack_Start(DialogBox, Notebook);
       Show_All(DialogBox);

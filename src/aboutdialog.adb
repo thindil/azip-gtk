@@ -21,11 +21,15 @@
 with Gtk.About_Dialog; use Gtk.About_Dialog;
 with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Widget; use Gtk.Widget;
+with Glib.Error; use Glib.Error;
+with Gdk.Pixbuf; use Gdk.Pixbuf;
 
 package body AboutDialog is
 
    procedure ShowAboutDialog(Parent: Gtk_Window) is
       AboutDialog: constant Gtk_About_Dialog := Gtk_About_Dialog_New;
+      Logo: Gdk_Pixbuf;
+      Error: GError;
    begin
       -- Set parent for dialog
       Set_Transient_For(Gtk_Window(AboutDialog), Parent);
@@ -34,6 +38,8 @@ package body AboutDialog is
       Set_Program_Name(AboutDialog, "AZip");
       Set_License_Type(AboutDialog, License_Mit_X11);
       Set_Copyright(AboutDialog, "(c) 2019 Gautier de Montmollin");
+      Gdk_New_From_File(Logo, "azip.ico", Error);
+      Set_Logo(AboutDialog, Logo);
       Set_Authors
         (AboutDialog,
          (new String'

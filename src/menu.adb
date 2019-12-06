@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
 with Gtk.Dialog; use Gtk.Dialog;
@@ -464,6 +465,51 @@ package body Menu is
       ShowHelpDialog;
    end HelpMenu;
 
+   procedure ShowWebpage(URL: String) is
+      Executable: access String := Locate_Exec_On_Path("xdg-open");
+      MessageDialog: Gtk_Message_Dialog;
+      Pid: Process_Id;
+   begin
+      if Executable = null then
+         Executable := Locate_Exec_On_Path("xdg-open");
+      end if;
+      if Executable = null then
+         MessageDialog :=
+           Gtk_Message_Dialog_New
+             (Window, Modal, Message_Error, Buttons_Close,
+              "Can't find the program to open webpage.");
+         if Run(MessageDialog) = Gtk_Response_Close then
+            Destroy(MessageDialog);
+         end if;
+         return;
+      end if;
+      Pid :=
+        Non_Blocking_Spawn(Executable.all, Argument_String_To_List(URL).all);
+      if Pid = Invalid_Pid then
+         MessageDialog :=
+           Gtk_Message_Dialog_New
+             (Window, Modal, Message_Error, Buttons_Close,
+              "Can't start the program to open webpage.");
+         if Run(MessageDialog) = Gtk_Response_Close then
+            Destroy(MessageDialog);
+         end if;
+      end if;
+   end ShowWebpage;
+
+   procedure WebpageMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowWebpage("http://azip.sf.net/");
+   end WebpageMenu;
+
+   procedure NewsMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      -- ****
+   begin
+      ShowWebpage("https://sourceforge.net/p/azip/news/");
+   end NewsMenu;
+
    -- ****if* Menu/EmptyMenu
    -- FUNCTION
    -- Placeholder code, will be removed later
@@ -600,8 +646,8 @@ package body Menu is
       Menu := Gtk_Menu_New;
       AddSubmenu("_Help");
       AddMenuItem("_Quick help", HelpMenu'Access);
-      AddMenuItem("AZip _Webpage (contact, support)", EmptyMenu'Access);
-      AddMenuItem("Azip _news", EmptyMenu'Access);
+      AddMenuItem("AZip _Webpage (contact, support)", WebpageMenu'Access);
+      AddMenuItem("Azip _news", NewsMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       AddMenuItem("_About AZip", ShowAbout'Access);
       Pack_Start(WindowBox, Menubar, False);

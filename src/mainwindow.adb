@@ -53,6 +53,24 @@ with OptionsDialog; use OptionsDialog;
 
 package body MainWindow is
 
+   procedure UpdateToolbar
+     (Self: access MDI_Window_Record'Class;
+      Child: not null access MDI_Child_Record'Class) is
+      pragma Unreferenced(Self);
+      List: constant Gtk_List_Store :=
+        -(Get_Model
+           (-(Get_Model
+               (Gtk_Tree_View
+                  (Get_Child
+                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(Child))))))))));
+      Enabled: Boolean := True;
+      ToolBar: constant Gtk_Toolbar := Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
+   begin
+      if N_Children(List) = 0 then
+         Enabled := False;
+      end if;
+   end UpdateToolbar;
+
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       ArchivePaned: constant Gtk_Paned :=
@@ -147,10 +165,9 @@ package body MainWindow is
          return;
       end if;
       MChild := Get_Focus_Child(MWindow);
-      if MChild /= null and then Get_Title(MChild) = "New Archive" then
-         Close_Child(MChild, True);
+      if MChild = null or else Get_Title(MChild) /= "New Archive" then
+         NewArchive(null);
       end if;
-      NewArchive(null);
       MChild := Get_Focus_Child(MWindow);
       Set_Title(MChild, FileName);
       Tree :=
@@ -178,6 +195,7 @@ package body MainWindow is
          end loop;
          Set(List, Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
       end loop;
+      Child_Selected(MWindow, MChild);
    end OpenFile;
 
    -- ****if* MainWindow/ExtractArchive
@@ -470,7 +488,7 @@ package body MainWindow is
       WindowBox: constant Gtk_Vbox := Gtk_Vbox_New;
       procedure AddButton
         (IconStarts: Gint; Label: String;
-         Subprogram: Cb_Gtk_Tool_Button_Void) is
+        Subprogram: Cb_Gtk_Tool_Button_Void; Enabled: Boolean := False) is
          Button: Gtk_Tool_Button;
       begin
          Button :=
@@ -481,6 +499,7 @@ package body MainWindow is
               Label);
          On_Clicked(Button, Subprogram);
          Set_Tooltip_Text(Gtk_Widget(Button), Label);
+         Set_Sensitive(Button, Enabled);
          Add(Toolbar, Button);
       end AddButton;
    begin
@@ -496,8 +515,9 @@ package body MainWindow is
       end if;
       ToolsIcons := Add_Alpha(ToolsIcons, True, 163, 73, 164);
       Gtk_New(MWindow, null);
-      AddButton(320, "New archive", NewArchive'Access);
-      AddButton(352, "Open archive", OpenArchive'Access);
+      On_Child_Selected(MWindow, UpdateToolbar'Access);
+      AddButton(320, "New archive", NewArchive'Access, True);
+      AddButton(352, "Open archive", OpenArchive'Access, True);
       AddButton(64, "Extract archive", ExtractArchive'Access);
       Add(Toolbar, Gtk_Separator_Tool_Item_New);
       AddButton(0, "Add files...", AddFile'Access);

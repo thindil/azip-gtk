@@ -64,11 +64,17 @@ package body MainWindow is
                   (Get_Child
                      (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(Child))))))))));
       Enabled: Boolean := True;
-      ToolBar: constant Gtk_Toolbar := Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
+      ToolBar: constant Gtk_Toolbar :=
+        Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
+      Buttons: constant array(Positive range <>) of Gint :=
+        (2, 6, 8, 9, 11, 12);
    begin
       if N_Children(List) = 0 then
          Enabled := False;
       end if;
+      for Button of Buttons loop
+         Set_Sensitive(Gtk_Widget(Get_Nth_Item(ToolBar, Button)), Enabled);
+      end loop;
    end UpdateToolbar;
 
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
@@ -83,6 +89,9 @@ package body MainWindow is
       Area: Gtk_Cell_Area_Box;
       Renderer: Gtk_Cell_Renderer_Text;
       MChild: MDI_Child;
+      ToolBar: constant Gtk_Toolbar :=
+        Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
+      Buttons: constant array(1 .. 4) of Gint := (4, 5, 14, 16);
    begin
       -- Split archive window on 1/3 for tree and rest for list.
       Set_Position
@@ -152,6 +161,10 @@ package body MainWindow is
       Put(MWindow, MChild);
       Split(MWindow, Orientation, MChild);
       Set_Focus_Child(MChild);
+      -- Enable some buttons in toolbar
+      for Button of Buttons loop
+         Set_Sensitive(Gtk_Widget(Get_Nth_Item(ToolBar, Button)), True);
+      end loop;
    end NewArchive;
 
    procedure OpenFile(FileName: String) is
@@ -487,8 +500,8 @@ package body MainWindow is
       Toolbar: constant Gtk_Toolbar := Gtk_Toolbar_New;
       WindowBox: constant Gtk_Vbox := Gtk_Vbox_New;
       procedure AddButton
-        (IconStarts: Gint; Label: String;
-        Subprogram: Cb_Gtk_Tool_Button_Void; Enabled: Boolean := False) is
+        (IconStarts: Gint; Label: String; Subprogram: Cb_Gtk_Tool_Button_Void;
+         Enabled: Boolean := False) is
          Button: Gtk_Tool_Button;
       begin
          Button :=

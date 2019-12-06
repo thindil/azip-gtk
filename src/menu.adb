@@ -465,14 +465,26 @@ package body Menu is
       ShowHelpDialog;
    end HelpMenu;
 
+   -- ****if* Menu/ShowWebpage
+   -- FUNCTION
+   -- Open selected URL in the user default web browser. Show message if for
+   -- some reason, it was impossible to do.
+   -- PARAMETERS
+   -- URL - Full URL (with http(s)://) to open
+   -- SOURCE
    procedure ShowWebpage(URL: String) is
+      -- ****
       Executable: access String := Locate_Exec_On_Path("xdg-open");
       MessageDialog: Gtk_Message_Dialog;
       Pid: Process_Id;
    begin
+      -- 'xdg-open' should be available in all Linux distributions. If the
+      -- program can't find it, this may means, we are on another OS :)
+      -- Windows and MacOS both use 'open' command to open URL's
       if Executable = null then
-         Executable := Locate_Exec_On_Path("xdg-open");
+         Executable := Locate_Exec_On_Path("open");
       end if;
+      -- No command to run was found, inform the user and exit
       if Executable = null then
          MessageDialog :=
            Gtk_Message_Dialog_New
@@ -483,8 +495,10 @@ package body Menu is
          end if;
          return;
       end if;
+      -- Spawn browser and open selected URL for the user
       Pid :=
         Non_Blocking_Spawn(Executable.all, Argument_String_To_List(URL).all);
+      -- If URL can't be opened, show information to the user
       if Pid = Invalid_Pid then
          MessageDialog :=
            Gtk_Message_Dialog_New
@@ -496,6 +510,12 @@ package body Menu is
       end if;
    end ShowWebpage;
 
+   -- ****if* Menu/WebpageMenu
+   -- FUNCTION
+   -- Show the program webpage to the user
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure WebpageMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
@@ -503,6 +523,12 @@ package body Menu is
       ShowWebpage("http://azip.sf.net/");
    end WebpageMenu;
 
+   -- ****if* Menu/NewsMenu
+   -- FUNCTION
+   -- Show the program news webpage to the user
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was activated. Unused, can be null.
+   -- SOURCE
    procedure NewsMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****

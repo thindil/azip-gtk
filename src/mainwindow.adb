@@ -242,9 +242,11 @@ package body MainWindow is
       ShowAddFileDialog
         (Window,
          -(Get_Model
-            (Gtk_Tree_View
-               (Get_Child
-                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))));
+            (-(Get_Model
+                (Gtk_Tree_View
+                   (Get_Child
+                      (Gtk_Bin
+                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))));
    end AddFile;
 
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
@@ -254,9 +256,11 @@ package body MainWindow is
       ShowAddFileDialog
         (Window,
          -(Get_Model
-            (Gtk_Tree_View
-               (Get_Child
-                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+            (-(Get_Model
+                (Gtk_Tree_View
+                   (Get_Child
+                      (Gtk_Bin
+                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))),
          True);
    end AddFileEncrypted;
 

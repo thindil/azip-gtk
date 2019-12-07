@@ -53,10 +53,19 @@ with OptionsDialog; use OptionsDialog;
 
 package body MainWindow is
 
+   -- ****if* MainWindow/UpdateToolbar
+   -- FUNCTION
+   -- Enable or disable toolbar buttons based on state of currently selected
+   -- archive
+   -- PARAMETERS
+   -- Self  - Main MDI_Window which contains all archives windows. Unused.
+   -- Child - Currently selected MDI_Child window with archive
+   -- SOURCE
    procedure UpdateToolbar
      (Self: access MDI_Window_Record'Class;
       Child: not null access MDI_Child_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       List: constant Gtk_List_Store :=
         -(Get_Model
            (-(Get_Model
@@ -66,9 +75,10 @@ package body MainWindow is
       Enabled: Boolean := True;
       ToolBar: constant Gtk_Toolbar :=
         Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
-      Buttons: constant array(Positive range <>) of Gint :=
-        (2, 6, 8, 9, 11, 12);
+      Buttons: constant array(1 .. 6) of Gint := (2, 6, 8, 9, 11, 12);
    begin
+      -- If currently selected is empty archive, block buttons, otherwise
+      -- enable them
       if N_Children(List) = 0 then
          Enabled := False;
       end if;
@@ -290,7 +300,12 @@ package body MainWindow is
       Destroy(MessageDialog);
    end DeleteFiles;
 
+   -- ****iv* MainWindow/ValidArchive
+   -- FUNCTION
+   -- If true, selected archive is valid. Default is true
+   -- SOURCE
    ValidArchive: Boolean := True;
+   -- ****
 
    -- ****if* MainWindow/ValidateArchive
    -- FUNCTION

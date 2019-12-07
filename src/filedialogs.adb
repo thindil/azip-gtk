@@ -27,7 +27,9 @@ with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Widget; use Gtk.Widget;
+with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
+with MainWindow; use MainWindow;
 with OptionsDialog; use OptionsDialog;
 
 package body FileDialogs is
@@ -238,6 +240,7 @@ package body FileDialogs is
                AddFile(String_SList.Nth_Data(FilesNames, I));
             end if;
          end loop;
+         Child_Selected(MWindow, Get_Focus_Child(MWindow));
       end if;
       Destroy(Dialog);
    end ShowAddFileDialog;

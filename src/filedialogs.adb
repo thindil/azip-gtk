@@ -13,6 +13,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
@@ -168,7 +169,7 @@ package body FileDialogs is
          -- FileName is full path to the file which will be added.
          -- Columns from 0 to 11: Name, Type, Modified, Attributes,
          -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
-         Set(FilesList, Iter, 0, FileName);
+         Set(FilesList, Iter, 0, Simple_Name(FileName));
          -- This code is placeholder for fill selected file information
          for J in 1 .. 11 loop
             Set(FilesList, Iter, Gint(J), Integer'Image(J));

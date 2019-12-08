@@ -95,7 +95,6 @@ package body MainWindow is
       Tree: constant Gtk_Tree_Store :=
         Gtk_Tree_Store_Newv((0 => GType_String));
       Column: Gtk_Tree_View_Column;
-      Iter: Gtk_Tree_Iter;
       Area: Gtk_Cell_Area_Box;
       Renderer: Gtk_Cell_Renderer_Text;
       MChild: MDI_Child;
@@ -108,8 +107,6 @@ package body MainWindow is
         (ArchivePaned,
          Gint(Float(Get_Allocated_Width(Gtk_Widget(Window))) * 0.3));
       -- Add tree view with directory tree for the archive
-      Append(Tree, Iter, Null_Iter);
-      Set(Tree, Iter, 0, "New archive");
       declare
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Tree));
       begin

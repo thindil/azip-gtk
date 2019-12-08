@@ -271,12 +271,13 @@ package body MainWindow is
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
       TreeView: constant Gtk_Tree_View :=
         Gtk_Tree_View
           (Get_Child
              (Gtk_Bin
                 (Get_Child2
-                   (Gtk_Paned(Get_Widget(Get_Focus_Child(MWindow)))))));
+                   (Gtk_Paned(Get_Widget(MChild))))));
       Model: Gtk_Tree_Model;
       SelectedList, List: Glist;
       FileName: Unbounded_String;
@@ -301,6 +302,7 @@ package body MainWindow is
             Convert_Iter_To_Child_Iter(-(Model), ListIter, Iter);
             Gtk.List_Store.Remove(-(Get_Model(-(Model))), ListIter);
          end loop;
+         Child_Selected(MWindow, MChild);
       end if;
       Destroy(MessageDialog);
    end DeleteFiles;

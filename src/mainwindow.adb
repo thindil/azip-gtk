@@ -264,42 +264,43 @@ package body MainWindow is
          True);
    end AddFileEncrypted;
 
-   -- ****if* MainWindow/DeleteItems
-   -- FUNCTION
-   -- Delete selected file or directory from the archive.
-   -- PARAMETERS
-   -- Model - Gtk_Tree_Model with list of all files and directories in the
-   --         selected archive.
-   -- Path  - Gtk_Tree_Path to the selected file or directory. Unused.
-   -- Iter  - Gtk_Tree_Iter in Model to selected file or directory.
-   -- SOURCE
-   procedure DeleteItems
-     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter) is
-      pragma Unreferenced(Path);
-      -- ****
-      NewIter: Gtk_Tree_Iter := Iter;
-   begin
-      Gtk.List_Store.Remove(-(Model), NewIter);
-      -- This is placeholder code. Probably all code to remove files or
-      -- directories from the archive should go here.
-      Ada.Text_IO.Put_Line("Deleting: " & Get_String(Model, Iter, 0));
-   end DeleteItems;
-
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
+      use Gtk_Tree_Path_List;
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,
            "Do you want to delete selected item(s)?");
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      TreeView: constant Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child
+             (Gtk_Bin
+                (Get_Child2
+                   (Gtk_Paned(Get_Widget(Get_Focus_Child(MWindow)))))));
+      Model: Gtk_Tree_Model;
+      SelectedList, List: Glist;
+      FileName: Unbounded_String;
+      Iter, ListIter: Gtk_Tree_Iter;
    begin
+      -- Show dialog with question to the user. If the user answer Yes, start
+      -- removing selected files one by one.
       if Run(MessageDialog) = Gtk_Response_Yes then
-         Selected_Foreach
-           (Get_Selection
-              (Gtk_Tree_View
-                 (Get_Child
-                    (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))),
-            DeleteItems'Access);
+         Get_Selected_Rows(Get_Selection(TreeView), Model, SelectedList);
+         for I in reverse 0 .. Gtk_Tree_Path_List.Length(SelectedList) - 1 loop
+            List := Gtk_Tree_Path_List.Nth(SelectedList, I);
+            Iter :=
+              Gtk.Tree_Model_Sort.Get_Iter
+                (-(Model), Gtk.Tree_Model.Convert(Get_Data_Address(List)));
+            FileName :=
+              To_Unbounded_String
+                (Gtk.Tree_Model_Sort.Get_String(-(Model), Iter, 0));
+            -- Here probably should go all the code to delete selected file
+            -- from the archive. This line is just a placeholder code
+            Ada.Text_IO.Put_Line("Deleting: " & To_String(FileName));
+            -- Remove file from archive list
+            Convert_Iter_To_Child_Iter(-(Model), ListIter, Iter);
+            Gtk.List_Store.Remove(-(Get_Model(-(Model))), ListIter);
+         end loop;
       end if;
       Destroy(MessageDialog);
    end DeleteFiles;

@@ -182,6 +182,7 @@ package body FileDialogs is
            (Gtk_Tree_View
               (Get_Child
                  (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
+        CurrentDirectory: Unbounded_String := To_Unbounded_String("/");
       procedure AddFile(FileName: String) is
       begin
          Append(FilesList, Iter);
@@ -190,9 +191,12 @@ package body FileDialogs is
          -- Columns from 0 to 11: Name, Type, Modified, Attributes,
          -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
          Set(FilesList, Iter, 0, Simple_Name(FileName));
+         Set(FilesList, Iter, 9, To_String(CurrentDirectory));
          -- This code is placeholder for fill selected file information
          for J in 1 .. 11 loop
-            Set(FilesList, Iter, Gint(J), Integer'Image(J));
+            if J /= 9 then
+               Set(FilesList, Iter, Gint(J), Integer'Image(J));
+            end if;
          end loop;
       end AddFile;
       procedure AddDirectory(Path: String) is
@@ -204,6 +208,7 @@ package body FileDialogs is
          TreeIter := Get_Iter_From_String(Tree, To_String(TreePath));
          Append(TreePath, ":0");
          SubIter := Get_Iter_From_String(Tree, To_String(TreePath));
+         Append(CurrentDirectory, Simple_Name(Path) & "/");
          Open(Directory, Path);
          loop
             Read(Directory, FileName, Last);

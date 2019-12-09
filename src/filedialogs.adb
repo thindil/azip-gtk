@@ -18,6 +18,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
+with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Combo_Box; use Gtk.Combo_Box;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
@@ -27,7 +28,10 @@ with Gtk.File_Chooser; use Gtk.File_Chooser;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
+with Gtk.Paned; use Gtk.Paned;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
+with Gtk.Tree_Store; use Gtk.Tree_Store;
+with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
@@ -170,7 +174,14 @@ package body FileDialogs is
       Encrypted: Boolean := False; Directory: Boolean := False) is
       Dialog: Gtk_File_Chooser_Dialog;
       FilesNames: String_SList.GSlist;
-      Iter: Gtk_Tree_Iter;
+      Iter, TreeIter: Gtk_Tree_Iter;
+      TreePath: Unbounded_String := To_Unbounded_String("0");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      Tree: constant Gtk_Tree_Store :=
+        -(Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
       procedure AddFile(FileName: String) is
       begin
          Append(FilesList, Iter);
@@ -188,7 +199,11 @@ package body FileDialogs is
          Directory: Dir_Type;
          Last: Natural;
          FileName: String(1 .. 1024);
+         SubIter: Gtk_Tree_Iter;
       begin
+         TreeIter := Get_Iter_From_String(Tree, To_String(TreePath));
+         Append(TreePath, ":0");
+         SubIter := Get_Iter_From_String(Tree, To_String(TreePath));
          Open(Directory, Path);
          loop
             Read(Directory, FileName, Last);
@@ -198,11 +213,26 @@ package body FileDialogs is
             end if;
             if Is_Directory
                 (Path & Directory_Separator & FileName(1 .. Last)) then
-               AddDirectory(Path & Directory_Separator & FileName(1 .. Last));
+               Append(Tree, SubIter, TreeIter);
+               Set(Tree, SubIter, 0, Simple_Name(FileName(1 .. Last)));
             else
                AddFile(Path & Directory_Separator & FileName(1 .. Last));
             end if;
             <<End_Of_Loop>>
+         end loop;
+         Close(Directory);
+         Open(Directory, Path);
+         loop
+            Read(Directory, FileName, Last);
+            exit when Last = 0;
+            if FileName(1 .. Last) in "." | ".." then
+               goto End_Of_Loop2;
+            end if;
+            if Is_Directory
+                (Path & Directory_Separator & FileName(1 .. Last)) then
+               AddDirectory(Path & Directory_Separator & FileName(1 .. Last));
+            end if;
+            <<End_Of_Loop2>>
          end loop;
          Close(Directory);
       end AddDirectory;

@@ -95,6 +95,7 @@ package body MainWindow is
       Tree: constant Gtk_Tree_Store :=
         Gtk_Tree_Store_Newv((0 => GType_String));
       Column: Gtk_Tree_View_Column;
+      Iter: Gtk_Tree_Iter;
       Area: Gtk_Cell_Area_Box;
       Renderer: Gtk_Cell_Renderer_Text;
       MChild: MDI_Child;
@@ -107,6 +108,8 @@ package body MainWindow is
         (ArchivePaned,
          Gint(Float(Get_Allocated_Width(Gtk_Widget(Window))) * 0.3));
       -- Add tree view with directory tree for the archive
+      Append(Tree, Iter, Null_Iter);
+      Set(Tree, Iter, 0, "New archive");
       declare
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Tree));
       begin
@@ -271,10 +274,7 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
       TreeView: constant Gtk_Tree_View :=
         Gtk_Tree_View
-          (Get_Child
-             (Gtk_Bin
-                (Get_Child2
-                   (Gtk_Paned(Get_Widget(MChild))))));
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
       Model: Gtk_Tree_Model;
       SelectedList, List: Glist;
       FileName: Unbounded_String;
@@ -512,6 +512,19 @@ package body MainWindow is
    begin
       Main_Quit;
    end ProgramQuit;
+
+   procedure ChangeName(NewName: String) is
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      Tree: constant Gtk_Tree_Store :=
+        -(Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
+      Iter: constant Gtk_Tree_Iter := Get_Iter_From_String(Tree, "0");
+   begin
+      Set_Title(MChild, NewName);
+      Set(Tree, Iter, 0, Simple_Name(NewName));
+   end ChangeName;
 
    procedure CreateMainWindow is
       Error: GError;

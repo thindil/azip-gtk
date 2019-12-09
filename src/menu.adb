@@ -86,8 +86,11 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      NewName: constant String := ShowSaveDialog(Window, Get_Title(MChild));
    begin
-      ShowSaveDialog(Window, Get_Title(MChild));
+      if NewName /= "" then
+         ChangeName(NewName);
+      end if;
    end SaveArchiveMenu;
 
    -- ****if* Menu/CloseArchiveMenu

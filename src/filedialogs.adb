@@ -26,6 +26,7 @@ with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser; use Gtk.File_Chooser;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
+with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
@@ -130,7 +131,8 @@ package body FileDialogs is
       return "";
    end ShowFileDialog;
 
-   procedure ShowSaveDialog(Parent: Gtk_Window; Archive: String) is
+   function ShowSaveDialog
+     (Parent: Gtk_Window; Archive: String) return String is
    begin
       CurrentDialog :=
         Gtk_File_Chooser_Dialog_New("Save archive as", Parent, Action_Save);
@@ -150,10 +152,17 @@ package body FileDialogs is
          -- If button Ok was pressed, save selected archive to selected
          -- directory This code is a placeholder, probably whole compress
          -- or move code should go here.
-         Put_Line("New full path: " & Get_Filename(CurrentDialog));
-         Put_Line("Archive to save: " & Archive);
+         declare
+            ArchivePath: constant String := Get_Filename(CurrentDialog);
+         begin
+            Put_Line("New full path: " & ArchivePath);
+            Put_Line("Archive to save: " & Archive);
+            Destroy(CurrentDialog);
+            return ArchivePath;
+         end;
       end if;
       Destroy(CurrentDialog);
+      return "";
    end ShowSaveDialog;
 
    procedure ShowAddFileDialog
@@ -231,6 +240,32 @@ package body FileDialogs is
       end if;
       -- Show dialog to the user
       if Run(Dialog) = Gtk_Response_OK then
+         -- If this is a new, empty archive, ask the use under which name save
+         -- it
+         declare
+            MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+            MessageDialog: constant Gtk_Message_Dialog :=
+              Gtk_Message_Dialog_New
+                (Window, Modal, Message_Question, Buttons_Ok,
+                 "You'll be asked under which name the archive will be created.");
+            NewName: Unbounded_String;
+         begin
+            if Get_Title(MChild) = "New Archive" then
+               Hide(Dialog);
+               if Run(MessageDialog) /= Gtk_Response_Yes then
+                  Destroy(MessageDialog);
+                  NewName :=
+                    To_Unbounded_String
+                      (ShowSaveDialog(Window, Get_Title(MChild)));
+                  if NewName /= Null_Unbounded_String then
+                     ChangeName(To_String(NewName));
+                  else
+                     Destroy(Dialog);
+                     return;
+                  end if;
+               end if;
+            end if;
+         end;
          FilesNames := Get_Filenames(Dialog);
          for I in 0 .. String_SList.Length(FilesNames) - 1 loop
             -- If selected item is directory, add its content

@@ -55,8 +55,11 @@ package FileDialogs is
    -- Parent  - Gtk_Window which will be parent for the dialog. Should be
    --           always main window
    -- Archive - Full path to the archive which will be extracted
+   -- RESULT
+   -- Full path to the new archive name or empty string in dialog closed
+   -- without selection
    -- SOURCE
-   procedure ShowSaveDialog(Parent: Gtk_Window; Archive: String);
+   function ShowSaveDialog(Parent: Gtk_Window; Archive: String) return String;
    -- ****
 
    -- ****f* FileDialogs/ShowAddFileDialog

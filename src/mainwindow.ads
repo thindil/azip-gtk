@@ -169,6 +169,15 @@ package MainWindow is
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class);
    -- ****
 
+   -- ****f* MainWindow/ChangeName
+   -- FUNCTION
+   -- Change name of currently selected archive
+   -- PARAMETERS
+   -- NewName - Full path to the new archive
+   -- SOURCE
+   procedure ChangeName(NewName: String);
+   -- ****
+
    -- ****f* MainWindow/CreateMainWindow
    -- FUNCTION
    -- Create main window of the program.

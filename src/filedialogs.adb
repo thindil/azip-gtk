@@ -171,10 +171,21 @@ package body FileDialogs is
 
    CurrentDirectory: Unbounded_String;
 
+   -- ****if* FileDialogs/UpdateTree
+   -- FUNCTION
+   -- Add selected directory to the archive directory tree
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with the selected archive directories tree.
+   -- Path  - Gtk_Tree_Path to current directory in tree. Unused.
+   -- Iter  - Gtk_Tree_Iter to the current directory in tree.
+   -- RESULT
+   -- True if the selected directory was added to tree, otherwise False.
+   -- SOURCE
    function UpdateTree
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
       return Boolean is
       pragma Unreferenced(Path);
+      -- ****
       Depth: constant Natural :=
         Ada.Strings.Unbounded.Count
           (CurrentDirectory, "" & Directory_Separator) -

@@ -20,6 +20,7 @@
 
 with Ada.Directories; use Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Cell_Area_Box; use Gtk.Cell_Area_Box;
@@ -525,6 +526,28 @@ package body MainWindow is
       Set_Title(MChild, NewName);
       Set(Tree, Iter, 0, Simple_Name(NewName));
    end ChangeName;
+
+   function TreePathToPath
+     (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return String is
+      Path: Unbounded_String :=
+        To_Unbounded_String(Get_String(Model, Iter, 0));
+      NewIter: Gtk_Tree_Iter := Iter;
+   begin
+      loop
+         NewIter := Gtk.Tree_Store.Parent(-(Model), NewIter);
+         if NewIter = Null_Iter then
+            Path := Null_Unbounded_String;
+         end if;
+         exit when NewIter = Null_Iter
+           or else Iter_Depth(-(Model), NewIter) = 0;
+         Path :=
+           To_Unbounded_String
+             (Get_String(Model, NewIter, 0) & Directory_Separator) &
+           Path;
+      end loop;
+      Path := To_Unbounded_String("" & Directory_Separator) & Path;
+      return To_String(Path);
+   end TreePathToPath;
 
    procedure CreateMainWindow is
       Error: GError;

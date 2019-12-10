@@ -191,26 +191,10 @@ package body FileDialogs is
           (CurrentDirectory, "" & Directory_Separator) -
         1;
       NewIter: Gtk_Tree_Iter := Iter;
-      ParentPath: Unbounded_String;
    begin
       if Iter_Depth(-(Model), Iter) = Gint(Depth) then
-         ParentPath := To_Unbounded_String(Get_String(Model, Iter, 0));
-         loop
-            NewIter := Gtk.Tree_Store.Parent(-(Model), NewIter);
-            if NewIter = Null_Iter then
-               ParentPath := Null_Unbounded_String;
-            end if;
-            exit when NewIter = Null_Iter
-              or else Iter_Depth(-(Model), NewIter) = 0;
-            ParentPath :=
-              To_Unbounded_String
-                (Get_String(Model, NewIter, 0) & Directory_Separator) &
-              ParentPath;
-         end loop;
-         ParentPath :=
-           To_Unbounded_String("" & Directory_Separator) & ParentPath;
          if Containing_Directory(To_String(CurrentDirectory)) =
-           To_String(ParentPath) then
+           TreePathToPath(Model, Iter) then
             Gtk.Tree_Store.Append(-(Model), NewIter, Iter);
             Gtk.Tree_Store.Set
               (-(Model), NewIter, 0, Simple_Name(To_String(CurrentDirectory)));

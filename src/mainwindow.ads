@@ -178,6 +178,9 @@ package MainWindow is
    procedure ChangeName(NewName: String);
    -- ****
 
+   function TreePathToPath
+     (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return String;
+
    -- ****f* MainWindow/CreateMainWindow
    -- FUNCTION
    -- Create main window of the program.

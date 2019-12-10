@@ -230,7 +230,12 @@ package body FileDialogs is
          -- Columns from 0 to 11: Name, Type, Modified, Attributes,
          -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
          Set(FilesList, Iter, 0, Simple_Name(FileName));
-         Set(FilesList, Iter, 9, To_String(CurrentDirectory));
+         Set
+           (FilesList, Iter, 9,
+            Containing_Directory
+              (Slice
+                 (To_Unbounded_String(FileName), Length(MainDirectory) + 1,
+                  FileName'Length)));
          -- This code is placeholder for fill selected file information
          for J in 1 .. 11 loop
             if J /= 9 then
@@ -326,13 +331,12 @@ package body FileDialogs is
             end if;
          end;
          FilesNames := Get_Filenames(Dialog);
+         MainDirectory :=
+           To_Unbounded_String
+             (Containing_Directory(String_SList.Nth_Data(FilesNames, 0)));
          for I in 0 .. String_SList.Length(FilesNames) - 1 loop
             -- If selected item is directory, add its content
             if Is_Directory(String_SList.Nth_Data(FilesNames, I)) then
-               MainDirectory :=
-                 To_Unbounded_String
-                   (Containing_Directory
-                      (String_SList.Nth_Data(FilesNames, I)));
                AddDirectory(String_SList.Nth_Data(FilesNames, I));
                -- If selected item is file, add it
             else

@@ -34,6 +34,7 @@ with Gtk.Recent_Chooser; use Gtk.Recent_Chooser;
 with Gtk.Recent_Chooser_Menu; use Gtk.Recent_Chooser_Menu;
 with Gtk.Recent_Filter; use Gtk.Recent_Filter;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
+with Gtk.Tree_Model_Filter; use Gtk.Tree_Model_Filter;
 with Gtk.Tree_Model_Sort; use Gtk.Tree_Model_Sort;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_View; use Gtk.Tree_View;
@@ -191,12 +192,14 @@ package body Menu is
    begin
       ShowAddFileDialog
         (Window,
-         -(Get_Model
-            (-(Get_Model
-                (Gtk_Tree_View
-                   (Get_Child
-                      (Gtk_Bin
-                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))),
+         -(Gtk.Tree_Model_Filter.Get_Model
+            (-(Gtk.Tree_Model_Sort.Get_Model
+                (-(Get_Model
+                    (Gtk_Tree_View
+                       (Get_Child
+                          (Gtk_Bin
+                             (Get_Child2
+                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
          False, True);
    end AddFolderMenu;
 
@@ -215,12 +218,14 @@ package body Menu is
    begin
       ShowAddFileDialog
         (Window,
-         -(Get_Model
-            (-(Get_Model
-                (Gtk_Tree_View
-                   (Get_Child
-                      (Gtk_Bin
-                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))),
+         -(Gtk.Tree_Model_Filter.Get_Model
+            (-(Gtk.Tree_Model_Sort.Get_Model
+                (-(Get_Model
+                    (Gtk_Tree_View
+                       (Get_Child
+                          (Gtk_Bin
+                             (Get_Child2
+                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
          True, True);
    end AddFolderEncryptionMenu;
 

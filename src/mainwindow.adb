@@ -37,6 +37,7 @@ with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
 with Gtk.Separator_Tool_Item; use Gtk.Separator_Tool_Item;
 with Gtk.Status_Bar; use Gtk.Status_Bar;
 with Gtk.Toolbar; use Gtk.Toolbar;
+with Gtk.Tree_Model_Filter; use Gtk.Tree_Model_Filter;
 with Gtk.Tree_Model_Sort; use Gtk.Tree_Model_Sort;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_Store; use Gtk.Tree_Store;
@@ -68,11 +69,13 @@ package body MainWindow is
       pragma Unreferenced(Self);
       -- ****
       List: constant Gtk_List_Store :=
-        -(Get_Model
-           (-(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(Child))))))))));
+        -(Gtk.Tree_Model_Filter.Get_Model
+           (-(Gtk.Tree_Model_Sort.Get_Model
+               (-(Get_Model
+                   (Gtk_Tree_View
+                      (Get_Child
+                         (Gtk_Bin
+                            (Get_Child2(Gtk_Paned(Get_Widget(Child))))))))))));
       Enabled: Boolean := True;
       ToolBar: constant Gtk_Toolbar :=
         Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
@@ -87,6 +90,25 @@ package body MainWindow is
          Set_Sensitive(Gtk_Widget(Get_Nth_Item(ToolBar, Button)), Enabled);
       end loop;
    end UpdateToolbar;
+
+   function VisibleFiles
+     (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return Boolean is
+      SelectedModel: Gtk_Tree_Model;
+      SelectedIter: Gtk_Tree_Iter;
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      Path: Unbounded_String;
+   begin
+      Get_Selected
+        (Get_Selection
+           (Gtk_Tree_View
+              (Get_Child(Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))),
+         SelectedModel, SelectedIter);
+      Path := To_Unbounded_String(TreePathToPath(SelectedModel, SelectedIter));
+      if Get_String(Model, Iter, 9) = To_String(Path) then
+         return True;
+      end if;
+      return False;
+   end VisibleFiles;
 
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
@@ -137,8 +159,10 @@ package body MainWindow is
                GType_String, GType_String, GType_String, GType_String,
                GType_String, GType_String, GType_String, GType_String,
                GType_String));
+         Filter: constant Gtk_Tree_Model_Filter :=
+           Gtk_Tree_Model_Filter_Filter_New(+(List));
          Sort: constant Gtk_Tree_Model_Sort :=
-           Gtk_Tree_Model_Sort_Sort_New_With_Model(+(List));
+           Gtk_Tree_Model_Sort_Sort_New_With_Model(+(Filter));
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Sort));
       begin
          Set_Headers_Clickable(View, True);
@@ -162,6 +186,7 @@ package body MainWindow is
          if SortFiles then
             Set_Sort_Column_Id(Sort, 0, Sort_Ascending);
          end if;
+         Set_Visible_Func(Filter, VisibleFiles'Access);
          Scroll := Gtk_Scrolled_Window_New;
          Add(Gtk_Container(Scroll), Gtk_Widget(View));
          Pack2(ArchivePaned, Gtk_Widget(Scroll));
@@ -242,12 +267,14 @@ package body MainWindow is
    begin
       ShowAddFileDialog
         (Window,
-         -(Get_Model
-            (-(Get_Model
-                (Gtk_Tree_View
-                   (Get_Child
-                      (Gtk_Bin
-                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))));
+         -(Gtk.Tree_Model_Filter.Get_Model
+            (-(Gtk.Tree_Model_Sort.Get_Model
+                (-(Get_Model
+                    (Gtk_Tree_View
+                       (Get_Child
+                          (Gtk_Bin
+                             (Get_Child2
+                                (Gtk_Paned(Get_Widget(MChild)))))))))))));
    end AddFile;
 
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
@@ -256,12 +283,14 @@ package body MainWindow is
    begin
       ShowAddFileDialog
         (Window,
-         -(Get_Model
-            (-(Get_Model
-                (Gtk_Tree_View
-                   (Get_Child
-                      (Gtk_Bin
-                         (Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))))),
+         -(Gtk.Tree_Model_Filter.Get_Model
+            (-(Gtk.Tree_Model_Sort.Get_Model
+                (-(Get_Model
+                    (Gtk_Tree_View
+                       (Get_Child
+                          (Gtk_Bin
+                             (Get_Child2
+                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
          True);
    end AddFileEncrypted;
 
@@ -297,8 +326,14 @@ package body MainWindow is
             -- from the archive. This line is just a placeholder code
             Ada.Text_IO.Put_Line("Deleting: " & To_String(FileName));
             -- Remove file from archive list
-            Convert_Iter_To_Child_Iter(-(Model), ListIter, Iter);
-            Gtk.List_Store.Remove(-(Get_Model(-(Model))), ListIter);
+            Gtk.Tree_Model_Sort.Convert_Iter_To_Child_Iter
+              (-(Model), ListIter, Iter);
+            Gtk.Tree_Model_Filter.Convert_Iter_To_Child_Iter
+              (-(Gtk.Tree_Model_Sort.Get_Model(-(Model))), ListIter, ListIter);
+            Gtk.List_Store.Remove
+              (-(Gtk.Tree_Model_Filter.Get_Model
+                  (-(Gtk.Tree_Model_Sort.Get_Model(-(Model))))),
+               ListIter);
          end loop;
          Child_Selected(MWindow, MChild);
       end if;

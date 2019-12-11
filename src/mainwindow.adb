@@ -103,12 +103,15 @@ package body MainWindow is
    -- SOURCE
    function VisibleFiles
      (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return Boolean is
-     -- ****
+      -- ****
       SelectedModel: Gtk_Tree_Model;
       SelectedIter: Gtk_Tree_Iter;
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
       Path: Unbounded_String;
    begin
+      if not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))) then
+         return True;
+      end if;
       Get_Selected
         (Get_Selection
            (Gtk_Tree_View
@@ -546,10 +549,15 @@ package body MainWindow is
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      TreeView: constant Gtk_Widget :=
+        Get_Child1(Gtk_Paned(Get_Widget(MChild)));
+      FilesView: constant Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
    begin
-      Set_Visible
-        (Get_Child1(Gtk_Paned(Get_Widget(MChild))),
-         not Get_Visible(Get_Child1(Gtk_Paned(Get_Widget(MChild)))));
+      Set_Visible(TreeView, not Get_Visible(TreeView));
+      Set_Visible(Get_Column(FilesView, 9), not Get_Visible(TreeView));
+      Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(FilesView)))));
    end ChangeView;
 
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class) is

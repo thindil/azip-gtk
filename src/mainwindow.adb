@@ -110,6 +110,18 @@ package body MainWindow is
       return False;
    end VisibleFiles;
 
+   procedure RefreshFilesList
+     (Self: access Gtk_Tree_View_Record'Class; Path: Gtk_Tree_Path;
+      Column: not null access Gtk_Tree_View_Column_Record'Class) is
+      pragma Unreferenced(Self, Path, Column);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      View: constant Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+   begin
+      Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))));
+   end RefreshFilesList;
+
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       ArchivePaned: constant Gtk_Paned :=
@@ -144,7 +156,8 @@ package body MainWindow is
          if Append_Column(View, Column) /= 1 then
             Ada.Text_IO.Put_Line("Error in adding columns.");
          end if;
-         Expand_All(View);
+         Set_Activate_On_Single_Click(View, True);
+         On_Row_Activated(View, RefreshFilesList'Access);
          Scroll := Gtk_Scrolled_Window_New;
          Set_Policy(Scroll, Policy_Never, Policy_Never);
          Add(Gtk_Container(Scroll), Gtk_Widget(View));

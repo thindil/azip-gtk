@@ -91,8 +91,19 @@ package body MainWindow is
       end loop;
    end UpdateToolbar;
 
+   -- ****if* MainWindow/VisibleFiles
+   -- FUNCTION
+   -- Check if selected file should be visible on the files list in selected
+   -- archive.
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model containing all files in selected archive
+   -- Iter  - Gtk_Tree_Iter to selected file
+   -- RESULT
+   -- Return True if file should be visible, otherwise False.
+   -- SOURCE
    function VisibleFiles
      (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return Boolean is
+     -- ****
       SelectedModel: Gtk_Tree_Model;
       SelectedIter: Gtk_Tree_Iter;
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -110,10 +121,21 @@ package body MainWindow is
       return False;
    end VisibleFiles;
 
+   -- ****if* MainWindow/RefreshFilesList
+   -- FUNCTION
+   -- Refresh list of files in selected archive when the user select new
+   -- directory from the tree in that archive.
+   -- PARAMETERS
+   -- Self   - Gtk_Tree_View with tree of directories which was clicked.
+   --          Unused.
+   -- Path   - Gtk_Tree_Path to directory which was clicked. Unused.
+   -- Column - Gtk_Tree_View_Column which was clicked. Unused.
+   -- SOURCE
    procedure RefreshFilesList
      (Self: access Gtk_Tree_View_Record'Class; Path: Gtk_Tree_Path;
       Column: not null access Gtk_Tree_View_Column_Record'Class) is
       pragma Unreferenced(Self, Path, Column);
+      -- ****
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
       View: constant Gtk_Tree_View :=
         Gtk_Tree_View

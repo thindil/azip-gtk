@@ -137,7 +137,7 @@ package body FileDialogs is
 
    function ShowSaveDialog
      (Parent: Gtk_Window; Archive: String) return String is
-      ArchivePath: Unbounded_String;
+      ArchivePath: Unbounded_String := Null_Unbounded_String;
    begin
       CurrentDialog :=
         Gtk_File_Chooser_Dialog_New("Save archive as", Parent, Action_Save);
@@ -164,11 +164,9 @@ package body FileDialogs is
          end if;
          Put_Line("New full path: " & To_String(ArchivePath));
          Put_Line("Archive to save: " & Archive);
-         Destroy(CurrentDialog);
-         return To_String(ArchivePath);
       end if;
       Destroy(CurrentDialog);
-      return "";
+      return To_String(ArchivePath);
    end ShowSaveDialog;
 
    CurrentDirectory: Unbounded_String;

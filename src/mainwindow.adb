@@ -269,7 +269,9 @@ package body MainWindow is
            (Gtk_Tree_View
               (Get_Child
                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
-      List := -(Get_Model(Sort));
+      List :=
+        -(Gtk.Tree_Model_Filter.Get_Model
+           (-(Gtk.Tree_Model_Sort.Get_Model(Sort))));
       -- Placeholder code. Here should go all data read from the selected
       -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
       -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
@@ -434,10 +436,14 @@ package body MainWindow is
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
       Gtk.List_Store.Foreach
-        (-(Get_Model
-            (Gtk_Tree_View
-               (Get_Child
-                  (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+        (-(Gtk.Tree_Model_Filter.Get_Model
+            (-(Gtk.Tree_Model_Sort.Get_Model
+                (-(Get_Model
+                    (Gtk_Tree_View
+                       (Get_Child
+                          (Gtk_Bin
+                             (Get_Child2
+                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
          ValidateArchive'Access);
       -- Set text to show to the user
       if ValidArchive then
@@ -468,10 +474,14 @@ package body MainWindow is
    begin
       ShowFindDialog
         (Window,
-         Get_Model
-           (Gtk_Tree_View
-              (Get_Child
-                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
+         Gtk.Tree_Model_Filter.Get_Model
+           (-(Gtk.Tree_Model_Sort.Get_Model
+               (-(Get_Model
+                   (Gtk_Tree_View
+                      (Get_Child
+                         (Gtk_Bin
+                            (Get_Child2
+                               (Gtk_Paned(Get_Widget(MChild))))))))))));
    end Find;
 
    -- ****if* MainWindow/UpdateSelectedArchive
@@ -502,8 +512,10 @@ package body MainWindow is
       -- Ratio, Format, CRC 32, Path, Name encoding, Result.
       -- Last value is value of color (name, rgb, rgba) which will be used as
       -- background for Result cell. All values are Strings.
-      for I in 0 .. 11 loop
-         Gtk.List_Store.Set(-(Model), Iter, Gint(I), Integer'Image(I));
+      for I in 1 .. 11 loop
+         if I /= 9 then
+            Gtk.List_Store.Set(-(Model), Iter, Gint(I), Integer'Image(I + 10));
+         end if;
       end loop;
       Gtk.List_Store.Set(-(Model), Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
       return False;
@@ -519,10 +531,14 @@ package body MainWindow is
    begin
       if Run(MessageDialog) = Gtk_Response_Yes then
          Gtk.List_Store.Foreach
-           (-(Get_Model
-               (Gtk_Tree_View
-                  (Get_Child
-                     (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild)))))))),
+           (-(Gtk.Tree_Model_Filter.Get_Model
+               (-(Gtk.Tree_Model_Sort.Get_Model
+                   (-(Get_Model
+                       (Gtk_Tree_View
+                          (Get_Child
+                             (Gtk_Bin
+                                (Get_Child2
+                                   (Gtk_Paned(Get_Widget(MChild)))))))))))),
             UpdateSelectedArchive'Access);
          -- If you need to do something with archive after upgrading, here
          -- is probably best place to do.

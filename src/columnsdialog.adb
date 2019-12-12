@@ -31,6 +31,7 @@ with Gtk.Tree_View_Column; use Gtk.Tree_View_Column;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
+with ArchivesView; use ArchivesView;
 with MainWindow; use MainWindow;
 
 package body ColumnsDialog is

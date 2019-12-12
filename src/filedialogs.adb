@@ -35,6 +35,7 @@ with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
+with ArchivesView; use ArchivesView;
 with MainWindow; use MainWindow;
 with OptionsDialog; use OptionsDialog;
 

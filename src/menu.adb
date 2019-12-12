@@ -41,6 +41,7 @@ with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with AboutDialog; use AboutDialog;
+with ArchivesView; use ArchivesView;
 with ColumnsDialog; use ColumnsDialog;
 with FileDialogs; use FileDialogs;
 with FindDialog; use FindDialog;

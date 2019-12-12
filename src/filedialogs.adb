@@ -137,6 +137,7 @@ package body FileDialogs is
 
    function ShowSaveDialog
      (Parent: Gtk_Window; Archive: String) return String is
+      ArchivePath: Unbounded_String;
    begin
       CurrentDialog :=
         Gtk_File_Chooser_Dialog_New("Save archive as", Parent, Action_Save);
@@ -156,14 +157,15 @@ package body FileDialogs is
          -- If button Ok was pressed, save selected archive to selected
          -- directory This code is a placeholder, probably whole compress
          -- or move code should go here.
-         declare
-            ArchivePath: constant String := Get_Filename(CurrentDialog);
-         begin
-            Put_Line("New full path: " & ArchivePath);
-            Put_Line("Archive to save: " & Archive);
-            Destroy(CurrentDialog);
-            return ArchivePath;
-         end;
+         ArchivePath := To_Unbounded_String(Get_Filename(CurrentDialog));
+         if Length(ArchivePath) < 4
+           or else Tail(ArchivePath, 4) /= To_Unbounded_String(".zip") then
+            Append(ArchivePath, ".zip");
+         end if;
+         Put_Line("New full path: " & To_String(ArchivePath));
+         Put_Line("Archive to save: " & Archive);
+         Destroy(CurrentDialog);
+         return To_String(ArchivePath);
       end if;
       Destroy(CurrentDialog);
       return "";

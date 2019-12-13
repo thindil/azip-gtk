@@ -16,9 +16,6 @@
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
-with GNAT.Directory_Operations; use GNAT.Directory_Operations;
-with GNAT.OS_Lib; use GNAT.OS_Lib;
-with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Combo_Box; use Gtk.Combo_Box;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
@@ -28,10 +25,6 @@ with Gtk.File_Chooser; use Gtk.File_Chooser;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
-with Gtk.Paned; use Gtk.Paned;
-with Gtk.Tree_Model; use Gtk.Tree_Model;
-with Gtk.Tree_Store; use Gtk.Tree_Store;
-with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
@@ -170,102 +163,11 @@ package body FileDialogs is
       return To_String(ArchivePath);
    end ShowSaveDialog;
 
-   CurrentDirectory: Unbounded_String;
-
-   -- ****if* FileDialogs/UpdateTree
-   -- FUNCTION
-   -- Add selected directory to the archive directory tree
-   -- PARAMETERS
-   -- Model - Gtk_Tree_Model with the selected archive directories tree.
-   -- Path  - Gtk_Tree_Path to current directory in tree. Unused.
-   -- Iter  - Gtk_Tree_Iter to the current directory in tree.
-   -- RESULT
-   -- True if the selected directory was added to tree, otherwise False.
-   -- SOURCE
-   function UpdateTree
-     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
-      return Boolean is
-      pragma Unreferenced(Path);
-      -- ****
-      Depth: constant Natural :=
-        Ada.Strings.Unbounded.Count
-          (CurrentDirectory, "" & Directory_Separator) -
-        1;
-      NewIter: Gtk_Tree_Iter := Iter;
-   begin
-      if Iter_Depth(-(Model), Iter) = Gint(Depth) then
-         if Containing_Directory(To_String(CurrentDirectory)) =
-           TreePathToPath(Model, Iter) then
-            Gtk.Tree_Store.Append(-(Model), NewIter, Iter);
-            Gtk.Tree_Store.Set
-              (-(Model), NewIter, 0, Simple_Name(To_String(CurrentDirectory)));
-            return True;
-         end if;
-      end if;
-      return False;
-   end UpdateTree;
-
    procedure ShowAddFileDialog
-     (Parent: Gtk_Window; FilesList: Gtk_List_Store;
-      Encrypted: Boolean := False; Directory: Boolean := False) is
+     (Parent: Gtk_Window; Encrypted: Boolean := False;
+      Directory: Boolean := False) is
       Dialog: Gtk_File_Chooser_Dialog;
       FilesNames: String_SList.GSlist;
-      Iter: Gtk_Tree_Iter;
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-      Tree: constant Gtk_Tree_Store :=
-        -(Get_Model
-           (Gtk_Tree_View
-              (Get_Child
-                 (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
-      MainDirectory: Unbounded_String;
-      procedure AddFile(FileName: String) is
-      begin
-         Append(FilesList, Iter);
-         -- Whole adding files code probably should go here,
-         -- FileName is full path to the file which will be added.
-         -- Columns from 0 to 11: Name, Type, Modified, Attributes,
-         -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
-         Set(FilesList, Iter, 0, Simple_Name(FileName));
-         Set
-           (FilesList, Iter, 9,
-            Containing_Directory
-              (Slice
-                 (To_Unbounded_String(FileName), Length(MainDirectory) + 1,
-                  FileName'Length)));
-         -- This code is placeholder for fill selected file information
-         for J in 1 .. 11 loop
-            if J /= 9 then
-               Set(FilesList, Iter, Gint(J), Integer'Image(J));
-            end if;
-         end loop;
-      end AddFile;
-      procedure AddDirectory(Path: String) is
-         Directory: Dir_Type;
-         Last: Natural;
-         FileName: String(1 .. 1024);
-      begin
-         CurrentDirectory :=
-           Unbounded_Slice
-             (To_Unbounded_String(Path), Length(MainDirectory) + 1,
-              Path'Length);
-         Foreach(Tree, UpdateTree'Access);
-         Open(Directory, Path);
-         loop
-            Read(Directory, FileName, Last);
-            exit when Last = 0;
-            if FileName(1 .. Last) in "." | ".." then
-               goto End_Of_Loop2;
-            end if;
-            if Is_Directory
-                (Path & Directory_Separator & FileName(1 .. Last)) then
-               AddDirectory(Path & Directory_Separator & FileName(1 .. Last));
-            else
-               AddFile(Path & Directory_Separator & FileName(1 .. Last));
-            end if;
-            <<End_Of_Loop2>>
-         end loop;
-         Close(Directory);
-      end AddDirectory;
    begin
       -- Create dialog with proper title depending if files will be encrypted
       -- or not
@@ -327,17 +229,10 @@ package body FileDialogs is
             end if;
          end;
          FilesNames := Get_Filenames(Dialog);
-         MainDirectory :=
-           To_Unbounded_String
-             (Containing_Directory(String_SList.Nth_Data(FilesNames, 0)));
          for I in 0 .. String_SList.Length(FilesNames) - 1 loop
-            -- If selected item is directory, add its content
-            if Is_Directory(String_SList.Nth_Data(FilesNames, I)) then
-               AddDirectory(String_SList.Nth_Data(FilesNames, I));
-               -- If selected item is file, add it
-            else
-               AddFile(String_SList.Nth_Data(FilesNames, I));
-            end if;
+            AddItem
+              (String_SList.Nth_Data(FilesNames, I),
+               Containing_Directory(String_SList.Nth_Data(FilesNames, 0)));
          end loop;
          Child_Selected(MWindow, Get_Focus_Child(MWindow));
       end if;

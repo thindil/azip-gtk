@@ -99,6 +99,8 @@ package ArchivesView is
    -- SOURCE
    function TreePathToPath
      (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return String;
-     -- ****
+   -- ****
+
+   procedure AddItem(Path, MainDirectory: String);
 
 end ArchivesView;

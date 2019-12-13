@@ -20,6 +20,7 @@
 
 with Ada.Directories; use Ada.Directories;
 with Ada.Text_IO;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
@@ -262,5 +263,113 @@ package body ArchivesView is
       Path := To_Unbounded_String("" & Directory_Separator) & Path;
       return To_String(Path);
    end TreePathToPath;
+
+   CurrentDirectory: Unbounded_String;
+
+   -- ****if* ArchivesView/UpdateTree
+   -- FUNCTION
+   -- Add selected directory to the archive directory tree
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with the selected archive directories tree.
+   -- Path  - Gtk_Tree_Path to current directory in tree. Unused.
+   -- Iter  - Gtk_Tree_Iter to the current directory in tree.
+   -- RESULT
+   -- True if the selected directory was added to tree, otherwise False.
+   -- SOURCE
+   function UpdateTree
+     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
+      return Boolean is
+      pragma Unreferenced(Path);
+      -- ****
+      Depth: constant Natural :=
+        Ada.Strings.Unbounded.Count
+          (CurrentDirectory, "" & Directory_Separator) -
+        1;
+      NewIter: Gtk_Tree_Iter := Iter;
+   begin
+      if Iter_Depth(-(Model), Iter) = Gint(Depth) then
+         if Containing_Directory(To_String(CurrentDirectory)) =
+           TreePathToPath(Model, Iter) then
+            Gtk.Tree_Store.Append(-(Model), NewIter, Iter);
+            Gtk.Tree_Store.Set
+              (-(Model), NewIter, 0, Simple_Name(To_String(CurrentDirectory)));
+            return True;
+         end if;
+      end if;
+      return False;
+   end UpdateTree;
+
+   procedure AddItem(Path, MainDirectory: String) is
+      Iter: Gtk_Tree_Iter;
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      Tree: constant Gtk_Tree_Store :=
+        -(Get_Model
+           (Gtk_Tree_View
+              (Get_Child
+                 (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
+      FilesList: constant Gtk_List_Store :=
+        -(Gtk.Tree_Model_Filter.Get_Model
+           (-(Gtk.Tree_Model_Sort.Get_Model
+               (-(Get_Model
+                   (Gtk_Tree_View
+                      (Get_Child
+                         (Gtk_Bin
+                            (Get_Child2
+                               (Gtk_Paned(Get_Widget(MChild))))))))))));
+      procedure AddFile(FileName: String) is
+      begin
+         Append(FilesList, Iter);
+         -- Whole adding files code probably should go here,
+         -- FileName is full path to the file which will be added.
+         -- Columns from 0 to 11: Name, Type, Modified, Attributes,
+         -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
+         Set(FilesList, Iter, 0, Simple_Name(FileName));
+         Set
+           (FilesList, Iter, 9,
+            Containing_Directory
+              (Slice
+                 (To_Unbounded_String(FileName), MainDirectory'Length + 1,
+                  FileName'Length)));
+         -- This code is placeholder for fill selected file information
+         for J in 1 .. 11 loop
+            if J /= 9 then
+               Set(FilesList, Iter, Gint(J), Integer'Image(J));
+            end if;
+         end loop;
+      end AddFile;
+      procedure AddDirectory(Path: String) is
+         Directory: Dir_Type;
+         Last: Natural;
+         FileName: String(1 .. 1024);
+      begin
+         CurrentDirectory :=
+           Unbounded_Slice
+             (To_Unbounded_String(Path), MainDirectory'Length + 1,
+              Path'Length);
+         Foreach(Tree, UpdateTree'Access);
+         Open(Directory, Path);
+         loop
+            Read(Directory, FileName, Last);
+            exit when Last = 0;
+            if FileName(1 .. Last) in "." | ".." then
+               goto End_Of_Loop2;
+            end if;
+            if Is_Directory
+                (Path & Directory_Separator & FileName(1 .. Last)) then
+               AddDirectory(Path & Directory_Separator & FileName(1 .. Last));
+            else
+               AddFile(Path & Directory_Separator & FileName(1 .. Last));
+            end if;
+            <<End_Of_Loop2>>
+         end loop;
+         Close(Directory);
+      end AddDirectory;
+   begin
+      if Is_Directory(Path) then
+         AddDirectory(Path);
+      else
+         AddFile(Path);
+      end if;
+   end AddItem;
 
 end ArchivesView;

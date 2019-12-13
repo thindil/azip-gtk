@@ -22,7 +22,6 @@ with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
 with Gtk.Dialog; use Gtk.Dialog;
-with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Main; use Gtk.Main;
 with Gtk.Menu; use Gtk.Menu;
 with Gtk.Menu_Bar; use Gtk.Menu_Bar;
@@ -34,8 +33,6 @@ with Gtk.Recent_Chooser; use Gtk.Recent_Chooser;
 with Gtk.Recent_Chooser_Menu; use Gtk.Recent_Chooser_Menu;
 with Gtk.Recent_Filter; use Gtk.Recent_Filter;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
-with Gtk.Tree_Model_Filter; use Gtk.Tree_Model_Filter;
-with Gtk.Tree_Model_Sort; use Gtk.Tree_Model_Sort;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
@@ -189,19 +186,8 @@ package body Menu is
    procedure AddFolderMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Gtk.Tree_Model_Filter.Get_Model
-            (-(Gtk.Tree_Model_Sort.Get_Model
-                (-(Get_Model
-                    (Gtk_Tree_View
-                       (Get_Child
-                          (Gtk_Bin
-                             (Get_Child2
-                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
-         False, True);
+      ShowAddFileDialog(Window, False, True);
    end AddFolderMenu;
 
    -- ****if* Menu/AddFolderEncryptionMenu
@@ -215,19 +201,8 @@ package body Menu is
      (Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Gtk.Tree_Model_Filter.Get_Model
-            (-(Gtk.Tree_Model_Sort.Get_Model
-                (-(Get_Model
-                    (Gtk_Tree_View
-                       (Get_Child
-                          (Gtk_Bin
-                             (Get_Child2
-                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
-         True, True);
+      ShowAddFileDialog(Window, True, True);
    end AddFolderEncryptionMenu;
 
    -- ****if* Menu/TestArchiveMenu

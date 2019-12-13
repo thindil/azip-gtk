@@ -13,7 +13,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Window; use Gtk.Window;
 
 -- ****h* AZipGtk/FileDialogs
@@ -68,13 +67,12 @@ package FileDialogs is
    -- PARAMETERS
    -- Parent    - Gtk_Window which will be parent for the dialog. Should be
    --             always main window
-   -- FilesList - List of files which will be updated with new file(s)
    -- Encrypted - If True, add file(s) with encryption. Default is False.
    -- Directory - If True, add directory instead file(s). Default is False.
    -- SOURCE
    procedure ShowAddFileDialog
-     (Parent: Gtk_Window; FilesList: Gtk_List_Store;
-      Encrypted: Boolean := False; Directory: Boolean := False);
+     (Parent: Gtk_Window; Encrypted: Boolean := False;
+      Directory: Boolean := False);
    -- ****
 
 end FileDialogs;

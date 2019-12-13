@@ -106,35 +106,14 @@ package body MainWindow is
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Gtk.Tree_Model_Filter.Get_Model
-            (-(Gtk.Tree_Model_Sort.Get_Model
-                (-(Get_Model
-                    (Gtk_Tree_View
-                       (Get_Child
-                          (Gtk_Bin
-                             (Get_Child2
-                                (Gtk_Paned(Get_Widget(MChild)))))))))))));
+      ShowAddFileDialog(Window);
    end AddFile;
 
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowAddFileDialog
-        (Window,
-         -(Gtk.Tree_Model_Filter.Get_Model
-            (-(Gtk.Tree_Model_Sort.Get_Model
-                (-(Get_Model
-                    (Gtk_Tree_View
-                       (Get_Child
-                          (Gtk_Bin
-                             (Get_Child2
-                                (Gtk_Paned(Get_Widget(MChild)))))))))))),
-         True);
+      ShowAddFileDialog(Window, True);
    end AddFileEncrypted;
 
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is

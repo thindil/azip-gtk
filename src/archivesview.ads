@@ -23,9 +23,14 @@ with Gtk.Tool_Button; use Gtk.Tool_Button;
 with Gtk.Tree_Model; use Gtk.Tree_Model;
 with Gtkada.MDI; use Gtkada.MDI;
 
+-- ****h* AZipGtk/ArchivesView
+-- FUNCTION
+-- Provides code to manipulate archives views
+-- SOURCE
 package ArchivesView is
+-- ****
 
-   -- ****t* MainWindow/ColumnData
+   -- ****t* ArchivesView/ColumnData
    -- FUNCTION
    -- Data structure for columns in archive list view
    -- PARAMETERS
@@ -38,14 +43,14 @@ package ArchivesView is
    end record;
    -- ****
 
-   -- ****v* MainWindow/MWindow
+   -- ****v* ArchivesView/MWindow
    -- FUNCTION
    -- MDI window which contains all open archives data
    -- SOURCE
    MWindow: MDI_Window;
    -- ****
 
-   -- ****v* MainWindow/Columns
+   -- ****v* ArchivesView/Columns
    -- FUNCTION
    -- Store data for all columns in archives list views. Columns from 0 to 11:
    -- Name, Type, Modified, Attributes, Size, Packed, Ratio, Format, CRC 32,
@@ -65,7 +70,7 @@ package ArchivesView is
       (To_Unbounded_String("Result"), True));
    -- ****
 
-   -- ****f* MainWindow/NewArchive
+   -- ****f* ArchivesView/NewArchive
    -- FUNCTION
    -- Create new archive view.
    -- PARAMETERS
@@ -74,7 +79,7 @@ package ArchivesView is
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class);
    -- ****
 
-   -- ****f* MainWindow/OpenFile
+   -- ****f* ArchivesView/OpenFile
    -- FUNCTION
    -- Open selected file and show it content to the user.
    -- PARAMETERS
@@ -83,7 +88,17 @@ package ArchivesView is
    procedure OpenFile(FileName: String);
    -- ****
 
+   -- ****f* ArchivesView/TreePathToPath
+   -- FUNCTION
+   -- Convert TreePath from directories tree to file path
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with directories tree
+   -- Iter  - Gtk_Tree_Iter to selected directory
+   -- RESULT
+   -- Full in-archive path to selected directory
+   -- SOURCE
    function TreePathToPath
      (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return String;
+     -- ****
 
 end ArchivesView;

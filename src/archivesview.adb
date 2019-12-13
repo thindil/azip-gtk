@@ -264,7 +264,13 @@ package body ArchivesView is
       return To_String(Path);
    end TreePathToPath;
 
+   -- ****iv* ArchivesView/CurrentDirectory
+   -- FUNCTION
+   -- Current directory which will be added to the directory tree of
+   -- selected archive
+   -- SOURCE
    CurrentDirectory: Unbounded_String;
+   -- ****
 
    -- ****if* ArchivesView/UpdateTree
    -- FUNCTION

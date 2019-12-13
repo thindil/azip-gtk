@@ -101,6 +101,16 @@ package ArchivesView is
      (Model: Gtk_Tree_Model; Iter: Gtk_Tree_Iter) return String;
    -- ****
 
+     -- ****f* ArchivesView/AddItem
+     -- FUNCTION
+     -- Add file or directory (with its contents) to the
+     -- selected archive
+     -- PARAMETERS
+     -- Path          - Full path to the file or directory which will be added
+     --                 to the archive
+     -- MainDirectory - Full path to the directory containing item to add
+     -- SOURCE
    procedure AddItem(Path, MainDirectory: String);
+   -- ****
 
 end ArchivesView;

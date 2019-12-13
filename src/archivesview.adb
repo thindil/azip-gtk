@@ -197,10 +197,6 @@ package body ArchivesView is
    end NewArchive;
 
    procedure OpenFile(FileName: String) is
-      Iter: Gtk_Tree_Iter;
-      Sort: Gtk_Tree_Model_Sort;
-      List: Gtk_List_Store;
-      Tree: Gtk_Tree_Store;
       MChild: MDI_Child;
    begin
       if FileName = "" then
@@ -211,34 +207,10 @@ package body ArchivesView is
          NewArchive(null);
       end if;
       MChild := Get_Focus_Child(MWindow);
-      Set_Title(MChild, FileName);
-      Tree :=
-        -(Get_Model
-           (Gtk_Tree_View
-              (Get_Child
-                 (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))));
-      Iter := Get_Iter_From_String(Tree, "0");
-      Set(Tree, Iter, 0, Simple_Name(FileName));
-      Sort :=
-        -(Get_Model
-           (Gtk_Tree_View
-              (Get_Child
-                 (Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))))));
-      List :=
-        -(Gtk.Tree_Model_Filter.Get_Model
-           (-(Gtk.Tree_Model_Sort.Get_Model(Sort))));
-      -- Placeholder code. Here should go all data read from the selected
-      -- archive. Columns from 0 to 11: Name, Type, Modified, Attributes,
-      -- Size, Packed, Ratio, Format, CRC 32, Path, Name encoding, Result.
-      -- Last value is value of color (name, rgb, rgba) which will be used as
-      -- background for Result cell. All values are Strings.
-      for I in 0 .. 11 loop
-         Append(List, Iter);
-         for J in 0 .. 11 loop
-            Set(List, Iter, Gint(J), Integer'Image(I));
-         end loop;
-         Set(List, Iter, 12, "rgba(0.0, 0.0, 0.0, 0.0)");
-      end loop;
+      ChangeName(FileName);
+      -- Placeholder code. Here probably should go all code to open and show
+      -- the content of the selected archive.
+      AddItem(Full_Name("azipgtk"), Containing_Directory(Full_Name("azipgtk")));
       Child_Selected(MWindow, MChild);
    end OpenFile;
 

@@ -99,21 +99,20 @@ package body MainWindow is
    procedure ExtractArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowDirectoryDialog(Window, Get_Title(MChild));
+      ShowDirectoryDialog(Get_Title(Get_Focus_Child(MWindow)));
    end ExtractArchive;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      ShowAddFileDialog(Window);
+      ShowAddFileDialog;
    end AddFile;
 
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
    begin
-      ShowAddFileDialog(Window, True);
+      ShowAddFileDialog(True);
    end AddFileEncrypted;
 
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class) is
@@ -375,7 +374,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       -- ****
    begin
-      OpenFile(ShowFileDialog(Window));
+      OpenFile(ShowFileDialog);
    end OpenArchive;
 
    -- ****if* MainWindow/ProgramQuit

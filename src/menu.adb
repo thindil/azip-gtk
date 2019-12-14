@@ -71,7 +71,7 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
    begin
-      OpenFile(ShowFileDialog(Window));
+      OpenFile(ShowFileDialog);
    end OpenArchiveMenu;
 
    -- ****if* Menu/SaveArchiveMenu
@@ -84,8 +84,8 @@ package body Menu is
    procedure SaveArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
-      NewName: constant String := ShowSaveDialog(Window, Get_Title(MChild));
+      NewName: constant String :=
+        ShowSaveDialog(Get_Title(Get_Focus_Child(MWindow)));
    begin
       if NewName /= "" then
          ChangeName(NewName);
@@ -131,9 +131,8 @@ package body Menu is
    procedure ExtractArchiveMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
       -- ****
-      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
    begin
-      ShowDirectoryDialog(Window, Get_Title(MChild));
+      ShowDirectoryDialog(Get_Title(Get_Focus_Child(MWindow)));
    end ExtractArchiveMenu;
 
    -- ****if* Menu/DeleteFiles
@@ -187,7 +186,7 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
    begin
-      ShowAddFileDialog(Window, False, True);
+      ShowAddFileDialog(False, True);
    end AddFolderMenu;
 
    -- ****if* Menu/AddFolderEncryptionMenu
@@ -202,7 +201,7 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
    begin
-      ShowAddFileDialog(Window, True, True);
+      ShowAddFileDialog(True, True);
    end AddFolderEncryptionMenu;
 
    -- ****if* Menu/TestArchiveMenu

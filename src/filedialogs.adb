@@ -41,10 +41,10 @@ package body FileDialogs is
    CurrentDialog: Gtk_File_Chooser_Dialog;
    -- ****
 
-   procedure ShowDirectoryDialog(Parent: Gtk_Window; Archive: String) is
+   procedure ShowDirectoryDialog(Archive: String) is
       Dialog: constant Gtk_File_Chooser_Dialog :=
         Gtk_File_Chooser_Dialog_New
-          ("Extract archive", Parent, Action_Select_Folder);
+          ("Extract archive", Window, Action_Select_Folder);
    begin
       -- Add Cancel button
       if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
@@ -103,10 +103,10 @@ package body FileDialogs is
       Show_All(Gtk_Widget(Get_Content_Area(CurrentDialog)));
    end AddFilter;
 
-   function ShowFileDialog(Parent: Gtk_Window) return String is
+   function ShowFileDialog return String is
    begin
       CurrentDialog :=
-        Gtk_File_Chooser_Dialog_New("Select archive", Parent, Action_Open);
+        Gtk_File_Chooser_Dialog_New("Select archive", Window, Action_Open);
       AddFilter;
       -- Add Cancel button
       if Add_Button(CurrentDialog, "Cancel", Gtk_Response_Cancel) = null then
@@ -129,12 +129,11 @@ package body FileDialogs is
       return "";
    end ShowFileDialog;
 
-   function ShowSaveDialog
-     (Parent: Gtk_Window; Archive: String) return String is
+   function ShowSaveDialog(Archive: String) return String is
       ArchivePath: Unbounded_String := Null_Unbounded_String;
    begin
       CurrentDialog :=
-        Gtk_File_Chooser_Dialog_New("Save archive as", Parent, Action_Save);
+        Gtk_File_Chooser_Dialog_New("Save archive as", Window, Action_Save);
       Set_Do_Overwrite_Confirmation(CurrentDialog, True);
       Set_Create_Folders(CurrentDialog, True);
       AddFilter;
@@ -164,8 +163,7 @@ package body FileDialogs is
    end ShowSaveDialog;
 
    procedure ShowAddFileDialog
-     (Parent: Gtk_Window; Encrypted: Boolean := False;
-      Directory: Boolean := False) is
+     (Encrypted: Boolean := False; Directory: Boolean := False) is
       Dialog: Gtk_File_Chooser_Dialog;
       FilesNames: String_SList.GSlist;
    begin
@@ -174,21 +172,21 @@ package body FileDialogs is
       if not Directory then
          if not Encrypted then
             Dialog :=
-              Gtk_File_Chooser_Dialog_New("Add file", Parent, Action_Open);
+              Gtk_File_Chooser_Dialog_New("Add file", Window, Action_Open);
          else
             Dialog :=
               Gtk_File_Chooser_Dialog_New
-                ("Add file with encryption", Parent, Action_Open);
+                ("Add file with encryption", Window, Action_Open);
          end if;
       else
          if not Encrypted then
             Dialog :=
               Gtk_File_Chooser_Dialog_New
-                ("Add folder", Parent, Action_Select_Folder);
+                ("Add folder", Window, Action_Select_Folder);
          else
             Dialog :=
               Gtk_File_Chooser_Dialog_New
-                ("Add folder with encryption", Parent, Action_Select_Folder);
+                ("Add folder with encryption", Window, Action_Select_Folder);
          end if;
       end if;
       Set_Select_Multiple(Dialog, True);
@@ -217,8 +215,7 @@ package body FileDialogs is
                if Run(MessageDialog) /= Gtk_Response_Yes then
                   Destroy(MessageDialog);
                   NewName :=
-                    To_Unbounded_String
-                      (ShowSaveDialog(Window, Get_Title(MChild)));
+                    To_Unbounded_String(ShowSaveDialog(Get_Title(MChild)));
                   if NewName /= Null_Unbounded_String then
                      ChangeName(To_String(NewName));
                   else

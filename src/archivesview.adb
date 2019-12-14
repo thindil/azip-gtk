@@ -210,7 +210,8 @@ package body ArchivesView is
       ChangeName(FileName);
       -- Placeholder code. Here probably should go all code to open and show
       -- the content of the selected archive.
-      AddItem(Full_Name("azipgtk"), Containing_Directory(Full_Name("azipgtk")));
+      AddItem
+        (Full_Name("azipgtk"), Containing_Directory(Full_Name("azipgtk")));
       Child_Selected(MWindow, MChild);
    end OpenFile;
 

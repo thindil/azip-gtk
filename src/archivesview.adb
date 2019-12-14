@@ -41,7 +41,6 @@ with Gtk.Tree_Store; use Gtk.Tree_Store;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Tree_View_Column; use Gtk.Tree_View_Column;
 with Gtk.Widget; use Gtk.Widget;
-with Gtk.Window; use Gtk.Window;
 with Glib; use Glib;
 with Gdk.Event; use Gdk.Event;
 with Gdk; use Gdk;
@@ -106,6 +105,8 @@ package body ArchivesView is
       Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))));
    end RefreshFilesList;
 
+   MouseX, MouseY: Gdouble;
+
    function ShowDirectoryMenu
      (Self: access Gtk_Widget_Record'Class; Event: Gdk_Event_Button)
       return Boolean is
@@ -121,18 +122,22 @@ package body ArchivesView is
          Popup
            (Menu => Gtk_Menu(Gtk.Widget.Convert(Get_Data_Address(List))),
             Button => Event.Button, Activate_Time => Event.Time);
+         MouseX := Event.X;
+         MouseY := Event.Y;
       end loop;
       return True;
    end ShowDirectoryMenu;
 
    procedure SelectMenu(Self: access Gtk_Menu_Item_Record'Class) is
-      View: constant Gtk_Tree_View := Gtk_Tree_View(Get_Attach_Widget(Gtk_Menu(Get_Parent(Self))));
+      View: constant Gtk_Tree_View :=
+        Gtk_Tree_View(Get_Attach_Widget(Gtk_Menu(Get_Parent(Self))));
       Path: Gtk_Tree_Path;
       TempX, TempY: Gint;
       Found: Boolean;
       Column: Gtk_Tree_View_Column;
    begin
-      Get_Path_At_Pos(View, 0, 0, Path, Column, TempX, TempY, Found);
+      Get_Path_At_Pos
+        (View, Gint(MouseX), Gint(MouseY), Path, Column, TempX, TempY, Found);
       Select_Path(Get_Selection(View), Path);
    end SelectMenu;
 
@@ -155,13 +160,16 @@ package body ArchivesView is
       Renderer: Gtk_Cell_Renderer_Text;
       MChild: MDI_Child;
       ToolBar: constant Gtk_Toolbar :=
-        Gtk_Toolbar(Get_Child(Gtk_Box(Get_Child(Window)), 1));
+        Gtk_Toolbar
+          (Get_Child
+             (Gtk_Box(Gtk.Bin.Get_Child(Gtk_Bin(MainWindow.Window))), 1));
       Buttons: constant array(1 .. 4) of Gint := (4, 5, 14, 16);
    begin
       -- Split archive window on 1/3 for tree and rest for list.
       Set_Position
         (ArchivePaned,
-         Gint(Float(Get_Allocated_Width(Gtk_Widget(Window))) * 0.3));
+         Gint
+           (Float(Get_Allocated_Width(Gtk_Widget(MainWindow.Window))) * 0.3));
       -- Add tree view with directory tree for the archive
       Append(Tree, Iter, Null_Iter);
       Set(Tree, Iter, 0, "New archive");

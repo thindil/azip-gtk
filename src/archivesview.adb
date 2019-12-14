@@ -44,6 +44,7 @@ with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
 with Glib; use Glib;
 with Gdk.Event; use Gdk.Event;
+with Gdk; use Gdk;
 with MainWindow; use MainWindow;
 with Menu; use Menu;
 
@@ -124,6 +125,17 @@ package body ArchivesView is
       return True;
    end ShowDirectoryMenu;
 
+   procedure SelectMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      View: constant Gtk_Tree_View := Gtk_Tree_View(Get_Attach_Widget(Gtk_Menu(Get_Parent(Self))));
+      Path: Gtk_Tree_Path;
+      TempX, TempY: Gint;
+      Found: Boolean;
+      Column: Gtk_Tree_View_Column;
+   begin
+      Get_Path_At_Pos(View, 0, 0, Path, Column, TempX, TempY, Found);
+      Select_Path(Get_Selection(View), Path);
+   end SelectMenu;
+
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
    begin
@@ -176,7 +188,7 @@ package body ArchivesView is
          Set_Activate_On_Single_Click(View, True);
          On_Row_Activated(View, RefreshFilesList'Access);
          -- Add right click menu to directory view
-         AddMenuItem("Select directory", EmptyMenu'Access);
+         AddMenuItem("Select directory", SelectMenu'Access);
          AddMenuItem("Delete directory", EmptyMenu'Access);
          Show_All(Menu);
          Attach_To_Widget(Menu, View, null);

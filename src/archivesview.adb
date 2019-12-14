@@ -29,6 +29,8 @@ with Gtk.Cell_Renderer_Text; use Gtk.Cell_Renderer_Text;
 with Gtk.Container; use Gtk.Container;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.List_Store; use Gtk.List_Store;
+with Gtk.Menu; use Gtk.Menu;
+with Gtk.Menu_Item; use Gtk.Menu_Item;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
 with Gtk.Toolbar; use Gtk.Toolbar;
@@ -41,6 +43,7 @@ with Gtk.Tree_View_Column; use Gtk.Tree_View_Column;
 with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
 with Glib; use Glib;
+with Gdk.Event; use Gdk.Event;
 with MainWindow; use MainWindow;
 with Menu; use Menu;
 
@@ -102,6 +105,31 @@ package body ArchivesView is
       Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))));
    end RefreshFilesList;
 
+   function ShowDirectoryMenu
+     (Self: access Gtk_Widget_Record'Class; Event: Gdk_Event_Button)
+      return Boolean is
+      use Widget_List;
+      MenusList: constant Glist := Get_For_Attach_Widget(Self);
+      List: Glist;
+   begin
+      if Event.Button /= 3 then
+         return False;
+      end if;
+      for I in 0 .. Widget_List.Length(MenusList) - 1 loop
+         List := Widget_List.Nth(MenusList, I);
+         Popup
+           (Menu => Gtk_Menu(Gtk.Widget.Convert(Get_Data_Address(List))),
+            Button => Event.Button, Activate_Time => Event.Time);
+      end loop;
+      return True;
+   end ShowDirectoryMenu;
+
+   procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+   begin
+      null;
+   end EmptyMenu;
+
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
       ArchivePaned: constant Gtk_Paned :=
@@ -127,6 +155,15 @@ package body ArchivesView is
       Set(Tree, Iter, 0, "New archive");
       declare
          View: constant Gtk_Tree_View := Gtk_Tree_View_New_With_Model(+(Tree));
+         Menu: constant Gtk_Menu := Gtk_Menu_New;
+         procedure AddMenuItem
+           (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void) is
+            Item: constant Gtk_Menu_Item :=
+              Gtk_Menu_Item_New_With_Mnemonic(Label);
+         begin
+            On_Activate(Item, Subprogram);
+            Append(Menu, Item);
+         end AddMenuItem;
       begin
          Gtk.Cell_Renderer_Text.Gtk_New(Renderer);
          Area := Gtk_Cell_Area_Box_New;
@@ -138,6 +175,12 @@ package body ArchivesView is
          end if;
          Set_Activate_On_Single_Click(View, True);
          On_Row_Activated(View, RefreshFilesList'Access);
+         -- Add right click menu to directory view
+         AddMenuItem("Select directory", EmptyMenu'Access);
+         AddMenuItem("Delete directory", EmptyMenu'Access);
+         Show_All(Menu);
+         Attach_To_Widget(Menu, View, null);
+         On_Button_Press_Event(View, ShowDirectoryMenu'Access);
          Scroll := Gtk_Scrolled_Window_New;
          Set_Policy(Scroll, Policy_Never, Policy_Never);
          Add(Gtk_Container(Scroll), Gtk_Widget(View));

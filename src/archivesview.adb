@@ -19,6 +19,7 @@
 -- SOFTWARE.
 
 with Ada.Directories; use Ada.Directories;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -27,10 +28,12 @@ with Gtk.Box; use Gtk.Box;
 with Gtk.Cell_Area_Box; use Gtk.Cell_Area_Box;
 with Gtk.Cell_Renderer_Text; use Gtk.Cell_Renderer_Text;
 with Gtk.Container; use Gtk.Container;
+with Gtk.Dialog; use Gtk.Dialog;
 with Gtk.Enums; use Gtk.Enums;
 with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Menu; use Gtk.Menu;
 with Gtk.Menu_Item; use Gtk.Menu_Item;
+with Gtk.Message_Dialog; use Gtk.Message_Dialog;
 with Gtk.Paned; use Gtk.Paned;
 with Gtk.Scrolled_Window; use Gtk.Scrolled_Window;
 with Gtk.Toolbar; use Gtk.Toolbar;
@@ -146,11 +149,63 @@ package body ArchivesView is
       ShowDirectoryDialog(TreePathToPath(SelectedModel, SelectedIter));
    end ExtractMenu;
 
-   procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
-      pragma Unreferenced(Self);
+   function DeleteFile
+     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
+      return Boolean is
+      pragma Unreferenced(Path);
+      SelectedModel: Gtk_Tree_Model;
+      SelectedIter: Gtk_Tree_Iter;
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      NewIter: Gtk_Tree_Iter := Iter;
+      FileName: constant String := Get_String(Model, Iter, 0);
+      FilePath: constant String := Get_String(Model, Iter, 9);
+      ArchivePath: constant String := Get_Title(MChild);
    begin
-      null;
-   end EmptyMenu;
+      Get_Selected
+        (Get_Selection
+           (Gtk_Tree_View
+              (Get_Child(Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))),
+         SelectedModel, SelectedIter);
+      if Index(FilePath, TreePathToPath(SelectedModel, SelectedIter), 1) =
+        1 then
+         Ada.Text_IO.Put_Line
+           ("Removing file '" & FileName & "' from archive '" & ArchivePath &
+            "' with archive path: '" & FilePath & "'.");
+         Gtk.List_Store.Remove(-(Model), NewIter);
+         Gtk.List_Store.Foreach(-(Model), DeleteFile'Access);
+         return True;
+      end if;
+      return False;
+   end DeleteFile;
+
+   procedure DeleteMenu(Self: access Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced(Self);
+      MessageDialog: constant Gtk_Message_Dialog :=
+        Gtk_Message_Dialog_New
+          (Window, Modal, Message_Question, Buttons_Yes_No,
+           "Do you want to remove the entire selected FOLDER and subfolders?");
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      View: constant Gtk_Tree_View :=
+        Gtk_Tree_View
+          (Get_Child(Gtk_Bin(Get_Child2(Gtk_Paned(Get_Widget(MChild))))));
+      SelectedModel: Gtk_Tree_Model;
+      SelectedIter: Gtk_Tree_Iter;
+   begin
+      if Run(MessageDialog) = Gtk_Response_Yes then
+         Gtk.List_Store.Foreach
+           (-(Gtk.Tree_Model_Filter.Get_Model
+               (-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))))),
+            DeleteFile'Access);
+         Get_Selected
+           (Get_Selection
+              (Gtk_Tree_View
+                 (Get_Child
+                    (Gtk_Bin(Get_Child1(Gtk_Paned(Get_Widget(MChild))))))),
+            SelectedModel, SelectedIter);
+         Gtk.Tree_Store.Remove(-(SelectedModel), SelectedIter);
+      end if;
+      Destroy(MessageDialog);
+   end DeleteMenu;
 
    procedure NewArchive(Self: access Gtk_Tool_Button_Record'Class) is
       pragma Unreferenced(Self);
@@ -202,7 +257,7 @@ package body ArchivesView is
          On_Row_Activated(View, RefreshFilesList'Access);
          -- Add right click menu to directory view
          AddMenuItem("Extract directory", ExtractMenu'Access);
-         AddMenuItem("Delete directory", EmptyMenu'Access);
+         AddMenuItem("Delete directory", DeleteMenu'Access);
          Show_All(Menu);
          Attach_To_Widget(Menu, View, null);
          On_Button_Press_Event(View, ShowDirectoryMenu'Access);

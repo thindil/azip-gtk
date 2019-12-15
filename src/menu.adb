@@ -132,7 +132,7 @@ package body Menu is
       pragma Unreferenced(Self);
       -- ****
    begin
-      ShowDirectoryDialog(Get_Title(Get_Focus_Child(MWindow)));
+      ShowDirectoryDialog;
    end ExtractArchiveMenu;
 
    -- ****if* Menu/DeleteFiles

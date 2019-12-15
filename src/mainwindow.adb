@@ -100,7 +100,7 @@ package body MainWindow is
       pragma Unreferenced(Self);
       -- ****
    begin
-      ShowDirectoryDialog(Get_Title(Get_Focus_Child(MWindow)));
+      ShowDirectoryDialog;
    end ExtractArchive;
 
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class) is

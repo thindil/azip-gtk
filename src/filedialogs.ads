@@ -25,9 +25,9 @@ package FileDialogs is
    -- FUNCTION
    -- Show directory dialog and extract selected archive to it.
    -- PARAMETERS
-   -- Archive - Full path to the archive which will be extracted
+   -- Path - In archive path for files which will be extracted
    -- SOURCE
-   procedure ShowDirectoryDialog(Archive: String);
+   procedure ShowDirectoryDialog(Path: String := "/");
    -- ****
 
    -- ****f* FileDialogs/ShowFileDialog

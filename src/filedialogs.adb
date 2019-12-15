@@ -14,8 +14,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 with Ada.Directories; use Ada.Directories;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
+with Gtk.Bin; use Gtk.Bin;
 with Gtk.Box; use Gtk.Box;
 with Gtk.Combo_Box; use Gtk.Combo_Box;
 with Gtk.Combo_Box_Text; use Gtk.Combo_Box_Text;
@@ -24,7 +26,13 @@ with Gtk.Enums; use Gtk.Enums;
 with Gtk.File_Chooser; use Gtk.File_Chooser;
 with Gtk.File_Chooser_Dialog; use Gtk.File_Chooser_Dialog;
 with Gtk.File_Filter; use Gtk.File_Filter;
+with Gtk.List_Store; use Gtk.List_Store;
 with Gtk.Message_Dialog; use Gtk.Message_Dialog;
+with Gtk.Paned; use Gtk.Paned;
+with Gtk.Tree_Model; use Gtk.Tree_Model;
+with Gtk.Tree_Model_Filter; use Gtk.Tree_Model_Filter;
+with Gtk.Tree_Model_Sort; use Gtk.Tree_Model_Sort;
+with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
 with Gtkada.MDI; use Gtkada.MDI;
 with Glib; use Glib;
@@ -41,10 +49,40 @@ package body FileDialogs is
    CurrentDialog: Gtk_File_Chooser_Dialog;
    -- ****
 
-   procedure ShowDirectoryDialog(Archive: String) is
+   ExtractPath, ArchivePath, ExtractDirectory: Unbounded_String;
+
+   function ExtractFile
+     (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
+      return Boolean is
+      pragma Unreferenced(Path);
+      FileName: constant String := Get_String(Model, Iter, 0);
+      FilePath: constant String := Get_String(Model, Iter, 9);
+   begin
+      -- If file is in proper extract path in archive, extract it
+      if Index(FilePath, To_String(ExtractPath), 1) = 1 then
+         -- This is a placeholder code
+         Ada.Text_IO.Put_Line
+           ("Extracting: '" & FileName & "' from archive: '" &
+            To_String(ArchivePath) & "' from archive path: '" & FilePath &
+            "' to directory: '" & To_String(ExtractDirectory) & "'");
+      end if;
+      return False;
+   end ExtractFile;
+
+   procedure ShowDirectoryDialog(Path: String := "/") is
       Dialog: constant Gtk_File_Chooser_Dialog :=
         Gtk_File_Chooser_Dialog_New
           ("Extract archive", Window, Action_Select_Folder);
+      MChild: constant MDI_Child := Get_Focus_Child(MWindow);
+      FilesList: constant Gtk_List_Store :=
+        -(Gtk.Tree_Model_Filter.Get_Model
+           (-(Gtk.Tree_Model_Sort.Get_Model
+               (-(Get_Model
+                   (Gtk_Tree_View
+                      (Get_Child
+                         (Gtk_Bin
+                            (Get_Child2
+                               (Gtk_Paned(Get_Widget(MChild))))))))))));
    begin
       -- Add Cancel button
       if Add_Button(Dialog, "Cancel", Gtk_Response_Cancel) = null then
@@ -61,11 +99,12 @@ package body FileDialogs is
       end if;
       -- Show dialog to the user
       if Run(Dialog) = Gtk_Response_OK then
-         -- If button Ok was pressed, extract archive to selected directory
-         -- This code is a placeholder, probably whole extraction code should
-         -- go here.
-         Put_Line("Selected directory: " & Get_Filename(Dialog));
-         Put_Line("Archive to extract: " & Archive);
+         -- If button Ok was pressed, extract archive to selected directory,
+         -- each file one by one.
+         ExtractPath := To_Unbounded_String(Path);
+         ArchivePath := To_Unbounded_String(Get_Title(MChild));
+         ExtractDirectory := To_Unbounded_String(Get_Filename(Dialog));
+         Foreach(+(FilesList), ExtractFile'Access);
       end if;
       Destroy(Dialog);
    end ShowDirectoryDialog;

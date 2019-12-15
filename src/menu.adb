@@ -19,6 +19,7 @@
 -- SOFTWARE.
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
+with Gtk.Accel_Group; use Gtk.Accel_Group;
 with Gtk.Bin; use Gtk.Bin;
 with Gtk.Check_Menu_Item; use Gtk.Check_Menu_Item;
 with Gtk.Dialog; use Gtk.Dialog;
@@ -36,6 +37,9 @@ with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 with Gtk.Tree_Selection; use Gtk.Tree_Selection;
 with Gtk.Tree_View; use Gtk.Tree_View;
 with Gtk.Widget; use Gtk.Widget;
+with Gtk.Window; use Gtk.Window;
+with Gdk.Types; use Gdk.Types;
+with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 with Gtkada.MDI; use Gtkada.MDI;
 with AboutDialog; use AboutDialog;
 with ArchivesView; use ArchivesView;
@@ -541,6 +545,7 @@ package body Menu is
       Menubar: constant Gtk_Menu_Bar := Gtk_Menu_Bar_New;
       Menu: Gtk_Menu;
       RadioGroup: Widget_SList.GSlist;
+      Accelerators: constant Gtk_Accel_Group := Gtk_Accel_Group_New;
       procedure AddSubmenu(Label: String) is
          Item: constant Gtk_Menu_Item :=
            Gtk_Menu_Item_New_With_Mnemonic(Label);
@@ -550,12 +555,17 @@ package body Menu is
       end AddSubmenu;
       procedure AddMenuItem
         (Label: String; Subprogram: Cb_Gtk_Menu_Item_Void;
-         Enabled: Boolean := True) is
+         Enabled: Boolean := True; Key: Gdk_Key_Type := 0;
+         Mods: Gdk_Modifier_Type := 0) is
          Item: constant Gtk_Menu_Item :=
            Gtk_Menu_Item_New_With_Mnemonic(Label);
       begin
          On_Activate(Item, Subprogram);
          Set_Sensitive(Item, Enabled);
+         if Key /= 0 then
+            Add_Accelerator
+              (Item, "activate", Accelerators, Key, Mods, Accel_Visible);
+         end if;
          Append(Menu, Item);
       end AddMenuItem;
       procedure AddRadioMenuItem
@@ -580,15 +590,22 @@ package body Menu is
          Append(Menu, Item);
       end AddCheckMenuItem;
    begin
+      Add_Accel_Group(Window, Accelerators);
       -- Add File menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_File");
-      AddMenuItem("_New", NewArchiveMenu'Access);
-      AddMenuItem("_Open", OpenArchiveMenu'Access);
-      AddMenuItem("Save _as", SaveArchiveMenu'Access);
-      AddMenuItem("_Close", CloseArchiveMenu'Access);
+      AddMenuItem
+        ("_New archive", NewArchiveMenu'Access, True, GDK_N, Control_Mask);
+      AddMenuItem
+        ("_Open archive...", OpenArchiveMenu'Access, True, GDK_O,
+         Control_Mask);
+      AddMenuItem
+        ("_Save archive as...", SaveArchiveMenu'Access, True, GDK_F12);
+      AddMenuItem
+        ("_Close archive", CloseArchiveMenu'Access, True, GDK_W, Control_Mask);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_Properties", PropertiesMenu'Access);
+      AddMenuItem
+        ("_Properties", PropertiesMenu'Access, True, GDK_D, Control_Mask);
       Append(Menu, Gtk_Separator_Menu_Item_New);
       declare
          Item: constant Gtk_Menu_Item :=
@@ -608,16 +625,18 @@ package body Menu is
          Append(Menu, Item);
       end;
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_Quit", QuitMenu'Access);
+      AddMenuItem("_Quit", QuitMenu'Access, True, GDK_F4, Mod1_Mask);
       -- Add Edit menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Edit");
-      AddMenuItem("Select _all", SelectAll'Access);
-      AddMenuItem("_Unselect all", UnselectAll'Access);
-      AddMenuItem("_Extract", ExtractArchiveMenu'Access);
+      AddMenuItem("Select _all", SelectAll'Access, True, GDK_A, Control_Mask);
+      AddMenuItem
+        ("_Unselect all", UnselectAll'Access, True, GDK_U, Control_Mask);
+      AddMenuItem
+        ("_Extract", ExtractArchiveMenu'Access, True, GDK_E, Control_Mask);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("Delete entries", DeleteFiles'Access);
-      AddMenuItem("A_dd files...", AddFileMenu'Access);
+      AddMenuItem("Delete entries", DeleteFiles'Access, True, GDK_minus);
+      AddMenuItem("A_dd files...", AddFileMenu'Access, True, GDK_plus);
       AddMenuItem
         ("Add files with encr_yption...", AddFileEncryptionMenu'Access);
       AddMenuItem("Add folder...", AddFolderMenu'Access);
@@ -626,11 +645,17 @@ package body Menu is
       -- Add Tools menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Tools");
-      AddMenuItem("_Test archive", TestArchiveMenu'Access);
-      AddMenuItem("_Find in archive...", FindMenu'Access);
+      AddMenuItem
+        ("_Test archive", TestArchiveMenu'Access, True, GDK_T, Control_Mask);
+      AddMenuItem
+        ("_Find in archive...", FindMenu'Access, True, GDK_F, Control_Mask);
       Append(Menu, Gtk_Separator_Menu_Item_New);
-      AddMenuItem("_Update archive", UpdateArchiveMenu'Access);
-      AddMenuItem("_Recompress archive", RecompressArchiveMenu'Access);
+      AddMenuItem
+        ("_Update archive", UpdateArchiveMenu'Access, True, GDK_P,
+         Control_Mask);
+      AddMenuItem
+        ("_Recompress archive", RecompressArchiveMenu'Access, True, GDK_R,
+         Control_Mask);
       AddMenuItem("_Touch time stamps", EmptyMenu'Access, False);
       AddMenuItem("Encr_ypt archive", EmptyMenu'Access, False);
       Append(Menu, Gtk_Separator_Menu_Item_New);
@@ -659,7 +684,7 @@ package body Menu is
       -- Add Help menu
       Menu := Gtk_Menu_New;
       AddSubmenu("_Help");
-      AddMenuItem("_Quick help", HelpMenu'Access);
+      AddMenuItem("_Quick help", HelpMenu'Access, True, GDK_F1);
       AddMenuItem("AZip _Webpage (contact, support)", WebpageMenu'Access);
       AddMenuItem("Azip _news", NewsMenu'Access);
       Append(Menu, Gtk_Separator_Menu_Item_New);

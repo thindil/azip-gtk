@@ -105,16 +105,21 @@ package body ArchivesView is
       Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))));
    end RefreshFilesList;
 
-   MouseX, MouseY: Gdouble;
-
    function ShowDirectoryMenu
      (Self: access Gtk_Widget_Record'Class; Event: Gdk_Event_Button)
       return Boolean is
       use Widget_List;
       MenusList: constant Glist := Get_For_Attach_Widget(Self);
       List: Glist;
+      SelectedModel: Gtk_Tree_Model;
+      SelectedIter: Gtk_Tree_Iter;
    begin
       if Event.Button /= 3 then
+         return False;
+      end if;
+      Get_Selected
+        (Get_Selection(Gtk_Tree_View(Self)), SelectedModel, SelectedIter);
+      if Get_String_From_Iter(SelectedModel, SelectedIter) = "0" then
          return False;
       end if;
       for I in 0 .. Widget_List.Length(MenusList) - 1 loop
@@ -122,24 +127,9 @@ package body ArchivesView is
          Popup
            (Menu => Gtk_Menu(Gtk.Widget.Convert(Get_Data_Address(List))),
             Button => Event.Button, Activate_Time => Event.Time);
-         MouseX := Event.X;
-         MouseY := Event.Y;
       end loop;
       return True;
    end ShowDirectoryMenu;
-
-   procedure SelectMenu(Self: access Gtk_Menu_Item_Record'Class) is
-      View: constant Gtk_Tree_View :=
-        Gtk_Tree_View(Get_Attach_Widget(Gtk_Menu(Get_Parent(Self))));
-      Path: Gtk_Tree_Path;
-      TempX, TempY: Gint;
-      Found: Boolean;
-      Column: Gtk_Tree_View_Column;
-   begin
-      Get_Path_At_Pos
-        (View, Gint(MouseX), Gint(MouseY), Path, Column, TempX, TempY, Found);
-      Select_Path(Get_Selection(View), Path);
-   end SelectMenu;
 
    procedure EmptyMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
@@ -196,7 +186,7 @@ package body ArchivesView is
          Set_Activate_On_Single_Click(View, True);
          On_Row_Activated(View, RefreshFilesList'Access);
          -- Add right click menu to directory view
-         AddMenuItem("Select directory", SelectMenu'Access);
+         AddMenuItem("Extract directory", EmptyMenu'Access);
          AddMenuItem("Delete directory", EmptyMenu'Access);
          Show_All(Menu);
          Attach_To_Widget(Menu, View, null);

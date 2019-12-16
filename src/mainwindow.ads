@@ -40,7 +40,7 @@ package MainWindow is
    -- FUNCTION
    -- Show delete files confirmation dialog and start deleting them on press
    -- the toolbar button
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure DeleteFiles(Self: access Gtk_Tool_Button_Record'Class);
@@ -49,7 +49,7 @@ package MainWindow is
    -- ****f* MainWindow/AddFile
    -- FUNCTION
    -- Show add file dialog on press the tool button.
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure AddFile(Self: access Gtk_Tool_Button_Record'Class);
@@ -58,7 +58,7 @@ package MainWindow is
    -- ****f* MainWindow/AddFileEncrypted
    -- FUNCTION
    -- Show add file with encryption dialog on press the tool button.
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure AddFileEncrypted(Self: access Gtk_Tool_Button_Record'Class);
@@ -67,7 +67,7 @@ package MainWindow is
    -- ****f* MainWindow/TestArchive
    -- FUNCTION
    -- Test archive and show it result to the user.
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure TestArchive(Self: access Gtk_Tool_Button_Record'Class);
@@ -76,7 +76,7 @@ package MainWindow is
    -- ****f* MainWindow/UpdateArchive
    -- FUNCTION
    -- Ask if update archive and if user answer "yes", update it
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure UpdateArchive(Self: access Gtk_Tool_Button_Record'Class);
@@ -85,7 +85,7 @@ package MainWindow is
    -- ****f* MainWindow/RecompressArchive
    -- FUNCTION
    -- Ask if recompress archive and if user answer "yes", recompress it.
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure RecompressArchive(Self: access Gtk_Tool_Button_Record'Class);
@@ -94,7 +94,7 @@ package MainWindow is
    -- ****f* MainWindow/ChangeView
    -- FUNCTION
    -- Show or hide directory tree view in selected archive view
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure ChangeView(Self: access Gtk_Tool_Button_Record'Class);
@@ -103,7 +103,7 @@ package MainWindow is
    -- ****f* MainWindow/ShowInfo
    -- FUNCTION
    -- Show information about selected archive
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure ShowInfo(Self: access Gtk_Tool_Button_Record'Class);

@@ -93,7 +93,7 @@ package body MainWindow is
    -- ****if* MainWindow/ExtractArchive
    -- FUNCTION
    -- Show extract archive dialog on press the proper tool button.
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure ExtractArchive(Self: access Gtk_Tool_Button_Record'Class) is
@@ -183,6 +183,7 @@ package body MainWindow is
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
       return Boolean is
       pragma Unreferenced(Path);
+      -- ****
       FileName: constant String := Get_String(Model, Iter, 0);
       Valid: Boolean;
       ArchiveName: constant String := Get_Title(Get_Focus_Child(MWindow));
@@ -245,7 +246,7 @@ package body MainWindow is
    -- ****if* MainWindow/Find
    -- FUNCTION
    -- Show find dialog and after, update archive listing with result of search
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure Find(Self: access Gtk_Tool_Button_Record'Class) is
@@ -367,7 +368,7 @@ package body MainWindow is
    -- ****if* MainWindow/OpenArchive
    -- FUNCTION
    -- Show file dialog and open selected archive
-   -- PARAMERTERS
+   -- PARAMETERS
    -- Self - Gtk_Tool_Button pressed. Can be null. Unused.
    -- SOURCE
    procedure OpenArchive(Self: access Gtk_Tool_Button_Record'Class) is
@@ -385,6 +386,7 @@ package body MainWindow is
    -- SOURCE
    procedure ProgramQuit(Self: access Gtk_Widget_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
    begin
       Main_Quit;
    end ProgramQuit;

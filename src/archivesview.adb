@@ -109,9 +109,20 @@ package body ArchivesView is
       Refilter(-(Gtk.Tree_Model_Sort.Get_Model(-(Get_Model(View)))));
    end RefreshFilesList;
 
+   -- ****if* ArchivesView/ShowDirectoryMenu
+   -- FUNCTION
+   -- Show selected in tree view directory menu on right click
+   -- PARAMETERS
+   -- Self  - Gtk_Widget with directory tree
+   -- Event - Keyboard/Mouse button which triggered this code
+   -- RESULT
+   -- True if menu was show, otherwise False for trigger other events if
+   -- needed
+   -- SOURCE
    function ShowDirectoryMenu
      (Self: access Gtk_Widget_Record'Class; Event: Gdk_Event_Button)
       return Boolean is
+      -- ****
       use Widget_List;
       MenusList: constant Glist := Get_For_Attach_Widget(Self);
       List: Glist;
@@ -135,8 +146,15 @@ package body ArchivesView is
       return True;
    end ShowDirectoryMenu;
 
+   -- ****if* ArchivesView/ExtractMenu
+   -- FUNCTION
+   -- Show directory dialog and extract selected directory
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was clicked. Ununsed.
+   -- SOURCE
    procedure ExtractMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       SelectedModel: Gtk_Tree_Model;
       SelectedIter: Gtk_Tree_Iter;
       MChild: constant MDI_Child := Get_Focus_Child(MWindow);
@@ -149,9 +167,20 @@ package body ArchivesView is
       ShowDirectoryDialog(TreePathToPath(SelectedModel, SelectedIter));
    end ExtractMenu;
 
+   -- ****if* ArchivesView/DeleteFile
+   -- FUNCTION
+   -- Delete selected file from archive.
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model with list of files from current directory
+   -- Path  - Gtk_Tree_Path to current file in list. Unused.
+   -- Iter  - Gtk_Tree_Iter to current file in list.
+   -- RESULT
+   -- True if file was deleted, to stop and restart iterating. Otherwise False.
+   -- SOURCE
    function DeleteFile
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
       return Boolean is
+      -- ****
       pragma Unreferenced(Path);
       SelectedModel: Gtk_Tree_Model;
       SelectedIter: Gtk_Tree_Iter;
@@ -178,8 +207,16 @@ package body ArchivesView is
       return False;
    end DeleteFile;
 
+   -- ****if* ArchivesView/DeleteMenu
+   -- FUNCTION
+   -- Show question to the user and if answer is 'yes', delete selected
+   -- directory and its content from the selected archive.
+   -- PARAMETERS
+   -- Self - Gtk_Menu_Item which was clicked. Unused.
+   -- SOURCE
    procedure DeleteMenu(Self: access Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced(Self);
+      -- ****
       MessageDialog: constant Gtk_Message_Dialog :=
         Gtk_Message_Dialog_New
           (Window, Modal, Message_Question, Buttons_Yes_No,

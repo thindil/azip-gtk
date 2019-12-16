@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AZipGtk/HelpDialog
+-- FUNCTION
+-- Provide code to show and manipulate help
+-- SOURCE
 package HelpDialog is
+-- ****
 
+   -- ****f* HelpDialog/ShowHelpDialog
+   -- FUNCTION
+   -- Show help dialog to the user
+   -- SOURCE
    procedure ShowHelpDialog;
+   -- ****
 
 end HelpDialog;

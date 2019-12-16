@@ -49,18 +49,52 @@ package body FileDialogs is
    CurrentDialog: Gtk_File_Chooser_Dialog;
    -- ****
 
-   ExtractPath, ArchivePath, ExtractDirectory: Unbounded_String;
+   -- ****iv* FileDialogs/ExtractPath
+   -- FUNCTION
+   -- In archive path from which files will be extracted. For example, if
+   -- ExtractPath is "/" then all files will be extracted. If value is
+   -- "/tmp" then all files from directory "tmp" and subdirectories will
+   -- be extracted.
+   -- SOURCE
+   ExtractPath: Unbounded_String;
+   -- ****
 
+   -- ****iv* FileDialogs/ArchivePath
+   -- FUNCTION
+   -- Full path to the selected archive to extract
+   -- SOURCE
+   ArchivePath: Unbounded_String;
+   -- ****
+
+   -- ****iv* FileDialogs/ExtractDirectory
+   -- FUNCTION
+   -- Full path to the directory where files will be extracted.
+   -- SOURCE
+   ExtractDirectory: Unbounded_String;
+   -- ****
+
+   -- ****if* FileDialogs/ExtractFile
+   -- FUNCTION
+   -- Extract selected file.
+   -- PARAMETERS
+   -- Model - Gtk_Tree_Model which contains list of files in selected archive.
+   -- Path  - Gtk_Tree_Path to the current file in selected archive. Unused.
+   -- Iter  - Gtk_Tree_Iter to the current file in selected archive.
+   -- RESULT
+   -- This function always returns False.
+   -- SOURCE
    function ExtractFile
      (Model: Gtk_Tree_Model; Path: Gtk_Tree_Path; Iter: Gtk_Tree_Iter)
       return Boolean is
       pragma Unreferenced(Path);
+      -- ****
       FileName: constant String := Get_String(Model, Iter, 0);
       FilePath: constant String := Get_String(Model, Iter, 9);
    begin
       -- If file is in proper extract path in archive, extract it
       if Index(FilePath, To_String(ExtractPath), 1) = 1 then
-         -- This is a placeholder code
+         -- This is a placeholder code. Probably whole extraction
+         -- code should go here.
          Ada.Text_IO.Put_Line
            ("Extracting: '" & FileName & "' from archive: '" &
             To_String(ArchivePath) & "' from archive path: '" & FilePath &

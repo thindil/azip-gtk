@@ -1,4 +1,4 @@
-This is test GTKAda GUI for the [AZip](https://azip.sourceforge.io/)
+This is test Tk GUI for the [AZip](https://azip.sourceforge.io/)
 
 
 ## Build the program from sources
@@ -13,27 +13,26 @@ To build you need:
   The program does not work with old compilers (like GCC 4.9) since it
   lacks full support for Ada 2012.
 
-* GtkAda library which should be available in most Linux distributions. Best
-  option is to use (with GNAT GPL) AdaCore version of GtkAda from:
+* Tcl/Tk library. Should be available in every Linux distribution. For
+  Windows it is recommended to use MagicSplat version:
 
-  https://www.adacore.com/download/more
+  https://www.magicsplat.com/tcl-installer/index.html
 
-  At this moment tested version of GtkAda is 2019 and the program require GTK
-  library in version 3.14 (may not works with other versions).
+* TASHY library. You can get it from:
+
+   https://github.com/thindil/tashy
 
 If you have all the required packages, navigate to the main directory(where
 this file is) to compile:
 
 * Easiest way to compile the program is use Gnat Programming Studio included
-  in GNAT. Just run GPS, select *azip-gtk.gpr* as a project file and select
+  in GNAT. Just run GPS, select *azipgtk.gpr* as a project file and select
   option `Build All`.
 
 * If you prefer using console: in main source code directory type
-  `gprbuild -P azip-gtk.gpr` for debug mode build or for release mode:
-  `gprbuild -P azip-gtk.gpr -XMode=release`.
+  `gprbuild -P aziptk.gpr` for debug mode build or for release mode:
+  `gprbuild -P aziptk.gpr -XMode=release`.
 
 ## Running it
 
-When you trying to run build by yourself version of the program, use script
-`run.sh`. The program will not works if you try to start it by binary file
-`azip-gtk` from `bin` directory.
+Just run `aziptk` (on Windows `aziptk.exe`) binary in `bin` directory.

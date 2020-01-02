@@ -22,6 +22,10 @@ To build you need:
 
    https://github.com/thindil/tashy
 
+   **Important:** To build this version of AZip you will need a repository
+   version of the library, not release (probably soon or later it will
+   be better synchronized).
+
 If you have all the required packages, navigate to the main directory(where
 this file is) to compile:
 

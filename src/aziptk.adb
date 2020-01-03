@@ -21,23 +21,20 @@
 with Ada.Text_IO;
 with CArgv;
 with Interfaces.C;
-with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
-with Tcl.Ada; use Tcl.Ada;
+with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with MenuBar; use MenuBar;
 
 procedure AZipTk is
 
    use type Interfaces.C.int;
 
-   Argc: Interfaces.C.int;
+   Argc: Cargv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
-   Result: Interfaces.C.int;
-   Menubar, FileMenu: Menu;
-   Toolbar, MDI: Frame;
+   Toolbar, MDI, MainWindow: Frame;
    Toolbutton: Button;
-   pragma Unreferenced(Result);
 
 begin
 
@@ -78,27 +75,9 @@ begin
    Set_Context(Interp);
 
    -- Create UI
-   Result := Tcl_Eval(Interp, "wm title . AZip");
-   Menubar := Create(".menubar", "-borderwidth 0");
-   FileMenu := Create(".menubar.file", "-tearoff false");
-   Add(FileMenu, "command", "-label ""New archive""");
-   Add(FileMenu, "command", "-label ""Open archive...""");
-   Add(FileMenu, "command", "-label ""Save archive as ...""");
-   Add(FileMenu, "command", "-label ""Close archive""");
-   Add(FileMenu, "separator");
-   Add(FileMenu, "command", "-label Properties");
-   Add(FileMenu, "separator");
-   Add(FileMenu, "command", "-label Recent");
-   Add(FileMenu, "separator");
-   Add(FileMenu, "command", "-label Quit -command exit");
-   Add(Menubar, "cascade", "-menu .menubar.file -label File");
-   Add(Menubar, "command", "-label Edit");
-   Add(Menubar, "command", "-label Tools");
-   Add(Menubar, "command", "-label View");
-   Add(Menubar, "command", "-label Options");
-   Add(Menubar, "command", "-label Window");
-   Add(Menubar, "command", "-label Help");
-   Result := Tcl_Eval(Interp, New_String(". configure -menu .menubar"));
+   MainWindow := Get_Main_Window(Interp);
+   Wm_Set(MainWindow, "title", "AZip");
+   CreateMenuBar(MainWindow);
    Toolbar := Create(".toolbar", "-relief groove -borderwidth 1");
    Toolbutton := Create(".toolbar.new", "-text New");
    Pack(Toolbutton, "-side left");

@@ -24,6 +24,7 @@ with Interfaces.C;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with MenuBar; use MenuBar;
 
 procedure AZipTk is

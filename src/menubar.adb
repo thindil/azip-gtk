@@ -18,31 +18,85 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 package body MenuBar is
 
    procedure CreateMenuBar(MainWindow: Frame) is
-      Menubar, FileMenu: Menu;
+      Menubar: constant Menu := Create(".menubar", "-borderwidth 0");
+      type Menu_Item is record
+         Label: Unbounded_String;
+         Command: Unbounded_String;
+      end record;
+      type Menu_Item_Array is array(Positive range <>) of Menu_Item;
+      Separator: constant Menu_Item :=
+        (Null_Unbounded_String, Null_Unbounded_String);
+      procedure CreateSubMenu
+        (MenuName, MenuLabel: String; MenuItems: Menu_Item_Array) is
+         SubMenu: constant Menu := Create(MenuName, "-tearoff false");
+         Options: Unbounded_String;
+      begin
+         for MenuItem of MenuItems loop
+            if MenuItem.Label /= Null_Unbounded_String then
+               Options :=
+                 To_Unbounded_String("-label """) & MenuItem.Label &
+                 To_Unbounded_String("""");
+               if MenuItem.Command /= Null_Unbounded_String then
+                  Append(Options, " -command ");
+                  Append(Options, MenuItem.Command);
+               end if;
+               Add(SubMenu, "command", To_String(Options));
+            else
+               Add(SubMenu, "separator");
+            end if;
+         end loop;
+         Add(Menubar, "cascade", "-menu " & MenuName & " -label " & MenuLabel);
+      end CreateSubMenu;
    begin
-      Menubar := Create(".menubar", "-borderwidth 0");
-      FileMenu := Create(".menubar.file", "-tearoff false");
-      Add(FileMenu, "command", "-label ""New archive""");
-      Add(FileMenu, "command", "-label ""Open archive...""");
-      Add(FileMenu, "command", "-label ""Save archive as ...""");
-      Add(FileMenu, "command", "-label ""Close archive""");
-      Add(FileMenu, "separator");
-      Add(FileMenu, "command", "-label Properties");
-      Add(FileMenu, "separator");
-      Add(FileMenu, "command", "-label Recent");
-      Add(FileMenu, "separator");
-      Add(FileMenu, "command", "-label Quit -command exit");
-      Add(Menubar, "cascade", "-menu .menubar.file -label File");
-      Add(Menubar, "command", "-label Edit");
+      CreateSubMenu
+        (".menubar.file", "File",
+         ((Label => To_Unbounded_String("New archive"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Open archive..."),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Save archive as..."),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Close archive"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Properties"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Recent"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Quit"),
+           Command => To_Unbounded_String("exit"))));
+      CreateSubMenu
+        (".menubar.edit", "Edit",
+         ((Label => To_Unbounded_String("Select all"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Unselect all"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Extract..."),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Delete entries"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Add files..."),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Add files with encryption..."),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Add folder..."),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Add folder with encryption..."),
+           Command => Null_Unbounded_String)));
       Add(Menubar, "command", "-label Tools");
       Add(Menubar, "command", "-label View");
       Add(Menubar, "command", "-label Options");
       Add(Menubar, "command", "-label Window");
       Add(Menubar, "command", "-label Help");
       configure(MainWindow, "-menu .menubar");
-   end;
+   end CreateMenuBar;
 
 end MenuBar;

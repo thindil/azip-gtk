@@ -19,10 +19,11 @@
 -- SOFTWARE.
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 
 package body MenuBar is
 
-   procedure CreateMenuBar(MainWindow: Frame) is
+   procedure CreateMenuBar(MainWindow: Tk_Frame) is
       Menubar: constant Menu := Create(".menubar", "-borderwidth 0");
       type Menu_Item is record
          Label: Unbounded_String;

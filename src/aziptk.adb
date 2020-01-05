@@ -25,6 +25,7 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 with MenuBar; use MenuBar;
 
 procedure AZipTk is
@@ -34,7 +35,7 @@ procedure AZipTk is
    Argc: Cargv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
-   Toolbar, MDI, MainWindow: Frame;
+   Toolbar, MDI, MainWindow: Tk_Frame;
    Toolbutton: Button;
 
 begin

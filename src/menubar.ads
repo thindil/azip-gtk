@@ -18,10 +18,10 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 
 package MenuBar is
 
-   procedure CreateMenuBar(MainWindow: Frame);
+   procedure CreateMenuBar(MainWindow: Tk_Frame);
 
 end MenuBar;

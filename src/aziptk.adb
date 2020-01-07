@@ -27,6 +27,7 @@ with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
+with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with MenuBar; use MenuBar;
 
 procedure AZipTk is

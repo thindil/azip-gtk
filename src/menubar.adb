@@ -93,7 +93,26 @@ package body MenuBar is
            Command => Null_Unbounded_String),
           (Label => To_Unbounded_String("Add folder with encryption..."),
            Command => Null_Unbounded_String)));
-      Add(Menubar, "command", "-label Tools");
+      CreateSubMenu
+        (".menubar.tools", "Tools",
+         ((Label => To_Unbounded_String("Test archive"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Find in archive..."),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Update archive"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Recompress archive"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Touch time stamps"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Encrypt archive"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("Compare archives"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Merge archives"),
+           Command => Null_Unbounded_String)));
       Add(Menubar, "command", "-label View");
       Add(Menubar, "command", "-label Options");
       Add(Menubar, "command", "-label Window");

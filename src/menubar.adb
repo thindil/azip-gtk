@@ -20,11 +20,12 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
 
 package body MenuBar is
 
    procedure CreateMenuBar(MainWindow: Tk_Frame) is
-      Menubar: constant Menu := Create(".menubar", "-borderwidth 0");
+      Menubar: constant Tk_Menu := Create(".menubar", "-borderwidth 0");
       type Menu_Item is record
          Label: Unbounded_String;
          Command: Unbounded_String;
@@ -34,7 +35,7 @@ package body MenuBar is
         (Null_Unbounded_String, Null_Unbounded_String);
       procedure CreateSubMenu
         (MenuName, MenuLabel: String; MenuItems: Menu_Item_Array) is
-         SubMenu: constant Menu := Create(MenuName, "-tearoff false");
+         SubMenu: constant Tk_Menu := Create(MenuName, "-tearoff false");
          Options: Unbounded_String;
       begin
          for MenuItem of MenuItems loop

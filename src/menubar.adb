@@ -24,7 +24,7 @@ with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
 
 package body MenuBar is
 
-   procedure CreateMenuBar(MainWindow: Tk_Frame) is
+   procedure CreateMenuBar(MainWindow: Tk_Toplevel) is
       Menubar: constant Tk_Menu := Create(".menubar", "-borderwidth 0");
       type Menu_Item is record
          Label: Unbounded_String;
@@ -113,10 +113,41 @@ package body MenuBar is
            Command => Null_Unbounded_String),
           (Label => To_Unbounded_String("Merge archives"),
            Command => Null_Unbounded_String)));
-      Add(Menubar, "command", "-label View");
-      Add(Menubar, "command", "-label Options");
-      Add(Menubar, "command", "-label Window");
-      Add(Menubar, "command", "-label Help");
+      CreateSubMenu
+        (".menubar.view", "View",
+         ((Label => To_Unbounded_String("Flat view"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Tree view"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("No sorting"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Select columns"),
+           Command => Null_Unbounded_String)));
+      CreateSubMenu
+        (".menubar.options", "Options",
+         (1 =>
+            (Label => To_Unbounded_String("General options"),
+             Command => Null_Unbounded_String)));
+      CreateSubMenu
+        (".menubar.window", "Window",
+         ((Label => To_Unbounded_String("Tile horizontal"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Tile vertical"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("Close all"),
+           Command => Null_Unbounded_String)));
+      CreateSubMenu
+        (".menubar.help", "Help",
+         ((Label => To_Unbounded_String("Quick help"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("AZip Web page(contact, support)"),
+           Command => Null_Unbounded_String),
+          (Label => To_Unbounded_String("AZip news"),
+           Command => Null_Unbounded_String),
+          Separator,
+          (Label => To_Unbounded_String("About AZip"),
+           Command => Null_Unbounded_String)));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
 

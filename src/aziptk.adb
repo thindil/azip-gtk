@@ -25,8 +25,10 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
+with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
+with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
+with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow; use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with MenuBar; use MenuBar;
 
@@ -37,8 +39,9 @@ procedure AZipTk is
    Argc: Cargv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
-   Toolbar, MDI, MainWindow: Tk_Frame;
+   Toolbar, MDI: Tk_Frame;
    Toolbutton: Tk_Button;
+   MainWindow: Tk_Toplevel;
 
 begin
 

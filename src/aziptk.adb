@@ -25,12 +25,12 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
 with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow; use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with MenuBar; use MenuBar;
+with Toolbar; use Toolbar;
 
 procedure AZipTk is
 
@@ -39,8 +39,7 @@ procedure AZipTk is
    Argc: Cargv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
-   Toolbar, MDI: Tk_Frame;
-   Toolbutton: Tk_Button;
+   MDI: Tk_Frame;
    MainWindow: Tk_Toplevel;
 
 begin
@@ -85,12 +84,7 @@ begin
    MainWindow := Get_Main_Window(Interp);
    Wm_Set(MainWindow, "title", "AZip");
    CreateMenuBar(MainWindow);
-   Toolbar := Create(".toolbar", "-relief groove -borderwidth 1");
-   Toolbutton := Create(".toolbar.new", "-text New");
-   Pack(Toolbutton, "-side left");
-   Toolbutton := Create(".toolbar.open", "-text Open");
-   Pack(Toolbutton, "-side left");
-   Pack(Toolbar, "-fill x");
+   CreateToolbar;
    MDI := Create(".mdi");
    Pack(MDI, "-fill both -expand true");
 

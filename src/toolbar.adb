@@ -26,12 +26,24 @@ package body Toolbar is
 
    procedure CreateToolbar is
       Toolbar: constant Tk_Frame := Create(".toolbar");
-      Toolbutton: Tk_Button;
+      procedure AddButton(Name, Text: String) is
+         Toolbutton: constant Tk_Button := Create(Name, "-text " & Text);
+      begin
+         Pack(Toolbutton, "-side left");
+      end AddButton;
    begin
-      Toolbutton := Create(".toolbar.new", "-text New");
-      Pack(Toolbutton, "-side left");
-      Toolbutton := Create(".toolbar.open", "-text Open");
-      Pack(Toolbutton, "-side left");
+      AddButton(".toolbar.new", "New");
+      AddButton(".toolbar.open", "Open");
+      AddButton(".toolbar.extract", "Extract");
+      AddButton(".toolbar.add", "Add");
+      AddButton(".toolbar.add2", "Add2");
+      AddButton(".toolbar.delete", "Delete");
+      AddButton(".toolbar.test", "Test");
+      AddButton(".toolbar.find", "Find");
+      AddButton(".toolbar.update", "Update");
+      AddButton(".toolbar.recompress", "Recompress");
+      AddButton(".toolbar.view", "View");
+      AddButton(".toolbar.properties", "Properties");
       Pack(Toolbar, "-fill x");
    end CreateToolbar;
 

@@ -18,6 +18,9 @@ To build you need:
 
   https://www.magicsplat.com/tcl-installer/index.html
 
+* TclLib and TkLib. Both are included in MagicSplat version for Windows,
+  on Linux should be available in all mayor distributions.
+
 * TASHY library. You can get it from:
 
    https://github.com/thindil/tashy

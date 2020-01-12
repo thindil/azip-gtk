@@ -18,33 +18,50 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Directories; use Ada.Directories;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
 with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
+with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
+with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 
 package body Toolbar is
 
    procedure CreateToolbar is
       Toolbar: constant Tk_Frame := Create(".toolbar");
-      procedure AddButton(Name, Text: String) is
-         Toolbutton: constant Tk_Button := Create(Name, "-text " & Text);
+      Image: Tk_Photo :=
+        Create
+          ("toolbaricons",
+           "-file """ & Containing_Directory(Command_Name) & Dir_Separator &
+           "az_tools.png""");
+      procedure AddButton(Name: String; StartX: Natural) is
+         Icon: constant Tk_Photo := Create(Name & "icon");
+         Toolbutton: constant Tk_Button := Create(Name);
       begin
+         Copy
+           (Image, Icon,
+            "-from" & Natural'Image(StartX) & " 0 " &
+            Natural'Image(StartX + 32) & " 32");
+         configure(Toolbutton, "-image " & Name & "icon");
          Pack(Toolbutton, "-side left");
       end AddButton;
    begin
-      AddButton(".toolbar.new", "New");
-      AddButton(".toolbar.open", "Open");
-      AddButton(".toolbar.extract", "Extract");
-      AddButton(".toolbar.add", "Add");
-      AddButton(".toolbar.add2", "Add2");
-      AddButton(".toolbar.delete", "Delete");
-      AddButton(".toolbar.test", "Test");
-      AddButton(".toolbar.find", "Find");
-      AddButton(".toolbar.update", "Update");
-      AddButton(".toolbar.recompress", "Recompress");
-      AddButton(".toolbar.view", "View");
-      AddButton(".toolbar.properties", "Properties");
+      AddButton(".toolbar.new", 320);
+      AddButton(".toolbar.open", 352);
+      AddButton(".toolbar.extract", 64);
+      AddButton(".toolbar.add", 0);
+      AddButton(".toolbar.add2", 192);
+      AddButton(".toolbar.delete", 32);
+      AddButton(".toolbar.test", 128);
+      AddButton(".toolbar.find", 96);
+      AddButton(".toolbar.update", 160);
+      AddButton(".toolbar.recompress", 288);
+      AddButton(".toolbar.view", 384);
+      AddButton(".toolbar.properties", 224);
       Pack(Toolbar, "-fill x");
+      Delete(Image);
    end CreateToolbar;
 
 end Toolbar;

@@ -27,7 +27,8 @@ with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
-with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow; use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
@@ -36,7 +37,9 @@ procedure AZipTk is
 
    use type Interfaces.C.int;
 
-   Argc: Cargv.CNatural;
+   package GetPackages is new Tcl.Ada.Generic_PkgRequire(Integer);
+
+   Argc: CArgv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
    MDI: Tk_Frame;
@@ -79,6 +82,23 @@ begin
    --  calls that require reference to the interpreter.
    ----------------------------------------------------
    Set_Context(Interp);
+
+   -- Load required packages
+   if GetPackages.Tcl_PkgRequireEx(Interp, "widget::toolbar", "1.0", 0, null)'
+       Length =
+     0 then
+      Ada.Text_IO.Put_Line
+        ("Failed to load widget::toolbar package: " &
+         Tcl.Ada.Tcl_GetStringResult(Interp));
+      return;
+   end if;
+   if GetPackages.Tcl_PkgRequireEx(Interp, "tooltip", "1.4.6", 0, null)'Length =
+     0 then
+      Ada.Text_IO.Put_Line
+        ("Failed to load tooltip package: " &
+         Tcl.Ada.Tcl_GetStringResult(Interp));
+      return;
+   end if;
 
    -- Create UI
    MainWindow := Get_Main_Window(Interp);

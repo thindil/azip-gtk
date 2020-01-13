@@ -83,15 +83,7 @@ begin
    ----------------------------------------------------
    Set_Context(Interp);
 
-   -- Load required packages
-   if GetPackages.Tcl_PkgRequireEx(Interp, "widget::toolbar", "1.0", 0, null)'
-       Length =
-     0 then
-      Ada.Text_IO.Put_Line
-        ("Failed to load widget::toolbar package: " &
-         Tcl.Ada.Tcl_GetStringResult(Interp));
-      return;
-   end if;
+   -- Load required Tcl packages
    if GetPackages.Tcl_PkgRequireEx(Interp, "tooltip", "1.4.6", 0, null)'Length =
      0 then
       Ada.Text_IO.Put_Line

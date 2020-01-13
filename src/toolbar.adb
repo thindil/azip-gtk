@@ -20,25 +20,27 @@
 
 with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Directories; use Ada.Directories;
-with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
+with Tcl; use Tcl;
+with Tcl.Ada;
+with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
+with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
 with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
-with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
-with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 
 package body Toolbar is
 
+   use type Interfaces.C.int;
+
    procedure CreateToolbar is
       Toolbar: constant Tk_Frame := Create(".toolbar");
-      Image: Tk_Photo :=
-        Create
-          ("toolbaricons",
-           "-file """ & Containing_Directory(Command_Name) & Dir_Separator &
-           "az_tools.png""");
-      procedure AddButton(Name: String; StartX: Natural) is
+      CurrentDir: constant String := Current_Directory;
+      Image: Tk_Photo;
+      procedure AddButton(Name: String; StartX: Natural; ToolTip: String) is
          Icon: constant Tk_Photo := Create(Name & "icon");
-         Toolbutton: constant Tk_Button := Create(Name);
+         Toolbutton: constant Tk_Button := Create(Name, "-relief flat");
       begin
          Copy
            (Image, Icon,
@@ -46,20 +48,40 @@ package body Toolbar is
             Natural'Image(StartX + 32) & " 32");
          configure(Toolbutton, "-image " & Name & "icon");
          Pack(Toolbutton, "-side left");
+         if Tcl_Eval
+             (Get_Context,
+              New_String
+                ("tooltip::tooltip " & Name & " """ & ToolTip & """")) /=
+           0 then
+            raise Program_Error with Tcl.Ada.Tcl_GetStringResult(Get_Context);
+         end if;
       end AddButton;
+      procedure AddSeparator(Number: String) is
+         Separator: constant Tk_Frame := Create(".toolbar.separator" & Number);
+      begin
+         Pack(Separator, "-side left -padx 5");
+      end AddSeparator;
    begin
-      AddButton(".toolbar.new", 320);
-      AddButton(".toolbar.open", 352);
-      AddButton(".toolbar.extract", 64);
-      AddButton(".toolbar.add", 0);
-      AddButton(".toolbar.add2", 192);
-      AddButton(".toolbar.delete", 32);
-      AddButton(".toolbar.test", 128);
-      AddButton(".toolbar.find", 96);
-      AddButton(".toolbar.update", 160);
-      AddButton(".toolbar.recompress", 288);
-      AddButton(".toolbar.view", 384);
-      AddButton(".toolbar.properties", 224);
+      Set_Directory(Containing_Directory(Command_Name));
+      Image := Create("toolbaricons", "-file ""az_tools.png""");
+      Set_Directory(CurrentDir);
+      AddButton(".toolbar.new", 320, "New archive");
+      AddButton(".toolbar.open", 352, "Open archive...");
+      AddButton(".toolbar.extract", 64, "Extract...");
+      AddSeparator("1");
+      AddButton(".toolbar.add", 0, "Add files...");
+      AddButton(".toolbar.add2", 192, "Add files with encryption...");
+      AddButton(".toolbar.delete", 32, "Delete entries");
+      AddSeparator("2");
+      AddButton(".toolbar.test", 128, "Test archive");
+      AddButton(".toolbar.find", 96, "Find in archive");
+      AddSeparator("3");
+      AddButton(".toolbar.update", 160, "Update archive");
+      AddButton(".toolbar.recompress", 288, "Recompress archive");
+      AddSeparator("4");
+      AddButton(".toolbar.view", 384, "Toggle flat/tree view");
+      AddSeparator("5");
+      AddButton(".toolbar.properties", 224, "Properties");
       Pack(Toolbar, "-fill x");
       Delete(Image);
    end CreateToolbar;

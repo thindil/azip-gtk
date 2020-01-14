@@ -30,10 +30,12 @@ package body MenuBar is
          Label: Unbounded_String;
          Command: Unbounded_String;
          Underline: Integer;
+         Accelerator: Unbounded_String;
       end record;
       type Menu_Item_Array is array(Positive range <>) of Menu_Item;
       Separator: constant Menu_Item :=
-        (Null_Unbounded_String, Null_Unbounded_String, 0);
+        (Null_Unbounded_String, Null_Unbounded_String, 0,
+         Null_Unbounded_String);
       procedure CreateSubMenu
         (MenuName, MenuLabel: String; MenuItems: Menu_Item_Array) is
          SubMenu: constant Tk_Menu := Create(MenuName, "-tearoff false");
@@ -52,6 +54,10 @@ package body MenuBar is
                   Append(Options, " -underline");
                   Append(Options, Integer'Image(MenuItem.Underline));
                end if;
+               if MenuItem.Accelerator /= Null_Unbounded_String then
+                  Append(Options, " -accelerator ");
+                  Append(Options, MenuItem.Accelerator);
+               end if;
                Add(SubMenu, "command", To_String(Options));
             else
                Add(SubMenu, "separator");
@@ -65,96 +71,131 @@ package body MenuBar is
       CreateSubMenu
         (".menubar.file", "File",
          ((Label => To_Unbounded_String("New archive"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+N")),
           (Label => To_Unbounded_String("Open archive..."),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+O")),
           (Label => To_Unbounded_String("Save archive as..."),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("F12")),
           (Label => To_Unbounded_String("Close archive"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+W/Ctrl+F4")),
           Separator,
           (Label => To_Unbounded_String("Properties"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+D")),
           Separator,
           (Label => To_Unbounded_String("Recent"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String),
           Separator,
           (Label => To_Unbounded_String("Quit"),
-           Command => To_Unbounded_String("exit"), Underline => 0)));
+           Command => To_Unbounded_String("exit"), Underline => 0,
+           Accelerator => To_Unbounded_String("Alt+F4"))));
       CreateSubMenu
         (".menubar.edit", "Edit",
          ((Label => To_Unbounded_String("Select all"),
-           Command => Null_Unbounded_String, Underline => 7),
+           Command => Null_Unbounded_String, Underline => 7,
+           Accelerator => To_Unbounded_String("Ctrl+A")),
           (Label => To_Unbounded_String("Unselect all"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+U")),
           (Label => To_Unbounded_String("Extract..."),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+E")),
           Separator,
           (Label => To_Unbounded_String("Delete entries"),
-           Command => Null_Unbounded_String, Underline => -1),
+           Command => Null_Unbounded_String, Underline => -1,
+           Accelerator => To_Unbounded_String("Del/-")),
           (Label => To_Unbounded_String("Add files..."),
-           Command => Null_Unbounded_String, Underline => 1),
+           Command => Null_Unbounded_String, Underline => 1,
+           Accelerator => To_Unbounded_String("+")),
           (Label => To_Unbounded_String("Add files with encryption..."),
-           Command => Null_Unbounded_String, Underline => 19),
+           Command => Null_Unbounded_String, Underline => 19,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Add folder..."),
-           Command => Null_Unbounded_String, Underline => -1),
+           Command => Null_Unbounded_String, Underline => -1,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Add folder with encryption..."),
-           Command => Null_Unbounded_String, Underline => -1)));
+           Command => Null_Unbounded_String, Underline => -1,
+           Accelerator => Null_Unbounded_String)));
       CreateSubMenu
         (".menubar.tools", "Tools",
          ((Label => To_Unbounded_String("Test archive"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+T")),
           (Label => To_Unbounded_String("Find in archive..."),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+F")),
           Separator,
           (Label => To_Unbounded_String("Update archive"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+P")),
           (Label => To_Unbounded_String("Recompress archive"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("Ctrl+R")),
           (Label => To_Unbounded_String("Touch time stamps"),
-           Command => Null_Unbounded_String, Underline => 1),
+           Command => Null_Unbounded_String, Underline => 1,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Encrypt archive"),
-           Command => Null_Unbounded_String, Underline => 4),
+           Command => Null_Unbounded_String, Underline => 4,
+           Accelerator => Null_Unbounded_String),
           Separator,
           (Label => To_Unbounded_String("Compare archives"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Merge archives"),
-           Command => Null_Unbounded_String, Underline => 0)));
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String)));
       CreateSubMenu
         (".menubar.view", "View",
          ((Label => To_Unbounded_String("Flat view"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Tree view"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String),
           Separator,
           (Label => To_Unbounded_String("No sorting"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Select columns"),
-           Command => Null_Unbounded_String, Underline => 0)));
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String)));
       CreateSubMenu
         (".menubar.options", "Options",
          (1 =>
             (Label => To_Unbounded_String("General options"),
-             Command => Null_Unbounded_String, Underline => 0)));
+             Command => Null_Unbounded_String, Underline => 0,
+             Accelerator => Null_Unbounded_String)));
       CreateSubMenu
         (".menubar.window", "Window",
          ((Label => To_Unbounded_String("Tile horizontal"),
-           Command => Null_Unbounded_String, Underline => 5),
+           Command => Null_Unbounded_String, Underline => 5,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Tile vertical"),
-           Command => Null_Unbounded_String, Underline => 5),
+           Command => Null_Unbounded_String, Underline => 5,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("Close all"),
-           Command => Null_Unbounded_String, Underline => 0)));
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String)));
       CreateSubMenu
         (".menubar.help", "Help",
          ((Label => To_Unbounded_String("Quick help"),
-           Command => Null_Unbounded_String, Underline => 0),
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => To_Unbounded_String("F1")),
           (Label => To_Unbounded_String("AZip Web page(contact, support)"),
-           Command => Null_Unbounded_String, Underline => -1),
+           Command => Null_Unbounded_String, Underline => -1,
+           Accelerator => Null_Unbounded_String),
           (Label => To_Unbounded_String("AZip news"),
-           Command => Null_Unbounded_String, Underline => -1),
+           Command => Null_Unbounded_String, Underline => -1,
+           Accelerator => Null_Unbounded_String),
           Separator,
           (Label => To_Unbounded_String("About AZip"),
-           Command => Null_Unbounded_String, Underline => 0)));
+           Command => Null_Unbounded_String, Underline => 0,
+           Accelerator => Null_Unbounded_String)));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
 

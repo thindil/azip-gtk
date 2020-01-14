@@ -29,10 +29,11 @@ package body MenuBar is
       type Menu_Item is record
          Label: Unbounded_String;
          Command: Unbounded_String;
+         Underline: Integer;
       end record;
       type Menu_Item_Array is array(Positive range <>) of Menu_Item;
       Separator: constant Menu_Item :=
-        (Null_Unbounded_String, Null_Unbounded_String);
+        (Null_Unbounded_String, Null_Unbounded_String, 0);
       procedure CreateSubMenu
         (MenuName, MenuLabel: String; MenuItems: Menu_Item_Array) is
          SubMenu: constant Tk_Menu := Create(MenuName, "-tearoff false");
@@ -47,107 +48,113 @@ package body MenuBar is
                   Append(Options, " -command ");
                   Append(Options, MenuItem.Command);
                end if;
+               if MenuItem.Underline > -1 then
+                  Append(Options, " -underline");
+                  Append(Options, Integer'Image(MenuItem.Underline));
+               end if;
                Add(SubMenu, "command", To_String(Options));
             else
                Add(SubMenu, "separator");
             end if;
          end loop;
-         Add(Menubar, "cascade", "-menu " & MenuName & " -label " & MenuLabel);
+         Add
+           (Menubar, "cascade",
+            "-menu " & MenuName & " -label " & MenuLabel & " -underline 0");
       end CreateSubMenu;
    begin
       CreateSubMenu
         (".menubar.file", "File",
          ((Label => To_Unbounded_String("New archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Open archive..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Save archive as..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Close archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("Properties"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("Recent"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("Quit"),
-           Command => To_Unbounded_String("exit"))));
+           Command => To_Unbounded_String("exit"), Underline => 0)));
       CreateSubMenu
         (".menubar.edit", "Edit",
          ((Label => To_Unbounded_String("Select all"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 7),
           (Label => To_Unbounded_String("Unselect all"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Extract..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("Delete entries"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => -1),
           (Label => To_Unbounded_String("Add files..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 1),
           (Label => To_Unbounded_String("Add files with encryption..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 19),
           (Label => To_Unbounded_String("Add folder..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => -1),
           (Label => To_Unbounded_String("Add folder with encryption..."),
-           Command => Null_Unbounded_String)));
+           Command => Null_Unbounded_String, Underline => -1)));
       CreateSubMenu
         (".menubar.tools", "Tools",
          ((Label => To_Unbounded_String("Test archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Find in archive..."),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("Update archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Recompress archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Touch time stamps"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 1),
           (Label => To_Unbounded_String("Encrypt archive"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 4),
           Separator,
           (Label => To_Unbounded_String("Compare archives"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Merge archives"),
-           Command => Null_Unbounded_String)));
+           Command => Null_Unbounded_String, Underline => 0)));
       CreateSubMenu
         (".menubar.view", "View",
          ((Label => To_Unbounded_String("Flat view"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Tree view"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           Separator,
           (Label => To_Unbounded_String("No sorting"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("Select columns"),
-           Command => Null_Unbounded_String)));
+           Command => Null_Unbounded_String, Underline => 0)));
       CreateSubMenu
         (".menubar.options", "Options",
          (1 =>
             (Label => To_Unbounded_String("General options"),
-             Command => Null_Unbounded_String)));
+             Command => Null_Unbounded_String, Underline => 0)));
       CreateSubMenu
         (".menubar.window", "Window",
          ((Label => To_Unbounded_String("Tile horizontal"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 5),
           (Label => To_Unbounded_String("Tile vertical"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 5),
           (Label => To_Unbounded_String("Close all"),
-           Command => Null_Unbounded_String)));
+           Command => Null_Unbounded_String, Underline => 0)));
       CreateSubMenu
         (".menubar.help", "Help",
          ((Label => To_Unbounded_String("Quick help"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => 0),
           (Label => To_Unbounded_String("AZip Web page(contact, support)"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => -1),
           (Label => To_Unbounded_String("AZip news"),
-           Command => Null_Unbounded_String),
+           Command => Null_Unbounded_String, Underline => -1),
           Separator,
           (Label => To_Unbounded_String("About AZip"),
-           Command => Null_Unbounded_String)));
+           Command => Null_Unbounded_String, Underline => 0)));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
 

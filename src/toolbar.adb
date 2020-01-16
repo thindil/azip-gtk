@@ -63,7 +63,7 @@ package body Toolbar is
       end AddSeparator;
    begin
       Set_Directory(Containing_Directory(Command_Name));
-      Image := Create("toolbaricons", "-file ""az_tools.png""");
+      Image := Create("toolbaricons", "-file ""az_tools.gif""");
       Set_Directory(CurrentDir);
       AddButton(".toolbar.new", 320, "New archive");
       AddButton(".toolbar.open", 352, "Open archive...");

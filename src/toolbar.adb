@@ -27,20 +27,21 @@ with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
 with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Button; use Tcl.Tk.Ada.Widgets.Button;
-with Tcl.Tk.Ada.Widgets.Frame; use Tcl.Tk.Ada.Widgets.Frame;
+with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
+with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
+with Tcl.Tk.Ada.Widgets.TtkSeparator; use Tcl.Tk.Ada.Widgets.TtkSeparator;
 
 package body Toolbar is
 
    use type Interfaces.C.int;
 
    procedure CreateToolbar is
-      Toolbar: constant Tk_Frame := Create(".toolbar");
+      Toolbar: constant Ttk_Frame := Create(".toolbar");
       CurrentDir: constant String := Current_Directory;
       Image: Tk_Photo;
       procedure AddButton(Name: String; StartX: Natural; ToolTip: String) is
          Icon: constant Tk_Photo := Create(Name & "icon");
-         Toolbutton: constant Tk_Button := Create(Name, "-relief flat");
+         Toolbutton: constant Ttk_Button := Create(Name, "-style Toolbutton");
       begin
          Copy
            (Image, Icon,
@@ -57,9 +58,10 @@ package body Toolbar is
          end if;
       end AddButton;
       procedure AddSeparator(Number: String) is
-         Separator: constant Tk_Frame := Create(".toolbar.separator" & Number);
+         Separator: constant Ttk_Separator :=
+           Create(".toolbar.separator" & Number, "-orient vertical");
       begin
-         Pack(Separator, "-side left -padx 5");
+         Pack(Separator, "-side left -padx 5 -fill y");
       end AddSeparator;
    begin
       Set_Directory(Containing_Directory(Command_Name));

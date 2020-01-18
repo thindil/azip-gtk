@@ -61,13 +61,16 @@ package body MenuBar is
                   Append(Options, " -accelerator ");
                   Append(Options, MenuItem.Accelerator);
                end if;
-               if not MenuItem.Enabled then
+               if not MenuItem.Enabled and
+                 MenuItem.MType /= To_Unbounded_String("radiobutton") then
                   Append(Options, " -state disabled");
                end if;
                if MenuItem.MType = To_Unbounded_String("radiobutton") then
                   Append(Options, " -variable viewtype");
                   if MenuItem.Enabled then
-                     Append(Options, " -state active");
+                     Append(Options, " -value tree");
+                  else
+                     Append(Options, " -value flat");
                   end if;
                end if;
             end if;

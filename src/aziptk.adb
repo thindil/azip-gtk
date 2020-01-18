@@ -21,6 +21,7 @@
 with Ada.Text_IO;
 with CArgv;
 with Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
@@ -90,6 +91,12 @@ begin
       Ada.Text_IO.Put_Line
         ("Failed to load tooltip package: " &
          Tcl.Ada.Tcl_GetStringResult(Interp));
+      return;
+   end if;
+
+   -- Set default type of view for archives
+   if Tcl_Eval(Interp, New_String("set viewtype tree")) = TCL_ERROR then
+      Ada.Text_IO.Put_Line("Can't set type of view for archives.");
       return;
    end if;
 

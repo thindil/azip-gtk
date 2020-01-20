@@ -18,6 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
@@ -26,193 +28,153 @@ package body MenuBar is
 
    procedure CreateMenuBar(MainWindow: Tk_Toplevel) is
       Menubar: constant Tk_Menu := Create(".menubar", "-borderwidth 0");
-      type Menu_Item_Array is array(Positive range <>) of Menu_Entry_Options;
-      MSeparator: constant Menu_Entry_Options :=
-        (SEPARATOR, Null_Unbounded_String, Null_Unbounded_String, -1,
-         Null_Unbounded_String, NORMAL, Null_Unbounded_String);
+      type Menu_Item is record
+         EntryType: Unbounded_String;
+         Options: Unbounded_String;
+      end record;
+      type Menu_Item_Array is array(Positive range <>) of Menu_Item;
+      Separator: constant Menu_Item :=
+        (EntryType => To_Unbounded_String("separator"),
+         Options => Null_Unbounded_String);
       procedure CreateSubMenu
         (MenuName, MenuLabel: String; MenuItems: Menu_Item_Array) is
          SubMenu: constant Tk_Menu := Create(MenuName, "-tearoff false");
       begin
          for MenuItem of MenuItems loop
-            Add(SubMenu, MenuItem);
+            Add
+              (SubMenu, To_String(MenuItem.EntryType),
+               To_String(MenuItem.Options));
          end loop;
          Add
-           (Menubar,
-            (MType => CASCADE, Label => To_Unbounded_String(MenuLabel),
-             Command => Null_Unbounded_String, Underline => 0,
-             Accelerator => Null_Unbounded_String, State => NORMAL,
-             Other => Null_Unbounded_String,
-             SubMenu => To_Unbounded_String(MenuName)));
+           (Menubar, "cascade",
+            "-label """ & MenuLabel & """ -underline 0 -menu " & MenuName);
       end CreateSubMenu;
+      function CreateRecent return Menu_Item is
+         SubMenu: constant Tk_Menu := Create(".recent", "-tearoff false");
+      begin
+         for I in 1 .. 9 loop
+            Add
+              (SubMenu, "command",
+               "-label " & Trim(Positive'Image(I), Both) & " -underline 0");
+         end loop;
+         return (To_Unbounded_String("cascade"),
+            To_Unbounded_String("-label Recent -underline 0 -menu .recent"));
+      end CreateRecent;
    begin
       CreateSubMenu
         (".menubar.file", "File",
-         ((Label => To_Unbounded_String("New archive"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+N"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Open archive..."),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+O"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Save archive as..."),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("F12"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Close archive"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+W/Ctrl+F4"),
-           State => NORMAL, MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Properties"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+D"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Recent"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Quit"),
-           Command => To_Unbounded_String("exit"), Underline => 0,
-           Accelerator => To_Unbounded_String("Alt+F4"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""New archive"" -underline 0 -accelerator ""Ctrl+N""")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Open archive..."" -underline 0 -accelerator Ctrl+O")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Save archive as..."" -underline 0 -accelerator F12")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Close archive"" -underline 0 -accelerator Ctrl+W/Ctrl+F4")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Properties"" -underline 0 -accelerator Ctrl+D")),
+          Separator, CreateRecent, Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Quit"" -underline 0 -accelerator Alt+F4 -command exit"))));
       CreateSubMenu
         (".menubar.edit", "Edit",
-         ((Label => To_Unbounded_String("Select all"),
-           Command => Null_Unbounded_String, Underline => 7,
-           Accelerator => To_Unbounded_String("Ctrl+A"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Unselect all"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+U"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Extract..."),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+E"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Delete entries"),
-           Command => Null_Unbounded_String, Underline => -1,
-           Accelerator => To_Unbounded_String("Del/-"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Add files..."),
-           Command => Null_Unbounded_String, Underline => 1,
-           Accelerator => To_Unbounded_String("+"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Add files with encryption..."),
-           Command => Null_Unbounded_String, Underline => 19,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Add folder..."),
-           Command => Null_Unbounded_String, Underline => -1,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Add folder with encryption..."),
-           Command => Null_Unbounded_String, Underline => -1,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Select all"" -underline 7 -accelerator Ctrl+A")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Delete entries"" -accelerator Del/-")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Add files..."" -underline 1 -accelerator +")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Add files with encryption..."" -underline 19")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Add folder...""")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Add folder with encryption..."""))));
       CreateSubMenu
         (".menubar.tools", "Tools",
-         ((Label => To_Unbounded_String("Test archive"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+T"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Find in archive..."),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+F"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Update archive"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+P"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Recompress archive"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("Ctrl+R"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Touch time stamps"),
-           Command => Null_Unbounded_String, Underline => 1,
-           Accelerator => Null_Unbounded_String, State => DISABLED,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Encrypt archive"),
-           Command => Null_Unbounded_String, Underline => 4,
-           Accelerator => Null_Unbounded_String, State => DISABLED,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("Compare archives"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => DISABLED,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Merge archives"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => DISABLED,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Test archive"" -underline 0 -accelerator Ctrl+T")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Find in archive..."" -underline 0 -accelerator Ctrl+F")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Update archive"" -underline 0 -accelerator Ctrl+P")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Recompress archive"" -underline 0 -accelerator Ctrl+R")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Touch time stamps"" -underline 1 -state disabled")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Encrypt archive"" -underline 4 -state disabled")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Compare archives"" -underline 0 -state disabled")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Merge archives"" -underline 0 -state disabled"))));
       CreateSubMenu
         (".menubar.view", "View",
-         ((Label => To_Unbounded_String("Flat view"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => RADIOBUTTON, Other => Null_Unbounded_String,
-           RadioVariable => To_Unbounded_String("view"),
-           Value => To_Unbounded_String("flat")),
-          (Label => To_Unbounded_String("Tree view"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => RADIOBUTTON, Other => Null_Unbounded_String,
-           RadioVariable => To_Unbounded_String("view"),
-           Value => To_Unbounded_String("tree")),
-          MSeparator,
-          (Label => To_Unbounded_String("No sorting"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Select columns"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("radiobutton"),
+           To_Unbounded_String
+             ("-label ""Flat view"" -underline 0 -variable view -value flat")),
+          (To_Unbounded_String("radiobutton"),
+           To_Unbounded_String
+             ("-label ""Tree view"" -underline 0 -variable view -value tree")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""No sorting"" -underline 0")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Select columns"" -underline 0"))));
       CreateSubMenu
         (".menubar.options", "Options",
          (1 =>
-            (Label => To_Unbounded_String("General options"),
-             Command => Null_Unbounded_String, Underline => 0,
-             Accelerator => Null_Unbounded_String, State => NORMAL,
-             MType => COMMAND, Other => Null_Unbounded_String)));
+            (To_Unbounded_String("command"),
+             To_Unbounded_String("-label ""General options"" -underline 0"))));
       CreateSubMenu
         (".menubar.window", "Window",
-         ((Label => To_Unbounded_String("Tile horizontal"),
-           Command => Null_Unbounded_String, Underline => 5,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Tile vertical"),
-           Command => Null_Unbounded_String, Underline => 5,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("Close all"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Tile horizontal"" -underline 5")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Tile vertical"" -underline 5")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""Close all"" -underline 0"))));
       CreateSubMenu
         (".menubar.help", "Help",
-         ((Label => To_Unbounded_String("Quick help"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => To_Unbounded_String("F1"), State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("AZip Web page(contact, support)"),
-           Command => Null_Unbounded_String, Underline => -1,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          (Label => To_Unbounded_String("AZip news"),
-           Command => Null_Unbounded_String, Underline => -1,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String),
-          MSeparator,
-          (Label => To_Unbounded_String("About AZip"),
-           Command => Null_Unbounded_String, Underline => 0,
-           Accelerator => Null_Unbounded_String, State => NORMAL,
-           MType => COMMAND, Other => Null_Unbounded_String)));
+         ((To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""Quick help"" -underline 0 -accelerator F1")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String
+             ("-label ""AZip Web page(contact, support)"" -underline 5")),
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""AZip news"" -underline 5")),
+          Separator,
+          (To_Unbounded_String("command"),
+           To_Unbounded_String("-label ""About AZip"" -underline 0"))));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
 

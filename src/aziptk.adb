@@ -103,6 +103,7 @@ begin
    -- Create UI
    MainWindow := Get_Main_Window(Interp);
    Wm_Set(MainWindow, "title", "AZip");
+   Bind_To_Main_Window(Interp, "<Alt-F4>", "{exit}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    MDI := Create(".mdi");

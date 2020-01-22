@@ -29,8 +29,8 @@ with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
-with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
+with ArchivesViews; use ArchivesViews;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
 
@@ -43,7 +43,6 @@ procedure AZipTk is
    Argc: CArgv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
-   MDI: Ttk_Frame;
    MainWindow: Tk_Toplevel;
 
 begin
@@ -100,14 +99,19 @@ begin
       return;
    end if;
 
+   -- Set default type of tiling for archives
+   if Tcl_Eval(Interp, New_String("set tiletype horizontal")) = TCL_ERROR then
+      Ada.Text_IO.Put_Line("Can't set type of tiling for archives.");
+      return;
+   end if;
+
    -- Create UI
    MainWindow := Get_Main_Window(Interp);
    Wm_Set(MainWindow, "title", "AZip");
    Bind_To_Main_Window(Interp, "<Alt-F4>", "{exit}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
-   MDI := Create(".mdi");
-   Pack(MDI, "-fill both -expand true");
+   CreateMDI;
 
    --  Loop inside Tk, waiting for commands to execute.
    --  When there are no windows left, Tcl.Tk.Tk_MainLoop returns and we exit.

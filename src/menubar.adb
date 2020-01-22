@@ -140,10 +140,10 @@ package body MenuBar is
         (".menubar.view", "View",
          ((To_Unbounded_String("radiobutton"),
            To_Unbounded_String
-             ("-label ""Flat view"" -underline 0 -variable view -value flat")),
+             ("-label ""Flat view"" -underline 0 -variable viewtype -value flat")),
           (To_Unbounded_String("radiobutton"),
            To_Unbounded_String
-             ("-label ""Tree view"" -underline 0 -variable view -value tree")),
+             ("-label ""Tree view"" -underline 0 -variable viewtype -value tree")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String("-label ""No sorting"" -underline 0")),
@@ -156,10 +156,12 @@ package body MenuBar is
              To_Unbounded_String("-label ""General options"" -underline 0"))));
       CreateSubMenu
         (".menubar.window", "Window",
-         ((To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Tile horizontal"" -underline 5")),
-          (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Tile vertical"" -underline 5")),
+         ((To_Unbounded_String("radiobutton"),
+           To_Unbounded_String
+             ("-label ""Tile horizontal"" -underline 5 -variable tiletype -value horizontal")),
+          (To_Unbounded_String("radiobutton"),
+           To_Unbounded_String
+             ("-label ""Tile vertical"" -underline 5 -variable tiletype -value vertical")),
           (To_Unbounded_String("command"),
            To_Unbounded_String("-label ""Close all"" -underline 0"))));
       CreateSubMenu

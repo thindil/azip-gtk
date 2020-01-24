@@ -18,7 +18,12 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Calendar; use Ada.Calendar;
+with Ada.Calendar.Formatting;
+with Ada.Directories;
+with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with CArgv;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
@@ -117,5 +122,29 @@ begin
    --  When there are no windows left, Tcl.Tk.Tk_MainLoop returns and we exit.
    --------------------------------------------------------------------------
    Tcl.Tk.Tk_MainLoop;
+
+exception
+   when An_Exception : others =>
+      declare
+         ErrorFile: File_Type;
+      begin
+         if Ada.Directories.Exists("error.log") then
+            Open(ErrorFile, Append_File, "error.log");
+         else
+            Create(ErrorFile, Append_File, "error.log");
+         end if;
+         Put_Line(ErrorFile, Ada.Calendar.Formatting.Image(Clock));
+         Put_Line(ErrorFile, "0.1");
+         Put_Line(ErrorFile, "Exception: " & Exception_Name(An_Exception));
+         Put_Line(ErrorFile, "Message: " & Exception_Message(An_Exception));
+         Put_Line
+           (ErrorFile, "-------------------------------------------------");
+         Put(ErrorFile, Symbolic_Traceback(An_Exception));
+         Put_Line
+           (ErrorFile, "-------------------------------------------------");
+         Close(ErrorFile);
+         Put_Line
+           ("Oops, something bad happen and program crashed. File 'error.log' (should be in this same directory) contains all traceback.");
+      end;
 
 end AZipTk;

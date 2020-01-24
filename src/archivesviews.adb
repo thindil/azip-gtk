@@ -21,9 +21,7 @@
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
-with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Pack;
@@ -36,8 +34,6 @@ with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 
 package body ArchivesViews is
-
-   use type Interfaces.C.int;
 
    ArchiveNumber: Positive;
 
@@ -80,12 +76,6 @@ package body ArchivesViews is
          To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
          To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
          To_Unbounded_String("Result"));
-      procedure Run_Command(Tcl_Command: String) is
-      begin
-         if Tcl_Eval(Get_Context, New_String(Tcl_Command)) /= 0 then
-            raise Program_Error with Tcl.Ada.Tcl_GetStringResult(Get_Context);
-         end if;
-      end Run_Command;
    begin
       for I in ColumnsNames'Range loop
          Heading
@@ -95,21 +85,13 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
-      Run_Command
-        (Widget_Image(Paned) & " add " & Widget_Image(DirectoryTree) &
-         " -weight 1");
-      Run_Command
-        (Widget_Image(Paned) & " add " & Widget_Image(FilesFrame) &
-         " -weight 20");
+      Add(Paned, DirectoryTree, "-weight 1");
+      Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Grid.Grid(FilesList, "-column 0 -row 0 -sticky nwes");
       Tcl.Tk.Ada.Grid.Grid(FilesYScroll, "-column 1 -row 0 -sticky nwes");
       Tcl.Tk.Ada.Grid.Grid(FilesXScroll, "-column 0 -row 1 -sticky nwes");
-      Run_Command
-        ("grid rowconfigure " & Widget_Image(FilesFrame) & " " &
-         Widget_Image(FilesList) & " -weight 1");
-      Run_Command
-        ("grid columnconfigure " & Widget_Image(FilesFrame) & " " &
-         Widget_Image(FilesList) & " -weight 1");
+      Tcl.Tk.Ada.Grid.Row_Configure(FilesFrame, FilesList, "-weight 1");
+      Tcl.Tk.Ada.Grid.Column_Configure(FilesFrame, FilesList, "-weight 1");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(ArchiveView, "-fill both -expand true");
       ArchiveNumber := ArchiveNumber + 1;

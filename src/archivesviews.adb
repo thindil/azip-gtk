@@ -21,7 +21,10 @@
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Interfaces.C;
+with CArgv;
 with Tcl; use Tcl;
+with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Pack;
@@ -43,7 +46,10 @@ package body ArchivesViews is
       ArchiveView: constant Ttk_Frame := Create(ViewName);
       Header: constant Ttk_Frame := Create(ViewName & ".header");
       CloseButton: constant Ttk_Button :=
-        Create(ViewName & ".header.close", "-text x -style Toolbutton");
+        Create
+          (ViewName & ".header.close",
+           "-text x -style Toolbutton -command ""Close" &
+           Positive'Image(ArchiveNumber) & """");
       NameLabel: constant Ttk_Label :=
         Create
           (ViewName & ".header.label",
@@ -98,9 +104,31 @@ package body ArchivesViews is
    end CreateView;
 
    procedure CreateMDI is
+      package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
       MDI: constant Ttk_Frame := Create(".mdi");
+      function Close_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int;
+      pragma Convention(C, Close_Command);
+      function Close_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int is
+         pragma Unreferenced(ClientData, Argc);
+         ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
+      begin
+         return Tcl.Ada.Tcl_Eval
+             (Interp,
+              "pack forget " & ArchiveName & ";destroy " & ArchiveName);
+      end Close_Command;
+      Command: Tcl.Tcl_Command;
+      pragma Unreferenced(Command);
    begin
       ArchiveNumber := 1;
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "Close", Close_Command'Access, 0, null);
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
       CreateView;
    end CreateMDI;

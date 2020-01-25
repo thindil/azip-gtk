@@ -56,8 +56,24 @@ package body ArchivesViews is
            "-text ""New Archive" & Positive'Image(ArchiveNumber) & """");
       Paned: constant Ttk_PanedWindow :=
         Create(ViewName & ".paned", "-orient horizontal");
+      DirectoryFrame: constant Ttk_Frame :=
+        Create(ViewName & ".directoryframe");
+      DirectoryXScroll: constant Ttk_Scrollbar :=
+        Create
+          (Widget_Image(DirectoryFrame) & ".scrollx",
+           "-orient horizontal -command [list " &
+           Widget_Image(DirectoryFrame) & ".directorytree xview]");
+      DirectoryYScroll: constant Ttk_Scrollbar :=
+        Create
+          (Widget_Image(DirectoryFrame) & ".scrolly",
+           "-orient vertical -command [list " & Widget_Image(DirectoryFrame) &
+           ".directorytree yview]");
       DirectoryTree: constant Ttk_Tree_View :=
-        Create(ViewName & ".directorytree", "-show tree");
+        Create
+          (Widget_Image(DirectoryFrame) & ".directorytree",
+           "-show tree -xscrollcommand """ & Widget_Image(DirectoryXScroll) &
+           " set"" -yscrollcommand """ & Widget_Image(DirectoryYScroll) &
+           " set""");
       FilesFrame: constant Ttk_Frame := Create(ViewName & ".filesframe");
       FilesXScroll: constant Ttk_Scrollbar :=
         Create
@@ -91,7 +107,14 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
-      Add(Paned, DirectoryTree, "-weight 1");
+      Add(Paned, DirectoryFrame, "-weight 1");
+      Tcl.Tk.Ada.Grid.Grid(DirectoryTree, "-column 0 -row 0 -sticky nwes");
+      Tcl.Tk.Ada.Grid.Grid(DirectoryYScroll, "-column 1 -row 0 -sticky nwes");
+      Tcl.Tk.Ada.Grid.Grid(DirectoryXScroll, "-column 0 -row 1 -sticky nwes");
+      Tcl.Tk.Ada.Grid.Row_Configure
+        (DirectoryFrame, DirectoryTree, "-weight 1");
+      Tcl.Tk.Ada.Grid.Column_Configure
+        (DirectoryFrame, DirectoryTree, "-weight 1");
       Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Grid.Grid(FilesList, "-column 0 -row 0 -sticky nwes");
       Tcl.Tk.Ada.Grid.Grid(FilesYScroll, "-column 1 -row 0 -sticky nwes");

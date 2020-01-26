@@ -65,7 +65,7 @@ package body MenuBar is
         (".menubar.file", "File",
          ((To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""New archive"" -underline 0 -accelerator ""Ctrl+N""")),
+             ("-label ""New archive"" -underline 0 -accelerator ""Ctrl+N"" -command Create")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Open archive..."" -underline 0 -accelerator Ctrl+O")),

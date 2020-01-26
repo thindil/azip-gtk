@@ -40,10 +40,18 @@ package body Toolbar is
       Toolbar: constant Ttk_Frame := Create(".toolbar");
       CurrentDir: constant String := Current_Directory;
       Image: Tk_Photo;
-      procedure AddButton(Name: String; StartX: Natural; ToolTip: String) is
+      procedure AddButton
+        (Name: String; StartX: Natural; ToolTip: String;
+         Command: String := "") is
          Icon: constant Tk_Photo := Create(Name & "icon");
-         Toolbutton: constant Ttk_Button := Create(Name, "-style Toolbutton");
+         Toolbutton: Ttk_Button;
       begin
+         if Command /= "" then
+            Toolbutton :=
+              Create(Name, "-style Toolbutton -command " & Command);
+         else
+            Toolbutton := Create(Name, "-style Toolbutton");
+         end if;
          Copy
            (Image, Icon,
             "-from" & Natural'Image(StartX) & " 0 " &
@@ -68,7 +76,7 @@ package body Toolbar is
       Set_Directory(Containing_Directory(Command_Name));
       Image := Create("toolbaricons", "-file ""az_tools.gif""");
       Set_Directory(CurrentDir);
-      AddButton(".toolbar.new", 320, "New archive");
+      AddButton(".toolbar.new", 320, "New archive", "Create");
       AddButton(".toolbar.open", 352, "Open archive...");
       AddButton(".toolbar.extract", 64, "Extract...");
       AddSeparator("1");

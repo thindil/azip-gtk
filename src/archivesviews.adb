@@ -145,6 +145,20 @@ package body ArchivesViews is
              (Interp,
               "pack forget " & ArchiveName & ";destroy " & ArchiveName);
       end Close_Command;
+      function Create_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int;
+      pragma Convention(C, Create_Command);
+      function Create_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int is
+         pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      begin
+         CreateView;
+         return 0;
+      end Create_Command;
       Command: Tcl.Tcl_Command;
       pragma Unreferenced(Command);
    begin
@@ -152,6 +166,9 @@ package body ArchivesViews is
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Close", Close_Command'Access, 0, null);
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "Create", Create_Command'Access, 0, null);
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
       CreateView;
    end CreateMDI;

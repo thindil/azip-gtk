@@ -26,7 +26,6 @@ with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
-with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -108,19 +107,13 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
       Add(Paned, DirectoryFrame, "-weight 1");
-      Tcl.Tk.Ada.Grid.Grid(DirectoryTree, "-column 0 -row 0 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Grid(DirectoryYScroll, "-column 1 -row 0 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Grid(DirectoryXScroll, "-column 0 -row 1 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Row_Configure
-        (DirectoryFrame, DirectoryTree, "-weight 1");
-      Tcl.Tk.Ada.Grid.Column_Configure
-        (DirectoryFrame, DirectoryTree, "-weight 1");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
       Add(Paned, FilesFrame, "-weight 20");
-      Tcl.Tk.Ada.Grid.Grid(FilesList, "-column 0 -row 0 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Grid(FilesYScroll, "-column 1 -row 0 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Grid(FilesXScroll, "-column 0 -row 1 -sticky nwes");
-      Tcl.Tk.Ada.Grid.Row_Configure(FilesFrame, FilesList, "-weight 1");
-      Tcl.Tk.Ada.Grid.Column_Configure(FilesFrame, FilesList, "-weight 1");
+      Tcl.Tk.Ada.Pack.Pack(FilesXScroll, "-side bottom -fill x");
+      Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
+      Tcl.Tk.Ada.Pack.Pack(FilesList, "-side top -fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(ArchiveView, "-fill both -expand true");
       ArchiveNumber := ArchiveNumber + 1;

@@ -22,7 +22,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Calendar; use Ada.Calendar;
 with Ada.Calendar.Formatting;
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Directories;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with CArgv;
 with Interfaces.C;
@@ -127,24 +129,26 @@ exception
    when An_Exception : others =>
       declare
          ErrorFile: File_Type;
+         ErrorText: Unbounded_String := Null_Unbounded_String;
       begin
+         Append(ErrorText, Ada.Calendar.Formatting.Image(Clock) & LF);
+         Append(ErrorText, "0.1" & LF);
+         Append(ErrorText, "Exception: " & Exception_Name(An_Exception) & LF);
+         Append(ErrorText, "Message: " & Exception_Message(An_Exception) & LF);
+         Append
+           (ErrorText,
+            "-------------------------------------------------" & LF);
+         Append(ErrorText, Symbolic_Traceback_No_Hex(An_Exception));
+         Append
+           (ErrorText, "-------------------------------------------------");
          if Ada.Directories.Exists("error.log") then
             Open(ErrorFile, Append_File, "error.log");
          else
             Create(ErrorFile, Append_File, "error.log");
          end if;
-         Put_Line(ErrorFile, Ada.Calendar.Formatting.Image(Clock));
-         Put_Line(ErrorFile, "0.1");
-         Put_Line(ErrorFile, "Exception: " & Exception_Name(An_Exception));
-         Put_Line(ErrorFile, "Message: " & Exception_Message(An_Exception));
-         Put_Line
-           (ErrorFile, "-------------------------------------------------");
-         Put(ErrorFile, Symbolic_Traceback(An_Exception));
-         Put_Line
-           (ErrorFile, "-------------------------------------------------");
+         Put_Line(ErrorFile, To_String(ErrorText));
          Close(ErrorFile);
-         Put_Line
-           ("Oops, something bad happen and program crashed. File 'error.log' (should be in this same directory) contains all traceback.");
+         Ada.Text_IO.Put_Line(To_String(ErrorText));
       end;
 
 end AZipTk;

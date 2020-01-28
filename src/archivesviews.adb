@@ -38,6 +38,7 @@ with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 package body ArchivesViews is
 
    ArchiveNumber: Positive;
+   MDI: Ttk_PanedWindow;
 
    procedure CreateView is
       ViewName: constant String :=
@@ -115,13 +116,12 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
       Tcl.Tk.Ada.Pack.Pack(FilesList, "-side top -fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
-      Tcl.Tk.Ada.Pack.Pack(ArchiveView, "-fill both -expand true");
+      Add(MDI, ArchiveView);
       ArchiveNumber := ArchiveNumber + 1;
    end CreateView;
 
    procedure CreateMDI is
       package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
-      MDI: constant Ttk_Frame := Create(".mdi");
       function Close_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -134,9 +134,7 @@ package body ArchivesViews is
          pragma Unreferenced(ClientData, Argc);
          ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
       begin
-         return Tcl.Ada.Tcl_Eval
-             (Interp,
-              "pack forget " & ArchiveName & ";destroy " & ArchiveName);
+         return Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName);
       end Close_Command;
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -156,6 +154,7 @@ package body ArchivesViews is
       pragma Unreferenced(Command);
    begin
       ArchiveNumber := 1;
+      MDI := Create(".mdi", "-orient vertical");
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Close", Close_Command'Access, 0, null);

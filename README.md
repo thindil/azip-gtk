@@ -21,7 +21,7 @@ To build you need:
 * TkLib. Included in MagicSplat version for Windows, on Linux should
   be available in all mayor distributions.
 
-* TASHY library. You can get it from:
+* TASHY library with included binding to Tk and TkLib. You can get it from:
 
    https://github.com/thindil/tashy
 

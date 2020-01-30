@@ -20,9 +20,7 @@
 
 with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Directories; use Ada.Directories;
-with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
-with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
 with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
@@ -31,10 +29,9 @@ with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkSeparator; use Tcl.Tk.Ada.Widgets.TtkSeparator;
+with Tcl.Tklib.Ada.Tooltip; use Tcl.Tklib.Ada.Tooltip;
 
 package body Toolbar is
-
-   use type Interfaces.C.int;
 
    procedure CreateToolbar is
       Toolbar: constant Ttk_Frame := Create(".toolbar");
@@ -58,13 +55,7 @@ package body Toolbar is
             Natural'Image(StartX + 32) & " 32");
          configure(Toolbutton, "-image " & Name & "icon");
          Tcl.Tk.Ada.Pack.Pack(Toolbutton, "-side left");
-         if Tcl_Eval
-             (Get_Context,
-              New_String
-                ("tooltip::tooltip " & Name & " """ & ToolTip & """")) /=
-           0 then
-            raise Program_Error with Tcl.Ada.Tcl_GetStringResult(Get_Context);
-         end if;
+         Add(Toolbutton, ToolTip);
       end AddButton;
       procedure AddSeparator(Number: String) is
          Separator: constant Ttk_Separator :=

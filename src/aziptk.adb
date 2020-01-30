@@ -37,6 +37,7 @@ with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
+with Tcl.Tklib.Ada.Tooltip; use Tcl.Tklib.Ada.Tooltip;
 with ArchivesViews; use ArchivesViews;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
@@ -44,8 +45,6 @@ with Toolbar; use Toolbar;
 procedure AZipTk is
 
    use type Interfaces.C.int;
-
-   package GetPackages is new Tcl.Ada.Generic_PkgRequire(Integer);
 
    Argc: CArgv.CNatural;
    Argv: CArgv.Chars_Ptr_Ptr;
@@ -91,14 +90,7 @@ begin
    Set_Context(Interp);
 
    -- Load required Tcl packages
-   if GetPackages.Tcl_PkgRequireEx(Interp, "tooltip", "1.4.6", 0, null)'
-       Length =
-     0 then
-      Ada.Text_IO.Put_Line
-        ("Failed to load tooltip package: " &
-         Tcl.Ada.Tcl_GetStringResult(Interp));
-      return;
-   end if;
+   Tooltip_Init(Interp);
 
    -- Set default type of view for archives
    if Tcl_Eval(Interp, New_String("set viewtype tree")) = TCL_ERROR then

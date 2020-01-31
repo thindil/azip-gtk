@@ -28,7 +28,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with CArgv;
 with Interfaces.C;
-with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
@@ -93,16 +92,10 @@ begin
    Tooltip_Init(Interp);
 
    -- Set default type of view for archives
-   if Tcl_Eval(Interp, New_String("set viewtype tree")) = TCL_ERROR then
-      Ada.Text_IO.Put_Line("Can't set type of view for archives.");
-      return;
-   end if;
+   Tcl.Ada.Tcl_SetVar(Interp, "viewtype", "tree");
 
    -- Set default type of tiling for archives
-   if Tcl_Eval(Interp, New_String("set tiletype horizontal")) = TCL_ERROR then
-      Ada.Text_IO.Put_Line("Can't set type of tiling for archives.");
-      return;
-   end if;
+   Tcl.Ada.Tcl_SetVar(Interp, "tiletype", "horizontal");
 
    -- Create UI
    MainWindow := Get_Main_Window(Interp);

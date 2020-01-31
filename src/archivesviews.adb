@@ -132,9 +132,16 @@ package body ArchivesViews is
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
          return Interfaces.C.int is
          pragma Unreferenced(ClientData, Argc);
+         use type Interfaces.C.int;
          ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
       begin
-         return Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName);
+         if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
+            raise Program_Error with "Can't destroy archive view.";
+         end if;
+         if Panes(MDI) = "" then
+            CreateView;
+         end if;
+         return 0;
       end Close_Command;
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

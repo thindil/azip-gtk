@@ -28,6 +28,7 @@ with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Canvas; use Tcl.Tk.Ada.Widgets.Canvas;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
@@ -42,7 +43,7 @@ package body ArchivesViews is
 
    procedure CreateView is
       ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
+        ".mdi.view.archive" & Trim(Positive'Image(ArchiveNumber), Both);
       ArchiveView: constant Ttk_Frame := Create(ViewName);
       Header: constant Ttk_Frame := Create(ViewName & ".header");
       CloseButton: constant Ttk_Button :=
@@ -122,18 +123,21 @@ package body ArchivesViews is
 
    procedure CreateMDI is
       package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
+
       function Close_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
          return Interfaces.C.int;
       pragma Convention(C, Close_Command);
+
       function Close_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
          return Interfaces.C.int is
          pragma Unreferenced(ClientData, Argc);
          use type Interfaces.C.int;
-         ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
+         ArchiveName: constant String :=
+           ".mdi.view.archive" & CArgv.Arg(Argv, 1);
       begin
          if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
             raise Program_Error with "Can't destroy archive view.";
@@ -143,11 +147,13 @@ package body ArchivesViews is
          end if;
          return 0;
       end Close_Command;
+
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
          return Interfaces.C.int;
       pragma Convention(C, Create_Command);
+
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -157,18 +163,25 @@ package body ArchivesViews is
          CreateView;
          return 0;
       end Create_Command;
+
+      ArchivesCanvas: constant Tk_Canvas := Create(".mdi");
       Command: Tcl.Tcl_Command;
       pragma Unreferenced(Command);
    begin
       ArchiveNumber := 1;
-      MDI := Create(".mdi", "-orient vertical");
+      MDI := Create(".mdi.view", "-orient vertical");
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Close", Close_Command'Access, 0, null);
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Create", Create_Command'Access, 0, null);
-      Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
+      Tcl.Tk.Ada.Pack.Pack(ArchivesCanvas, "-fill both -expand true");
+      configure
+        (MDI, "-width [winfo reqwidth .mdi] -height [winfo reqheight .mdi]");
+      Canvas_Create
+        (ArchivesCanvas, "window",
+         "0 0 -anchor nw -window " & Widget_Image(MDI));
       CreateView;
    end CreateMDI;
 

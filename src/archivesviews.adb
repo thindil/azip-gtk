@@ -167,16 +167,12 @@ package body ArchivesViews is
       Command: Tcl.Tcl_Command;
       pragma Unreferenced(Command);
 
-      CanvasXScroll: constant Ttk_Scrollbar :=
-        Create(".scrollx", "-orient horizontal -command [list .mdi xview]");
       CanvasYScroll: constant Ttk_Scrollbar :=
         Create(".scrolly", "-orient vertical -command [list .mdi yview]");
       ArchivesCanvas: constant Tk_Canvas :=
         Create
           (".mdi",
-           "-xscrollcommand """ & Widget_Image(CanvasXScroll) &
-           " set"" -yscrollcommand """ & Widget_Image(CanvasYScroll) &
-           " set""");
+           "-yscrollcommand """ & Widget_Image(CanvasYScroll) & " set""");
    begin
       ArchiveNumber := 1;
       MDI := Create(".mdi.view", "-orient vertical");
@@ -189,7 +185,6 @@ package body ArchivesViews is
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Create", Create_Command'Access, 0, null);
-      Tcl.Tk.Ada.Pack.Pack(CanvasXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(CanvasYScroll, "-side right -fill y");
       Tcl.Tk.Ada.Pack.Pack(ArchivesCanvas, "-fill both -expand true");
       Canvas_Create

@@ -28,7 +28,6 @@ with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Canvas; use Tcl.Tk.Ada.Widgets.Canvas;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
@@ -43,7 +42,7 @@ package body ArchivesViews is
 
    procedure CreateView is
       ViewName: constant String :=
-        ".mdi.view.archive" & Trim(Positive'Image(ArchiveNumber), Both);
+        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
       ArchiveView: constant Ttk_Frame := Create(ViewName);
       Header: constant Ttk_Frame := Create(ViewName & ".header");
       CloseButton: constant Ttk_Button :=
@@ -137,7 +136,7 @@ package body ArchivesViews is
          pragma Unreferenced(ClientData, Argc);
          use type Interfaces.C.int;
          ArchiveName: constant String :=
-           ".mdi.view.archive" & CArgv.Arg(Argv, 1);
+           ".mdi.archive" & CArgv.Arg(Argv, 1);
       begin
          if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
             raise Program_Error with "Can't destroy archive view.";
@@ -167,29 +166,16 @@ package body ArchivesViews is
       Command: Tcl.Tcl_Command;
       pragma Unreferenced(Command);
 
-      CanvasYScroll: constant Ttk_Scrollbar :=
-        Create(".scrolly", "-orient vertical -command [list .mdi yview]");
-      ArchivesCanvas: constant Tk_Canvas :=
-        Create
-          (".mdi",
-           "-yscrollcommand """ & Widget_Image(CanvasYScroll) & " set""");
    begin
       ArchiveNumber := 1;
-      MDI := Create(".mdi.view", "-orient vertical");
-      Bind
-        (ArchivesCanvas, "<Configure>",
-         "{.mdi.view configure -width %w -height %h}");
+      MDI := Create(".mdi", "-orient vertical");
+      Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Close", Close_Command'Access, 0, null);
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Create", Create_Command'Access, 0, null);
-      Tcl.Tk.Ada.Pack.Pack(CanvasYScroll, "-side right -fill y");
-      Tcl.Tk.Ada.Pack.Pack(ArchivesCanvas, "-fill both -expand true");
-      Canvas_Create
-        (ArchivesCanvas, "window",
-         "0 0 -anchor nw -window " & Widget_Image(MDI));
       CreateView;
    end CreateMDI;
 

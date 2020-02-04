@@ -22,6 +22,7 @@ with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
@@ -34,17 +35,20 @@ with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
 with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 
 package body ArchivesViews is
 
    ArchiveNumber: Positive;
+   ActiveArchive: Natural := 0;
    MDI: Ttk_PanedWindow;
 
    procedure CreateView is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
       ArchiveView: constant Ttk_Frame := Create(ViewName);
-      Header: constant Ttk_Frame := Create(ViewName & ".header");
+      Header: constant Ttk_Frame :=
+        Create(ViewName & ".header", "-style aziptk.TFrame");
       CloseButton: constant Ttk_Button :=
         Create
           (ViewName & ".header.close",
@@ -53,7 +57,8 @@ package body ArchivesViews is
       NameLabel: constant Ttk_Label :=
         Create
           (ViewName & ".header.label",
-           "-text ""New Archive" & Positive'Image(ArchiveNumber) & """");
+           "-text ""New Archive" & Positive'Image(ArchiveNumber) &
+           """ -style aziptk.TLabel");
       Paned: constant Ttk_PanedWindow :=
         Create(ViewName & ".paned", "-orient horizontal");
       DirectoryFrame: constant Ttk_Frame :=
@@ -98,6 +103,7 @@ package body ArchivesViews is
          To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
          To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
          To_Unbounded_String("Result"));
+      OldHeader: Ttk_Frame;
    begin
       for I in ColumnsNames'Range loop
          Heading
@@ -117,6 +123,22 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(FilesList, "-side top -fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
+      if ActiveArchive > 0 then
+         OldHeader.Interp := FilesFrame.Interp;
+         OldHeader.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+              ".header");
+         if Winfo_Get(OldHeader, "exists") = "1" then
+            configure(OldHeader, "-style TFrame");
+            OldHeader.Name :=
+              New_String
+                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+                 ".header.label");
+            configure(OldHeader, "-style TLabel");
+         end if;
+      end if;
+      ActiveArchive := ArchiveNumber;
       ArchiveNumber := ArchiveNumber + 1;
    end CreateView;
 
@@ -135,8 +157,7 @@ package body ArchivesViews is
          return Interfaces.C.int is
          pragma Unreferenced(ClientData, Argc);
          use type Interfaces.C.int;
-         ArchiveName: constant String :=
-           ".mdi.archive" & CArgv.Arg(Argv, 1);
+         ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
       begin
          if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
             raise Program_Error with "Can't destroy archive view.";

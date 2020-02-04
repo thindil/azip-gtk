@@ -31,6 +31,7 @@ with Interfaces.C;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.TtkStyle; use Tcl.Tk.Ada.TtkStyle;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
@@ -96,6 +97,12 @@ begin
 
    -- Set default type of tiling for archives
    Tcl.Ada.Tcl_SetVar(Interp, "tiletype", "horizontal");
+
+   -- Set color for active archive header
+   Style_Configure
+     ("aziptk.TFrame", "-background [ttk::style lookup . -selectbackground]");
+   Style_Configure
+     ("aziptk.TLabel", "-background [ttk::style lookup . -selectbackground]");
 
    -- Create UI
    MainWindow := Get_Main_Window(Interp);

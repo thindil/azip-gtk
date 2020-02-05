@@ -43,12 +43,41 @@ package body ArchivesViews is
    ActiveArchive: Natural := 0;
    MDI: Ttk_PanedWindow;
 
+   procedure SetActive(NewActive: Positive) is
+      Header: Ttk_Frame;
+   begin
+      Header.Interp := Get_Context;
+      if ActiveArchive > 0 then
+         Header.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+              ".header");
+         if Winfo_Get(Header, "exists") = "1" then
+            configure(Header, "-style TFrame");
+            Header.Name :=
+              New_String
+                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+                 ".header.label");
+            configure(Header, "-style TLabel");
+         end if;
+      end if;
+      Header.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(NewActive), Both) & ".header");
+      configure(Header, "-style aziptk.TFrame");
+      Header.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(NewActive), Both) &
+           ".header.label");
+      configure(Header, "-style aziptk.TLabel");
+      ActiveArchive := NewActive;
+   end SetActive;
+
    procedure CreateView is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
       ArchiveView: constant Ttk_Frame := Create(ViewName);
-      Header: constant Ttk_Frame :=
-        Create(ViewName & ".header", "-style aziptk.TFrame");
+      Header: constant Ttk_Frame := Create(ViewName & ".header");
       CloseButton: constant Ttk_Button :=
         Create
           (ViewName & ".header.close",
@@ -57,8 +86,7 @@ package body ArchivesViews is
       NameLabel: constant Ttk_Label :=
         Create
           (ViewName & ".header.label",
-           "-text ""New Archive" & Positive'Image(ArchiveNumber) &
-           """ -style aziptk.TLabel");
+           "-text ""New Archive" & Positive'Image(ArchiveNumber) & """");
       Paned: constant Ttk_PanedWindow :=
         Create(ViewName & ".paned", "-orient horizontal");
       DirectoryFrame: constant Ttk_Frame :=
@@ -103,7 +131,6 @@ package body ArchivesViews is
          To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
          To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
          To_Unbounded_String("Result"));
-      OldHeader: Ttk_Frame;
    begin
       for I in ColumnsNames'Range loop
          Heading
@@ -123,22 +150,16 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(FilesList, "-side top -fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
-      if ActiveArchive > 0 then
-         OldHeader.Interp := FilesFrame.Interp;
-         OldHeader.Name :=
-           New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-              ".header");
-         if Winfo_Get(OldHeader, "exists") = "1" then
-            configure(OldHeader, "-style TFrame");
-            OldHeader.Name :=
-              New_String
-                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-                 ".header.label");
-            configure(OldHeader, "-style TLabel");
-         end if;
-      end if;
-      ActiveArchive := ArchiveNumber;
+      SetActive(ArchiveNumber);
+      Bind
+        (Header, "<1>",
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+      Bind
+        (DirectoryTree, "<1>",
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+      Bind
+        (FilesList, "<1>",
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
       ArchiveNumber := ArchiveNumber + 1;
    end CreateView;
 
@@ -184,6 +205,22 @@ package body ArchivesViews is
          return 0;
       end Create_Command;
 
+      function SetActive_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int;
+      pragma Convention(C, SetActive_Command);
+
+      function SetActive_Command
+        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+         return Interfaces.C.int is
+         pragma Unreferenced(ClientData, Interp, Argc);
+      begin
+         SetActive(Integer'Value(CArgv.Arg(Argv, 1)));
+         return 0;
+      end SetActive_Command;
+
       Command: Tcl.Tcl_Command;
       pragma Unreferenced(Command);
 
@@ -197,6 +234,9 @@ package body ArchivesViews is
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Create", Create_Command'Access, 0, null);
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "setactive", SetActive_Command'Access, 0, null);
       CreateView;
    end CreateMDI;
 

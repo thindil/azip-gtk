@@ -102,7 +102,8 @@ begin
    Style_Configure
      ("aziptk.TFrame", "-background [ttk::style lookup . -selectbackground]");
    Style_Configure
-     ("aziptk.TLabel", "-background [ttk::style lookup . -selectbackground]");
+     ("aziptk.TLabel",
+      "-background [ttk::style lookup . -selectbackground] -foreground [ttk::style lookup . -selectforeground]");
 
    -- Create UI
    MainWindow := Get_Main_Window(Interp);

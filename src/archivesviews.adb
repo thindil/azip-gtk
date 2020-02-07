@@ -170,8 +170,8 @@ package body ArchivesViews is
       function Close_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int;
-      pragma Convention(C, Close_Command);
+         return Interfaces.C.int with
+         Convention => C;
 
       function Close_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -193,8 +193,8 @@ package body ArchivesViews is
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int;
-      pragma Convention(C, Create_Command);
+         return Interfaces.C.int with
+         Convention => C;
 
       function Create_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -209,8 +209,8 @@ package body ArchivesViews is
       function SetActive_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int;
-      pragma Convention(C, SetActive_Command);
+         return Interfaces.C.int with
+         Convention => C;
 
       function SetActive_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -225,8 +225,8 @@ package body ArchivesViews is
       function Close_All_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
          Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int;
-      pragma Convention(C, Close_All_Command);
+         return Interfaces.C.int with
+         Convention => C;
 
       function Close_All_Command
         (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -248,7 +248,6 @@ package body ArchivesViews is
       end Close_All_Command;
 
       Command: Tcl.Tcl_Command;
-      pragma Unreferenced(Command);
 
    begin
       ArchiveNumber := 1;
@@ -257,15 +256,27 @@ package body ArchivesViews is
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Close", Close_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command Close";
+      end if;
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "Create", Create_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command Create";
+      end if;
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "setactive", SetActive_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command setactive";
+      end if;
       Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, "CloseAll", Close_All_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command CloseAll";
+      end if;
       CreateView;
    end CreateMDI;
 

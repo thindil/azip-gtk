@@ -163,7 +163,8 @@ package body MenuBar is
            To_Unbounded_String
              ("-label ""Tile vertical"" -underline 5 -variable tiletype -value vertical")),
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Close all"" -underline 0"))));
+           To_Unbounded_String
+             ("-label ""Close all"" -underline 0 -command CloseAll"))));
       CreateSubMenu
         (".menubar.help", "Help",
          ((To_Unbounded_String("command"),

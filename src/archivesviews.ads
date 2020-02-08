@@ -30,5 +30,6 @@ private
 
    procedure SetActive(NewActive: Positive);
    procedure CreateView;
+   procedure LoadArchive(FileName: String);
 
 end ArchivesViews;

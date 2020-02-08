@@ -68,7 +68,7 @@ package body MenuBar is
              ("-label ""New archive"" -underline 0 -accelerator ""Ctrl+N"" -command Create")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Open archive..."" -underline 0 -accelerator Ctrl+O")),
+             ("-label ""Open archive..."" -underline 0 -accelerator Ctrl+O -command Load")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Save archive as..."" -underline 0 -accelerator F12")),

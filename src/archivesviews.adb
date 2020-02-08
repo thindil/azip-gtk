@@ -169,4 +169,11 @@ package body ArchivesViews is
       CreateView;
    end CreateMDI;
 
+   procedure LoadArchive(FileName: String) is
+   begin
+      if FileName = "" then
+         return;
+      end if;
+   end LoadArchive;
+
 end ArchivesViews;

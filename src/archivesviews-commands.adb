@@ -24,90 +24,109 @@ with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 
 package body ArchivesViews.Commands is
 
-      package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
+   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
-      function Close_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int with
-         Convention => C;
+   function Close_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
 
-      function Close_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int is
-         pragma Unreferenced(ClientData, Argc);
-         use type Interfaces.C.int;
-         ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
-      begin
-         if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
+   function Close_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc);
+      use type Interfaces.C.int;
+      ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
+   begin
+      if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
+         raise Program_Error with "Can't destroy archive view.";
+      end if;
+      if Panes(MDI) = "" then
+         CreateView;
+      end if;
+      return 0;
+   end Close_Command;
+
+   function Create_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Create_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      CreateView;
+      return 0;
+   end Create_Command;
+
+   function SetActive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function SetActive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc);
+   begin
+      SetActive(Integer'Value(CArgv.Arg(Argv, 1)));
+      return 0;
+   end SetActive_Command;
+
+   function Close_All_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Close_All_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc, Argv);
+      use type Interfaces.C.int;
+      Tokens: Slice_Set;
+   begin
+      Create(Tokens, Panes(MDI), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         if Tcl.Ada.Tcl_Eval(Interp, "destroy " & Slice(Tokens, I)) =
+           TCL_ERROR then
             raise Program_Error with "Can't destroy archive view.";
          end if;
-         if Panes(MDI) = "" then
-            CreateView;
-         end if;
-         return 0;
-      end Close_Command;
+      end loop;
+      CreateView;
+      return 0;
+   end Close_All_Command;
 
-      function Create_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int with
-         Convention => C;
+   function Load_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
 
-      function Create_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int is
-         pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      begin
-         CreateView;
-         return 0;
-      end Create_Command;
-
-      function SetActive_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int with
-         Convention => C;
-
-      function SetActive_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int is
-         pragma Unreferenced(ClientData, Interp, Argc);
-      begin
-         SetActive(Integer'Value(CArgv.Arg(Argv, 1)));
-         return 0;
-      end SetActive_Command;
-
-      function Close_All_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int with
-         Convention => C;
-
-      function Close_All_Command
-        (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-         Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-         return Interfaces.C.int is
-         pragma Unreferenced(ClientData, Argc, Argv);
-         use type Interfaces.C.int;
-         Tokens: Slice_Set;
-      begin
-         Create(Tokens, Panes(MDI), " ");
-         for I in 1 .. Slice_Count(Tokens) loop
-            if Tcl.Ada.Tcl_Eval(Interp, "destroy " & Slice(Tokens, I)) =
-              TCL_ERROR then
-               raise Program_Error with "Can't destroy archive view.";
-            end if;
-         end loop;
-         CreateView;
-         return 0;
-      end Close_All_Command;
+   function Load_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      LoadArchive
+        (Get_Open_File
+           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}}"));
+      return 0;
+   end Load_Command;
 
    procedure AddCommands is
       Command: Tcl.Tcl_Command;
@@ -135,6 +154,12 @@ package body ArchivesViews.Commands is
           (Get_Context, "CloseAll", Close_All_Command'Access, 0, null);
       if Command = null then
          raise Program_Error with "Can't add command CloseAll";
+      end if;
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "Load", Load_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command Load";
       end if;
    end AddCommands;
 

@@ -18,17 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
+package ArchivesViews.Commands is
 
-package ArchivesViews is
+   procedure AddCommands;
 
-   procedure CreateMDI;
-
-private
-
-   MDI: Ttk_PanedWindow;
-
-   procedure SetActive(NewActive: Positive);
-   procedure CreateView;
-
-end ArchivesViews;
+end ArchivesViews.Commands;

@@ -170,10 +170,27 @@ package body ArchivesViews is
    end CreateMDI;
 
    procedure LoadArchive(FileName: String) is
+      Label: Ttk_Label;
+      LabelText: Unbounded_String;
    begin
       if FileName = "" then
          return;
       end if;
+      Label.Interp := Get_Context;
+      Label.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".header.label");
+      LabelText := To_Unbounded_String(cget(Label, "-text"));
+      if Length(LabelText) > 10
+        and then Slice(LabelText, 1, 10) /= "New Archiv" then
+         CreateView;
+         Label.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+              ".header.label");
+      end if;
+      configure(Label, "-text """ & FileName & """");
    end LoadArchive;
 
 end ArchivesViews;

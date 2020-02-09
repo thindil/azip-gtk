@@ -18,8 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Ada.Command_Line; use Ada.Command_Line;
-with Ada.Directories; use Ada.Directories;
 with Tcl; use Tcl;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
@@ -35,7 +33,6 @@ package body Toolbar is
 
    procedure CreateToolbar is
       Toolbar: constant Ttk_Frame := Create(".toolbar");
-      CurrentDir: constant String := Current_Directory;
       Image: Tk_Photo;
       procedure AddButton
         (Name: String; StartX: Natural; ToolTip: String;
@@ -64,9 +61,7 @@ package body Toolbar is
          Tcl.Tk.Ada.Pack.Pack(Separator, "-side left -padx 5 -fill y");
       end AddSeparator;
    begin
-      Set_Directory(Containing_Directory(Command_Name));
       Image := Create("toolbaricons", "-file ""az_tools.gif""");
-      Set_Directory(CurrentDir);
       AddButton(".toolbar.new", 320, "New archive", "Create");
       AddButton(".toolbar.open", 352, "Open archive...", "Load");
       AddButton(".toolbar.extract", 64, "Extract...");

@@ -23,7 +23,8 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Calendar; use Ada.Calendar;
 with Ada.Calendar.Formatting;
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
-with Ada.Directories;
+with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 with CArgv;
@@ -31,6 +32,7 @@ with Interfaces.C;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 with Tcl.Tk.Ada.TtkStyle; use Tcl.Tk.Ada.TtkStyle;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
@@ -50,6 +52,9 @@ procedure AZipTk is
    Argv: CArgv.Chars_Ptr_Ptr;
    Interp: Tcl.Tcl_Interp;
    MainWindow: Tk_Toplevel;
+   CurrentDir: constant String := Current_Directory;
+   Icon: Tk_Photo;
+   pragma Unreferenced(Icon);
 
 begin
 
@@ -106,12 +111,16 @@ begin
       "-background [ttk::style lookup . -selectbackground] -foreground [ttk::style lookup . -selectforeground]");
 
    -- Create UI
+   Set_Directory(Containing_Directory(Command_Name));
    MainWindow := Get_Main_Window(Interp);
    Wm_Set(MainWindow, "title", "AZip");
+   Icon := Create("logo", "-file ""azip.gif""");
+   Wm_Set(MainWindow, "iconphoto", "-default logo");
    Bind_To_Main_Window(Interp, "<Alt-F4>", "{exit}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;
+   Set_Directory(CurrentDir);
 
    --  Loop inside Tk, waiting for commands to execute.
    --  When there are no windows left, Tcl.Tk.Tk_MainLoop returns and we exit.

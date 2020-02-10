@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -172,25 +173,46 @@ package body ArchivesViews is
    procedure LoadArchive(FileName: String) is
       Label: Ttk_Label;
       LabelText: Unbounded_String;
+      DirectoryTree, FilesList: Ttk_Tree_View;
+      ViewName: Unbounded_String :=
+        To_Unbounded_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
    begin
       if FileName = "" then
          return;
       end if;
       Label.Interp := Get_Context;
-      Label.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".header.label");
+      Label.Name := New_String(To_String(ViewName) & ".header.label");
       LabelText := To_Unbounded_String(cget(Label, "-text"));
       if Length(LabelText) > 10
         and then Slice(LabelText, 1, 10) /= "New Archiv" then
          CreateView;
-         Label.Name :=
-           New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-              ".header.label");
+         ViewName :=
+           To_Unbounded_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
+         Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
       configure(Label, "-text """ & FileName & """");
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(To_String(ViewName) & ".directoryframe.directorytree");
+      FilesList.Interp := Get_Context;
+      FilesList.Name :=
+        New_String(To_String(ViewName) & ".filesframe.fileslist");
+      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      -- Some test data for files list
+      Insert
+        (FilesList,
+         "{} end -text """ & Simple_Name(FileName) &
+         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+      Insert
+        (FilesList,
+         "{} end -text """ & Simple_Name(FileName) &
+         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+      Insert
+        (FilesList,
+         "{} end -text """ & Simple_Name(FileName) &
+         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
    end LoadArchive;
 
 end ArchivesViews;

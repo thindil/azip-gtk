@@ -215,4 +215,11 @@ package body ArchivesViews is
          """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
    end LoadArchive;
 
+   procedure ExtractArchive(Directory: String) is
+   begin
+      if Directory = "" then
+         return;
+      end if;
+   end ExtractArchive;
+
 end ArchivesViews;

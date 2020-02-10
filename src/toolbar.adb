@@ -64,7 +64,7 @@ package body Toolbar is
       Image := Create("toolbaricons", "-file ""az_tools.gif""");
       AddButton(".toolbar.new", 320, "New archive", "Create");
       AddButton(".toolbar.open", 352, "Open archive...", "Load");
-      AddButton(".toolbar.extract", 64, "Extract...");
+      AddButton(".toolbar.extract", 64, "Extract...", "Extract");
       AddSeparator("1");
       AddButton(".toolbar.add", 0, "Add files...");
       AddButton(".toolbar.add2", 192, "Add files with encryption...");

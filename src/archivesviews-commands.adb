@@ -128,6 +128,22 @@ package body ArchivesViews.Commands is
       return 0;
    end Load_Command;
 
+   function Extract_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Extract_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      ExtractArchive(Choose_Directory);
+      return 0;
+   end Extract_Command;
+
    procedure AddCommands is
       Command: Tcl.Tcl_Command;
    begin
@@ -160,6 +176,12 @@ package body ArchivesViews.Commands is
           (Get_Context, "Load", Load_Command'Access, 0, null);
       if Command = null then
          raise Program_Error with "Can't add command Load";
+      end if;
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "Extract", Extract_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command Extract";
       end if;
    end AddCommands;
 

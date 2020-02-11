@@ -124,7 +124,7 @@ package body ArchivesViews.Commands is
    begin
       LoadArchive
         (Get_Open_File
-           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}}"));
+           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent ."));
       return 0;
    end Load_Command;
 
@@ -140,7 +140,9 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
-      ExtractArchive(Choose_Directory);
+      ExtractArchive
+        (Choose_Directory
+           ("-parent . -title ""Select directory to which extract the archive"""));
       return 0;
    end Extract_Command;
 

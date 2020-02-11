@@ -22,6 +22,7 @@ with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
@@ -216,10 +217,20 @@ package body ArchivesViews is
    end LoadArchive;
 
    procedure ExtractArchive(Directory: String) is
+      FileName: Unbounded_String;
+      Label: Ttk_Label;
    begin
       if Directory = "" then
          return;
       end if;
+      Label.Interp := Get_Context;
+      Label.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".header.label");
+      FileName := To_Unbounded_String(cget(Label, "-text"));
+      Ada.Text_IO.Put_Line
+        ("Extracting: " & To_String(FileName) & " into: " & Directory);
    end ExtractArchive;
 
 end ArchivesViews;

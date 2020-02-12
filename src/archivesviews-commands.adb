@@ -156,11 +156,19 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Interp, Argc);
+      Encrypted: Boolean;
    begin
+      if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
+        CArgv.Arg(Argv, 1) = "yes" then
+         Encrypted := True;
+      else
+         Encrypted := False;
+      end if;
       AddFiles
         (Get_Open_File
-           ("-title ""Select the files to add to the archive"" -parent . -multiple true"));
+           ("-title ""Select the files to add to the archive"" -parent . -multiple true"),
+         Encrypted);
       return 0;
    end Add_Files_Command;
 

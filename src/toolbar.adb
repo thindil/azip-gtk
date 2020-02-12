@@ -42,7 +42,7 @@ package body Toolbar is
       begin
          if Command /= "" then
             Toolbutton :=
-              Create(Name, "-style Toolbutton -command " & Command);
+              Create(Name, "-style Toolbutton -command """ & Command & """");
          else
             Toolbutton := Create(Name, "-style Toolbutton");
          end if;
@@ -66,7 +66,7 @@ package body Toolbar is
       AddButton(".toolbar.open", 352, "Open archive...", "Load");
       AddButton(".toolbar.extract", 64, "Extract...", "Extract");
       AddSeparator("1");
-      AddButton(".toolbar.add", 0, "Add files...", "AddFiles");
+      AddButton(".toolbar.add", 0, "Add files...", "AddFiles false");
       AddButton(".toolbar.add2", 192, "Add files with encryption...");
       AddButton(".toolbar.delete", 32, "Delete entries");
       AddSeparator("2");

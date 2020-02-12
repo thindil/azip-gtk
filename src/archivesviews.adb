@@ -226,8 +226,7 @@ package body ArchivesViews is
         ("Extracting: " & To_String(FileName) & " into: " & Directory);
    end ExtractArchive;
 
-   procedure AddFiles(FileName: String; Encrypted: Boolean := False) is
-      pragma Unreferenced(Encrypted);
+   procedure AddFiles(FileName: String; Encrypted: Boolean) is
       Tokens: Slice_Set;
       FilesList: Ttk_Tree_View;
    begin
@@ -241,6 +240,11 @@ package body ArchivesViews is
            ".filesframe.fileslist");
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
+         if not Encrypted then
+            Ada.Text_IO.Put_Line("Adding file " & Slice(Tokens, I) & " without encryption");
+         else
+            Ada.Text_IO.Put_Line("Adding file " & Slice(Tokens, I) & " with encryption");
+         end if;
          Insert
            (FilesList,
             "{} end -text """ & Simple_Name(Slice(Tokens, I)) &

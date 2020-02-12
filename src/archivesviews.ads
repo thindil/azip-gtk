@@ -32,6 +32,6 @@ private
    procedure CreateView;
    procedure LoadArchive(FileName: String);
    procedure ExtractArchive(Directory: String);
-   procedure AddFiles(FileName: String; Encrypted: Boolean := False);
+   procedure AddFiles(FileName: String; Encrypted: Boolean);
 
 end ArchivesViews;

@@ -25,6 +25,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
+with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Pack;
@@ -201,15 +202,7 @@ package body ArchivesViews is
       FilesList.Name :=
         New_String(To_String(ViewName) & ".filesframe.fileslist");
       Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
-      -- Some test data for files list
-      Insert
-        (FilesList,
-         "{} end -text """ & Simple_Name(FileName) &
-         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
-      Insert
-        (FilesList,
-         "{} end -text """ & Simple_Name(FileName) &
-         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+      -- Some example data
       Insert
         (FilesList,
          "{} end -text """ & Simple_Name(FileName) &
@@ -232,5 +225,27 @@ package body ArchivesViews is
       Ada.Text_IO.Put_Line
         ("Extracting: " & To_String(FileName) & " into: " & Directory);
    end ExtractArchive;
+
+   procedure AddFiles(FileName: String; Encrypted: Boolean := False) is
+      pragma Unreferenced(Encrypted);
+      Tokens: Slice_Set;
+      FilesList: Ttk_Tree_View;
+   begin
+      if FileName = "" then
+         return;
+      end if;
+      FilesList.Interp := Get_Context;
+      FilesList.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Create(Tokens, FileName, " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         Insert
+           (FilesList,
+            "{} end -text """ & Simple_Name(Slice(Tokens, I)) &
+            """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+      end loop;
+   end AddFiles;
 
 end ArchivesViews;

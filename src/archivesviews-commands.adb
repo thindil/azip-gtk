@@ -124,7 +124,7 @@ package body ArchivesViews.Commands is
    begin
       LoadArchive
         (Get_Open_File
-           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent ."));
+           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false"));
       return 0;
    end Load_Command;
 
@@ -145,6 +145,24 @@ package body ArchivesViews.Commands is
            ("-parent . -title ""Select directory to which extract the archive"""));
       return 0;
    end Extract_Command;
+
+   function Add_Files_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Add_Files_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      AddFiles
+        (Get_Open_File
+           ("-title ""Select the files to add to the archive"" -parent . -multiple true"));
+      return 0;
+   end Add_Files_Command;
 
    procedure AddCommands is
       Command: Tcl.Tcl_Command;
@@ -184,6 +202,12 @@ package body ArchivesViews.Commands is
           (Get_Context, "Extract", Extract_Command'Access, 0, null);
       if Command = null then
          raise Program_Error with "Can't add command Extract";
+      end if;
+      Command :=
+        CreateCommands.Tcl_CreateCommand
+          (Get_Context, "AddFiles", Add_Files_Command'Access, 0, null);
+      if Command = null then
+         raise Program_Error with "Can't add command AddFiles";
       end if;
    end AddCommands;
 

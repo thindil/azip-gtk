@@ -173,50 +173,25 @@ package body ArchivesViews.Commands is
    end Add_Files_Command;
 
    procedure AddCommands is
-      Command: Tcl.Tcl_Command;
+      procedure AddCommand
+        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
+         Command: Tcl.Tcl_Command;
+      begin
+         Command :=
+           CreateCommands.Tcl_CreateCommand
+             (Get_Context, Name, AdaCommand, 0, null);
+         if Command = null then
+            raise Program_Error with "Can't add command " & Name;
+         end if;
+      end AddCommand;
    begin
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "Close", Close_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command Close";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "Create", Create_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command Create";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "setactive", SetActive_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command setactive";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "CloseAll", Close_All_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command CloseAll";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "Load", Load_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command Load";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "Extract", Extract_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command Extract";
-      end if;
-      Command :=
-        CreateCommands.Tcl_CreateCommand
-          (Get_Context, "AddFiles", Add_Files_Command'Access, 0, null);
-      if Command = null then
-         raise Program_Error with "Can't add command AddFiles";
-      end if;
+      AddCommand("Close", Close_Command'Access);
+      AddCommand("Create", Create_Command'Access);
+      AddCommand("setactive", SetActive_Command'Access);
+      AddCommand("CloseAll", Close_All_Command'Access);
+      AddCommand("Load", Load_Command'Access);
+      AddCommand("Extract", Extract_Command'Access);
+      AddCommand("AddFiles", Add_Files_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

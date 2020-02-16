@@ -229,10 +229,18 @@ package body ArchivesViews is
    procedure AddFiles(FileName: String; Encrypted: Boolean) is
       Tokens: Slice_Set;
       FilesList: Ttk_Tree_View;
+      ArchiveName: Unbounded_String;
+      HeaderLabel: Ttk_Label;
    begin
       if FileName = "" then
          return;
       end if;
+      HeaderLabel.Interp := Get_Context;
+      HeaderLabel.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".header.label");
+      ArchiveName := To_Unbounded_String(cget(HeaderLabel, "-text"));
       FilesList.Interp := Get_Context;
       FilesList.Name :=
         New_String
@@ -241,9 +249,13 @@ package body ArchivesViews is
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
          if not Encrypted then
-            Ada.Text_IO.Put_Line("Adding file " & Slice(Tokens, I) & " without encryption");
+            Ada.Text_IO.Put_Line
+              ("Adding file " & Slice(Tokens, I) & " to archive " &
+               To_String(ArchiveName) & " without encryption");
          else
-            Ada.Text_IO.Put_Line("Adding file " & Slice(Tokens, I) & " with encryption");
+            Ada.Text_IO.Put_Line
+              ("Adding file " & Slice(Tokens, I) & " to archive " &
+               To_String(ArchiveName) & " with encryption");
          end if;
          Insert
            (FilesList,

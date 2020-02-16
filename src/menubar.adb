@@ -100,10 +100,10 @@ package body MenuBar is
              ("-label ""Delete entries"" -accelerator Del/-")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Add files..."" -underline 1 -accelerator +")),
+             ("-label ""Add files..."" -underline 1 -accelerator + -command ""AddFiles false""")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Add files with encryption..."" -underline 19")),
+             ("-label ""Add files with encryption..."" -underline 19 -command ""AddFiles true""")),
           (To_Unbounded_String("command"),
            To_Unbounded_String("-label ""Add folder...""")),
           (To_Unbounded_String("command"),

@@ -28,6 +28,7 @@ with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -209,38 +210,34 @@ package body ArchivesViews is
          """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
    end LoadArchive;
 
-   procedure ExtractArchive(Directory: String) is
-      FileName: Unbounded_String;
-      Label: Ttk_Label;
-   begin
-      if Directory = "" then
-         return;
-      end if;
-      Label.Interp := Get_Context;
-      Label.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".header.label");
-      FileName := To_Unbounded_String(cget(Label, "-text"));
-      Ada.Text_IO.Put_Line
-        ("Extracting: " & To_String(FileName) & " into: " & Directory);
-   end ExtractArchive;
-
-   procedure AddFiles(FileName: String; Encrypted: Boolean) is
-      Tokens: Slice_Set;
-      FilesList: Ttk_Tree_View;
-      ArchiveName: Unbounded_String;
+   function GetArchiveName return String is
       HeaderLabel: Ttk_Label;
    begin
-      if FileName = "" then
-         return;
-      end if;
       HeaderLabel.Interp := Get_Context;
       HeaderLabel.Name :=
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".header.label");
-      ArchiveName := To_Unbounded_String(cget(HeaderLabel, "-text"));
+      return cget(HeaderLabel, "-text");
+   end GetArchiveName;
+
+   procedure ExtractArchive(Directory: String) is
+      FileName: constant String := GetArchiveName;
+   begin
+      if Directory = "" then
+         return;
+      end if;
+      Ada.Text_IO.Put_Line("Extracting: " & FileName & " into: " & Directory);
+   end ExtractArchive;
+
+   procedure AddFiles(FileName: String; Encrypted: Boolean) is
+      Tokens: Slice_Set;
+      FilesList: Ttk_Tree_View;
+      ArchiveName: constant String := GetArchiveName;
+   begin
+      if FileName = "" then
+         return;
+      end if;
       FilesList.Interp := Get_Context;
       FilesList.Name :=
         New_String
@@ -251,11 +248,11 @@ package body ArchivesViews is
          if not Encrypted then
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &
-               To_String(ArchiveName) & " without encryption");
+               ArchiveName & " without encryption");
          else
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &
-               To_String(ArchiveName) & " with encryption");
+               ArchiveName & " with encryption");
          end if;
          Insert
            (FilesList,
@@ -263,5 +260,30 @@ package body ArchivesViews is
             """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
       end loop;
    end AddFiles;
+
+   procedure SaveArchiveAs is
+      NewFileName: Unbounded_String;
+      HeaderLabel: Ttk_Label;
+      ArchiveName: Unbounded_String;
+   begin
+      HeaderLabel.Interp := Get_Context;
+      HeaderLabel.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".header.label");
+      ArchiveName := To_Unbounded_String(cget(HeaderLabel, "-text"));
+      NewFileName :=
+        To_Unbounded_String
+          (Get_Save_File
+             ("-parent . -title ""Select a new name for the archive"" -filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -initialfile """ &
+              Simple_Name(To_String(ArchiveName)) & """ -initialdir """ &
+              Containing_Directory(To_String(ArchiveName)) & """"));
+      if NewFileName = Null_Unbounded_String then
+         return;
+      end if;
+      Ada.Text_IO.Put_Line
+        ("Saving " & To_String(ArchiveName) & " as " & To_String(NewFileName));
+      configure(HeaderLabel, "-text """ & To_String(NewFileName) & """");
+   end SaveArchiveAs;
 
 end ArchivesViews;

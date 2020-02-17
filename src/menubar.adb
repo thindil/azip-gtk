@@ -71,7 +71,7 @@ package body MenuBar is
              ("-label ""Open archive..."" -underline 0 -accelerator Ctrl+O -command Load")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Save archive as..."" -underline 0 -accelerator F12")),
+             ("-label ""Save archive as..."" -underline 0 -accelerator F12 -command SaveAs")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Close archive"" -underline 0 -accelerator Ctrl+W/Ctrl+F4")),

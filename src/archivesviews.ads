@@ -33,5 +33,6 @@ private
    procedure LoadArchive(FileName: String);
    procedure ExtractArchive(Directory: String);
    procedure AddFiles(FileName: String; Encrypted: Boolean);
+   procedure SaveArchiveAs;
 
 end ArchivesViews;

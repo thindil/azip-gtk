@@ -286,4 +286,26 @@ package body ArchivesViews is
       configure(HeaderLabel, "-text """ & To_String(NewFileName) & """");
    end SaveArchiveAs;
 
+   procedure DeleteItems is
+      FilesList: Ttk_Tree_View;
+      Tokens: Slice_Set;
+      Selected: Unbounded_String;
+   begin
+      FilesList.Interp := Get_Context;
+      FilesList.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Selected := To_Unbounded_String(Selection(FilesList));
+      if Selected = Null_Unbounded_String then
+         return;
+      end if;
+      Create(Tokens, To_String(Selected), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         Ada.Text_IO.Put_Line
+           ("Deleting file " & Item(FilesList, Slice(Tokens, I), "-text"));
+         Delete(FilesList, Slice(Tokens, I));
+      end loop;
+   end DeleteItems;
+
 end ArchivesViews;

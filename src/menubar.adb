@@ -97,7 +97,7 @@ package body MenuBar is
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Delete entries"" -accelerator Del/-")),
+             ("-label ""Delete entries"" -accelerator Del/- -command DeleteItems")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Add files..."" -underline 1 -accelerator + -command ""AddFiles false""")),

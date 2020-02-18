@@ -34,5 +34,6 @@ private
    procedure ExtractArchive(Directory: String);
    procedure AddFiles(FileName: String; Encrypted: Boolean);
    procedure SaveArchiveAs;
+   procedure DeleteItems;
 
 end ArchivesViews;

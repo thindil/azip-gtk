@@ -233,9 +233,18 @@ package body ArchivesViews is
    procedure AddFiles(FileName: String; Encrypted: Boolean) is
       Tokens: Slice_Set;
       FilesList: Ttk_Tree_View;
-      ArchiveName: constant String := GetArchiveName;
+      ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
    begin
       if FileName = "" then
+         return;
+      end if;
+      if Length(ArchiveName) > 10
+        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+         SaveArchiveAs;
+      end if;
+      ArchiveName := To_Unbounded_String(GetArchiveName);
+      if Length(ArchiveName) > 10
+        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          return;
       end if;
       FilesList.Interp := Get_Context;
@@ -248,11 +257,11 @@ package body ArchivesViews is
          if not Encrypted then
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &
-               ArchiveName & " without encryption");
+               To_String(ArchiveName) & " without encryption");
          else
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &
-               ArchiveName & " with encryption");
+               To_String(ArchiveName) & " with encryption");
          end if;
          Insert
            (FilesList,

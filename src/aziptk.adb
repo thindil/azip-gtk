@@ -117,6 +117,9 @@ begin
    Icon := Create("logo", "-file ""azip.gif""");
    Wm_Set(MainWindow, "iconphoto", "-default logo");
    Bind_To_Main_Window(Interp, "<Alt-F4>", "{exit}");
+   Bind_To_Main_Window(Interp, "<Control-n>", "{Create}");
+   Bind_To_Main_Window(Interp, "<Control-o>", "{Load}");
+   Bind_To_Main_Window(Interp, "<F12>", "{SaveAs}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;

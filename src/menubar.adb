@@ -21,6 +21,8 @@
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
+with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
 
@@ -180,5 +182,14 @@ package body MenuBar is
            To_Unbounded_String("-label ""About AZip"" -underline 0"))));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
+
+   procedure SetCloseCommand(Index: Positive) is
+      FileMenu: Tk_Menu;
+   begin
+      FileMenu.Interp := Get_Context;
+      FileMenu.Name := New_String(".menubar.file");
+      Entry_Configure
+        (FileMenu, "3", "-command ""Close" & Positive'Image(Index) & """");
+   end SetCloseCommand;
 
 end MenuBar;

@@ -23,5 +23,6 @@ with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 package MenuBar is
 
    procedure CreateMenuBar(MainWindow: Tk_Toplevel);
+   procedure SetCloseCommand(Index: Positive);
 
 end MenuBar;

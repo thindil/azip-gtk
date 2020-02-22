@@ -38,6 +38,7 @@ with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands; use ArchivesViews.Commands;
+with MenuBar; use MenuBar;
 
 package body ArchivesViews is
 
@@ -72,6 +73,7 @@ package body ArchivesViews is
            ".header.label");
       configure(Header, "-style aziptk.TLabel");
       ActiveArchive := NewActive;
+      SetCloseCommand(ActiveArchive);
    end SetActive;
 
    procedure CreateView is

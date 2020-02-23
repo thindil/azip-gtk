@@ -120,6 +120,8 @@ begin
    Bind_To_Main_Window(Interp, "<Control-n>", "{Create}");
    Bind_To_Main_Window(Interp, "<Control-o>", "{Load}");
    Bind_To_Main_Window(Interp, "<F12>", "{SaveAs}");
+   Bind_To_Main_Window(Interp, "<Control-w>", "{.menubar.file invoke 3}");
+   Bind_To_Main_Window(Interp, "<Control-F4>", "{.menubar.file invoke 3}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;

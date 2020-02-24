@@ -204,6 +204,21 @@ package body ArchivesViews.Commands is
       return 0;
    end Delete_Items_Command;
 
+   function Sort_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Sort_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      return 0;
+   end Sort_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -226,6 +241,7 @@ package body ArchivesViews.Commands is
       AddCommand("AddFiles", Add_Files_Command'Access);
       AddCommand("SaveAs", Save_As_Command'Access);
       AddCommand("DeleteItems", Delete_Items_Command'Access);
+      AddCommand("Sort", Sort_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

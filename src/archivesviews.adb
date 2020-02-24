@@ -29,6 +29,7 @@ with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
+with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -140,6 +141,7 @@ package body ArchivesViews is
            (FilesList, "#" & Trim(Natural'Image(I), Both),
             "-text """ & To_String(ColumnsNames(I)) & """");
       end loop;
+      Heading(FilesList, "#0", "-image ""arrow-down""");
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
@@ -167,7 +169,17 @@ package body ArchivesViews is
    end CreateView;
 
    procedure CreateMDI is
+      Arrow: Tk_Bitmap;
+      pragma Unreferenced(Arrow);
    begin
+      Arrow :=
+        Create
+          ("arrow-up",
+           "-data {#define arrowUp_width 7  #define arrowUp_height 4 static char arrowUp_bits[] = { 0x08, 0x1c, 0x3e, 0x7f };}");
+      Arrow :=
+        Create
+          ("arrow-down",
+           "-data {#define arrowDown_width 7  #define arrowDown_height 4 static char arrowDown_bits[] = { 0x7f, 0x3e, 0x1c, 0x08 };}");
       ArchiveNumber := 1;
       MDI := Create(".mdi", "-orient vertical");
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");

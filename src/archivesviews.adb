@@ -45,6 +45,13 @@ package body ArchivesViews is
 
    ArchiveNumber: Positive;
    ActiveArchive: Natural := 0;
+   ColumnsNames: constant array(0 .. 10) of Unbounded_String :=
+     (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
+      To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
+      To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
+      To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
+      To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
+      To_Unbounded_String("Result"));
 
    procedure SetActive(NewActive: Positive) is
       Header: Ttk_Frame;
@@ -128,18 +135,12 @@ package body ArchivesViews is
            "-columns [list 1 2 3 4 5 6 7 8 9 10] -xscrollcommand """ &
            Widget_Image(FilesXScroll) & " set"" -yscrollcommand """ &
            Widget_Image(FilesYScroll) & " set""");
-      ColumnsNames: constant array(0 .. 10) of Unbounded_String :=
-        (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
-         To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
-         To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
-         To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
-         To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
-         To_Unbounded_String("Result"));
    begin
       for I in ColumnsNames'Range loop
          Heading
            (FilesList, "#" & Trim(Natural'Image(I), Both),
-            "-text """ & To_String(ColumnsNames(I)) & """");
+            "-text {" & To_String(ColumnsNames(I)) & "} -command {Sort {" &
+            To_String(ColumnsNames(I)) & "}}");
       end loop;
       Heading(FilesList, "#0", "-image ""arrow-down""");
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
@@ -330,5 +331,40 @@ package body ArchivesViews is
          Delete(FilesList, Slice(Tokens, I));
       end loop;
    end DeleteItems;
+
+   procedure SortArchive(Column: String) is
+      FilesView: Ttk_Tree_View;
+      ColumnIndex, OldSortColumn: Natural;
+      ArrowName, OldArrowName: Unbounded_String;
+   begin
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      for I in ColumnsNames'Range loop
+         ArrowName :=
+           To_Unbounded_String
+             (Heading
+                (FilesView, "#" & Trim(Natural'Image(I), Both), "-image"));
+         if ArrowName /= Null_Unbounded_String then
+            OldSortColumn := I;
+            OldArrowName := ArrowName;
+            Heading
+              (FilesView, "#" & Trim(Natural'Image(I), Both), "-image {}");
+         end if;
+         if ColumnsNames(I) = To_Unbounded_String(Column) then
+            ColumnIndex := I;
+         end if;
+      end loop;
+      ArrowName := To_Unbounded_String("arrow-down");
+      if OldSortColumn = ColumnIndex
+        and then OldArrowName = To_Unbounded_String("arrow-down") then
+         ArrowName := To_Unbounded_String("arrow-up");
+      end if;
+      Heading
+        (FilesView, "#" & Trim(Natural'Image(ColumnIndex), Both),
+         "-image " & To_String(ArrowName));
+   end SortArchive;
 
 end ArchivesViews;

@@ -214,8 +214,9 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Interp, Argc);
    begin
+      SortArchive(CArgv.Arg(Argv, 1));
       return 0;
    end Sort_Command;
 

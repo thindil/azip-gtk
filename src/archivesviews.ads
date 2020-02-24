@@ -35,5 +35,6 @@ private
    procedure AddFiles(FileName: String; Encrypted: Boolean);
    procedure SaveArchiveAs;
    procedure DeleteItems;
+   procedure SortArchive(Column: String);
 
 end ArchivesViews;

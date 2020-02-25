@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Containers.Vectors; use Ada.Containers;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
@@ -27,6 +28,7 @@ with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
+with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
@@ -335,7 +337,17 @@ package body ArchivesViews is
    procedure SortArchive(Column: String) is
       FilesView: Ttk_Tree_View;
       ColumnIndex, OldSortColumn: Natural;
-      ArrowName, OldArrowName: Unbounded_String;
+      ArrowName, OldArrowName, Values: Unbounded_String;
+      type File_Record is record
+         Name: Unbounded_String;
+         FType: Unbounded_String;
+         Modified: Unbounded_String;
+         Attributes: Unbounded_String;
+      end record;
+      package Files_Container is new Vectors(Positive, File_Record);
+      FilesList: Files_Container.Vector;
+      Tokens: Slice_Set;
+      FileEntry: File_Record;
    begin
       FilesView.Interp := Get_Context;
       FilesView.Name :=
@@ -365,6 +377,23 @@ package body ArchivesViews is
       Heading
         (FilesView, "#" & Trim(Natural'Image(ColumnIndex), Both),
          "-image " & To_String(ArrowName));
+      Create(Tokens, Children(FilesView, "{}"), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         FileEntry.Name :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-text"));
+         Values :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+         FileEntry.FType :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 1");
+         FileEntry.Modified :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 2");
+         FileEntry.Attributes :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         FilesList.Append(FileEntry);
+      end loop;
    end SortArchive;
 
 end ArchivesViews;

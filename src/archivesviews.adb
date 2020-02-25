@@ -18,7 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Ada.Containers.Vectors; use Ada.Containers;
+with Ada.Containers.Generic_Array_Sort;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
@@ -47,7 +47,7 @@ package body ArchivesViews is
 
    ArchiveNumber: Positive;
    ActiveArchive: Natural := 0;
-   ColumnsNames: constant array(0 .. 10) of Unbounded_String :=
+   ColumnsNames: constant array(1 .. 11) of Unbounded_String :=
      (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
       To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
       To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
@@ -134,7 +134,7 @@ package body ArchivesViews is
       FilesList: constant Ttk_Tree_View :=
         Create
           (Widget_Image(FilesFrame) & ".fileslist",
-           "-columns [list 1 2 3 4 5 6 7 8 9 10] -xscrollcommand """ &
+           "-show headings -columns [list 1 2 3 4 5 6 7 8 9 10 11] -xscrollcommand """ &
            Widget_Image(FilesXScroll) & " set"" -yscrollcommand """ &
            Widget_Image(FilesYScroll) & " set""");
    begin
@@ -223,8 +223,8 @@ package body ArchivesViews is
       -- Some example data
       Insert
         (FilesList,
-         "{} end -text """ & Simple_Name(FileName) &
-         """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+         "{} end -values [list {" & Simple_Name(FileName) &
+         "} 0 0 0 0 0 0 0 0 0 0 0]");
    end LoadArchive;
 
    function GetArchiveName return String is
@@ -282,8 +282,8 @@ package body ArchivesViews is
          end if;
          Insert
            (FilesList,
-            "{} end -text """ & Simple_Name(Slice(Tokens, I)) &
-            """ -values [list 0 0 0 0 0 0 0 0 0 0 0]");
+            "{} end -values [list {" & Simple_Name(Slice(Tokens, I)) &
+            "} 0 0 0 0 0 0 0 0 0 0 0]");
       end loop;
    end AddFiles;
 
@@ -338,16 +338,8 @@ package body ArchivesViews is
       FilesView: Ttk_Tree_View;
       ColumnIndex, OldSortColumn: Natural;
       ArrowName, OldArrowName, Values: Unbounded_String;
-      type File_Record is record
-         Name: Unbounded_String;
-         FType: Unbounded_String;
-         Modified: Unbounded_String;
-         Attributes: Unbounded_String;
-      end record;
-      package Files_Container is new Vectors(Positive, File_Record);
-      FilesList: Files_Container.Vector;
       Tokens: Slice_Set;
-      FileEntry: File_Record;
+      Ascending: Boolean := True;
    begin
       FilesView.Interp := Get_Context;
       FilesView.Name :=
@@ -373,27 +365,54 @@ package body ArchivesViews is
       if OldSortColumn = ColumnIndex
         and then OldArrowName = To_Unbounded_String("arrow-down") then
          ArrowName := To_Unbounded_String("arrow-up");
+         Ascending := False;
       end if;
       Heading
         (FilesView, "#" & Trim(Natural'Image(ColumnIndex), Both),
          "-image " & To_String(ArrowName));
       Create(Tokens, Children(FilesView, "{}"), " ");
-      for I in 1 .. Slice_Count(Tokens) loop
-         FileEntry.Name :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-text"));
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileEntry.FType :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 1");
-         FileEntry.Modified :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 2");
-         FileEntry.Attributes :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         FilesList.Append(FileEntry);
-      end loop;
+      if Slice(Tokens, 1) = "" then
+         return;
+      end if;
+      declare
+         type File_Record is record
+            Index: Unbounded_String;
+            Value: Unbounded_String;
+         end record;
+         function "<"(Left, Right: File_Record) return Boolean is
+         begin
+            if Ascending then
+               return Left.Value < Right.Value;
+            else
+               return Left.Value > Right.Value;
+            end if;
+         end "<";
+         type Files_Array is array(Natural range <>) of File_Record;
+         procedure Sort is new Ada.Containers.Generic_Array_Sort(Natural,
+            File_Record, Files_Array);
+         FilesList: Files_Array(1 .. Positive(Slice_Count(Tokens)));
+         FileEntry: File_Record;
+      begin
+         for I in 1 .. Slice_Count(Tokens) loop
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Slice(Tokens, I), "-values"));
+            Tcl_Eval
+              (FilesView.Interp,
+               "lindex {" & To_String(Values) & "}" &
+               Natural'Image(ColumnIndex - 1));
+            FileEntry.Index := To_Unbounded_String(Slice(Tokens, I));
+            FileEntry.Value :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            FilesList(Positive(I)) := FileEntry;
+         end loop;
+         Sort(FilesList);
+         for I in FilesList'Range loop
+            Move
+              (FilesView, To_String(FilesList(I).Index), "{}",
+               Natural'Image(I));
+         end loop;
+      end;
    end SortArchive;
 
 end ArchivesViews;

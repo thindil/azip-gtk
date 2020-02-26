@@ -34,12 +34,15 @@ with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
+with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
 with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
+with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with ArchivesViews.Commands; use ArchivesViews.Commands;
 with MenuBar; use MenuBar;
 
@@ -416,8 +419,31 @@ package body ArchivesViews is
    end SortArchive;
 
    procedure TestArchive is
+      ProgressDialog: constant Tk_Toplevel :=
+        Create(".progressdialog", "-class Dialog");
+      ProgressBar: constant Ttk_ProgressBar :=
+        Create
+          (".progressdialog.progressbar",
+           "-orient horizontal -length 250 -value 0");
+      X, Y: Integer;
    begin
-      null;
+      Wm_Set(ProgressDialog, "title", "{AZip - Test archive progress}");
+      Wm_Set(ProgressDialog, "transient", ".");
+      Wm_Set(ProgressDialog, "attributes", "-type dialog");
+      X := (Positive'Value(Winfo_Get(ProgressDialog, "vrootwidth")) - 275) / 2;
+      if X < 0 then
+         X := 0;
+      end if;
+      Y :=
+        (Positive'Value(Winfo_Get(ProgressDialog, "vrootheight")) - 50) / 2;
+      if Y < 0 then
+         Y := 0;
+      end if;
+      Wm_Set
+        (ProgressDialog, "geometry",
+         "275x50+" & Trim(Positive'Image(X), Both) & "+" &
+         Trim(Positive'Image(Y), Both));
+      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
    end TestArchive;
 
 end ArchivesViews;

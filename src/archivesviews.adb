@@ -415,4 +415,9 @@ package body ArchivesViews is
       end;
    end SortArchive;
 
+   procedure TestArchive is
+   begin
+      null;
+   end TestArchive;
+
 end ArchivesViews;

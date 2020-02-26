@@ -70,7 +70,7 @@ package body Toolbar is
       AddButton(".toolbar.add2", 192, "Add files with encryption...", "AddFiles true");
       AddButton(".toolbar.delete", 32, "Delete entries", "DeleteItems");
       AddSeparator("2");
-      AddButton(".toolbar.test", 128, "Test archive");
+      AddButton(".toolbar.test", 128, "Test archive", "TestArchive");
       AddButton(".toolbar.find", 96, "Find in archive");
       AddSeparator("3");
       AddButton(".toolbar.update", 160, "Update archive");

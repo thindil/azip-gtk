@@ -36,5 +36,6 @@ private
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure SortArchive(Column: String);
+   procedure TestArchive;
 
 end ArchivesViews;

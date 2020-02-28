@@ -30,11 +30,14 @@ with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
+with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
@@ -426,7 +429,9 @@ package body ArchivesViews is
           (".progressdialog.progressbar",
            "-orient horizontal -length 250 -value 0");
       X, Y: Integer;
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       Wm_Set(ProgressDialog, "title", "{AZip - Test archive progress}");
       Wm_Set(ProgressDialog, "transient", ".");
       Wm_Set(ProgressDialog, "attributes", "-type dialog");
@@ -434,8 +439,7 @@ package body ArchivesViews is
       if X < 0 then
          X := 0;
       end if;
-      Y :=
-        (Positive'Value(Winfo_Get(ProgressDialog, "vrootheight")) - 50) / 2;
+      Y := (Positive'Value(Winfo_Get(ProgressDialog, "vrootheight")) - 50) / 2;
       if Y < 0 then
          Y := 0;
       end if;
@@ -444,6 +448,7 @@ package body ArchivesViews is
          "275x50+" & Trim(Positive'Image(X), Both) & "+" &
          Trim(Positive'Image(Y), Both));
       Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
+      --Forget(MainWindow);
    end TestArchive;
 
 end ArchivesViews;

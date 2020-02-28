@@ -422,7 +422,7 @@ package body ArchivesViews is
    end SortArchive;
 
    procedure TestArchive is
-      ProgressDialog: constant Tk_Toplevel :=
+      ProgressDialog: Tk_Toplevel :=
         Create(".progressdialog", "-class Dialog");
       ProgressBar: constant Ttk_ProgressBar :=
         Create
@@ -430,6 +430,8 @@ package body ArchivesViews is
            "-orient horizontal -length 250 -value 0");
       X, Y: Integer;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      Tokens: Slice_Set;
+      FilesView: Ttk_Tree_View;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       Wm_Set(ProgressDialog, "title", "{AZip - Test archive progress}");
@@ -448,7 +450,21 @@ package body ArchivesViews is
          "275x50+" & Trim(Positive'Image(X), Both) & "+" &
          Trim(Positive'Image(Y), Both));
       Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
-      --Forget(MainWindow);
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Create(Tokens, Children(FilesView, "{}"), " ");
+      if Slice(Tokens, 1) = "" then
+         Tcl.Tk.Ada.Busy.Forget(MainWindow);
+         return;
+      end if;
+      for I in 1 .. Slice_Count(Tokens) loop
+         Ada.Text_IO.Put_Line(Slice(Tokens, I));
+      end loop;
+      Tcl.Tk.Ada.Busy.Forget(MainWindow);
+      Destroy(ProgressDialog);
    end TestArchive;
 
 end ArchivesViews;

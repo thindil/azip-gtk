@@ -432,6 +432,7 @@ package body ArchivesViews is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
+      Values, FileName: Unbounded_String;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       Wm_Set(ProgressDialog, "title", "{AZip - Test archive progress}");
@@ -461,7 +462,19 @@ package body ArchivesViews is
          return;
       end if;
       for I in 1 .. Slice_Count(Tokens) loop
-         Ada.Text_IO.Put_Line(Slice(Tokens, I));
+         Values :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+         FileName :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
+         Tcl_Eval
+           (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
+         Values :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Item
+           (FilesView, Slice(Tokens, I),
+            "-values [list " & To_String(Values) & " OK ]");
       end loop;
       Tcl.Tk.Ada.Busy.Forget(MainWindow);
       Destroy(ProgressDialog);

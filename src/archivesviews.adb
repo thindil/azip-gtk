@@ -459,6 +459,7 @@ package body ArchivesViews is
       Create(Tokens, Children(FilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then
          Tcl.Tk.Ada.Busy.Forget(MainWindow);
+         Destroy(ProgressDialog);
          return;
       end if;
       for I in 1 .. Slice_Count(Tokens) loop

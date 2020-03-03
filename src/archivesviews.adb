@@ -421,6 +421,28 @@ package body ArchivesViews is
       end;
    end SortArchive;
 
+   procedure SetDialog
+     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
+      X, Y: Integer;
+   begin
+      Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
+      Wm_Set(Dialog, "transient", ".");
+      Wm_Set(Dialog, "attributes", "-type dialog");
+      X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
+      if X < 0 then
+         X := 0;
+      end if;
+      Y := (Positive'Value(Winfo_Get(Dialog, "vrootheight")) - Height) / 2;
+      if Y < 0 then
+         Y := 0;
+      end if;
+      Wm_Set
+        (Dialog, "geometry",
+         Trim(Positive'Image(Width), Both) & "x" &
+         Trim(Positive'Image(Height), Both) & "+" &
+         Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
+   end SetDialog;
+
    procedure TestArchive is
       ProgressDialog: Tk_Toplevel :=
         Create(".progressdialog", "-class Dialog");
@@ -428,28 +450,13 @@ package body ArchivesViews is
         Create
           (".progressdialog.progressbar",
            "-orient horizontal -length 250 -value 0");
-      X, Y: Integer;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       Values, FileName: Unbounded_String;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      Wm_Set(ProgressDialog, "title", "{AZip - Test archive progress}");
-      Wm_Set(ProgressDialog, "transient", ".");
-      Wm_Set(ProgressDialog, "attributes", "-type dialog");
-      X := (Positive'Value(Winfo_Get(ProgressDialog, "vrootwidth")) - 275) / 2;
-      if X < 0 then
-         X := 0;
-      end if;
-      Y := (Positive'Value(Winfo_Get(ProgressDialog, "vrootheight")) - 50) / 2;
-      if Y < 0 then
-         Y := 0;
-      end if;
-      Wm_Set
-        (ProgressDialog, "geometry",
-         "275x50+" & Trim(Positive'Image(X), Both) & "+" &
-         Trim(Positive'Image(Y), Both));
+      SetDialog(ProgressDialog, "Azip - Test archive progress", 275, 50);
       Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
       FilesView.Interp := Get_Context;
       FilesView.Name :=
@@ -469,8 +476,7 @@ package body ArchivesViews is
          FileName :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
-         Tcl_Eval
-           (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
+         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
          Values :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Item
@@ -480,5 +486,15 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Busy.Forget(MainWindow);
       Destroy(ProgressDialog);
    end TestArchive;
+
+   procedure FindInArchive is
+      FindDialog: constant Tk_Toplevel :=
+        Create(".finddialog", "-class Dialog");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+   begin
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      SetDialog(FindDialog, "AZip - find in archive", 275, 50);
+      Tcl.Tk.Ada.Busy.Forget(MainWindow);
+   end FindInArchive;
 
 end ArchivesViews;

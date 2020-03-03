@@ -67,11 +67,13 @@ package body Toolbar is
       AddButton(".toolbar.extract", 64, "Extract...", "Extract");
       AddSeparator("1");
       AddButton(".toolbar.add", 0, "Add files...", "AddFiles false");
-      AddButton(".toolbar.add2", 192, "Add files with encryption...", "AddFiles true");
+      AddButton
+        (".toolbar.add2", 192, "Add files with encryption...",
+         "AddFiles true");
       AddButton(".toolbar.delete", 32, "Delete entries", "DeleteItems");
       AddSeparator("2");
       AddButton(".toolbar.test", 128, "Test archive", "TestArchive");
-      AddButton(".toolbar.find", 96, "Find in archive");
+      AddButton(".toolbar.find", 96, "Find in archive", "FindInArchive");
       AddSeparator("3");
       AddButton(".toolbar.update", 160, "Update archive");
       AddButton(".toolbar.recompress", 288, "Recompress archive");

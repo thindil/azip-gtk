@@ -37,6 +37,6 @@ private
    procedure DeleteItems;
    procedure SortArchive(Column: String);
    procedure TestArchive;
-   procedure FindInArchive;
+   procedure ShowFindDialog;
 
 end ArchivesViews;

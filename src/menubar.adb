@@ -117,7 +117,7 @@ package body MenuBar is
              ("-label ""Test archive"" -underline 0 -accelerator Ctrl+T -command TestArchive")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Find in archive..."" -underline 0 -accelerator Ctrl+F -command FindInArchive")),
+             ("-label ""Find in archive..."" -underline 0 -accelerator Ctrl+F -command ShowFindDialog")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String

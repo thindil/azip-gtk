@@ -34,11 +34,13 @@ with Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
+with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
+with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
@@ -487,14 +489,40 @@ package body ArchivesViews is
       Destroy(ProgressDialog);
    end TestArchive;
 
-   procedure FindInArchive is
+   procedure ShowFindDialog is
       FindDialog: constant Tk_Toplevel :=
         Create(".finddialog", "-class Dialog");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      Label: Ttk_Label;
+      TEntry: Ttk_Entry;
+      ButtonBox: constant Ttk_Frame := Create(".finddialog.buttonbox");
+      Button: Ttk_Button;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(FindDialog, "AZip - find in archive", 275, 50);
-      Tcl.Tk.Ada.Busy.Forget(MainWindow);
-   end FindInArchive;
+      SetDialog(FindDialog, "AZip - find in archive", 300, 200);
+      Label := Create(".finddialog.findimage", "-image .toolbar.findicon");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
+      Label :=
+        Create
+          (".finddialog.labelname",
+           "-text {Entry name ( if empty: all names )}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
+      TEntry := Create(".finddialog.entryname");
+      Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 1 -sticky we");
+      Label := Create(".finddialog.findimage2", "-image .toolbar.findicon");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 3");
+      Label :=
+        Create
+          (".finddialog.labelcontent",
+           "-text {Content ( if empty: all content )}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
+      TEntry := Create(".finddialog.entrycontent");
+      Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 3 -sticky we");
+      Button := Create(".finddialog.buttonbox.ok", "-text Ok");
+      Tcl.Tk.Ada.Grid.Grid(Button);
+      Button := Create(".finddialog.buttonbox.cancel", "-text Cancel");
+      Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
+      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 1 -row 4 -sticky e");
+   end ShowFindDialog;
 
 end ArchivesViews;

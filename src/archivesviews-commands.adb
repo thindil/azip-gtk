@@ -236,21 +236,21 @@ package body ArchivesViews.Commands is
       return 0;
    end Test_Archive_Command;
 
-   function Find_In_Archive_Command
+   function Show_Find_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
 
-   function Find_In_Archive_Command
+   function Show_Find_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
-      FindInArchive;
+      ShowFindDialog;
       return 0;
-   end Find_In_Archive_Command;
+   end Show_Find_Dialog_Command;
 
    procedure AddCommands is
       procedure AddCommand
@@ -276,7 +276,7 @@ package body ArchivesViews.Commands is
       AddCommand("DeleteItems", Delete_Items_Command'Access);
       AddCommand("Sort", Sort_Command'Access);
       AddCommand("TestArchive", Test_Archive_Command'Access);
-      AddCommand("FindInArchive", Find_In_Archive_Command'Access);
+      AddCommand("ShowFindDialog", Show_Find_Dialog_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

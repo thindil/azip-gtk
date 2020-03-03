@@ -73,7 +73,7 @@ package body Toolbar is
       AddButton(".toolbar.delete", 32, "Delete entries", "DeleteItems");
       AddSeparator("2");
       AddButton(".toolbar.test", 128, "Test archive", "TestArchive");
-      AddButton(".toolbar.find", 96, "Find in archive", "FindInArchive");
+      AddButton(".toolbar.find", 96, "Find in archive", "ShowFindDialog");
       AddSeparator("3");
       AddButton(".toolbar.update", 160, "Update archive");
       AddButton(".toolbar.recompress", 288, "Recompress archive");

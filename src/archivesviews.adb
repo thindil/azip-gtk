@@ -484,6 +484,7 @@ package body ArchivesViews is
          Item
            (FilesView, Slice(Tokens, I),
             "-values [list " & To_String(Values) & " OK ]");
+         Step(ProgressBar);
       end loop;
       Tcl.Tk.Ada.Busy.Forget(MainWindow);
       Destroy(ProgressDialog);

@@ -19,12 +19,18 @@
 -- SOFTWARE.
 
 with Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Busy; use Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
+with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 
 package body ArchivesViews.Commands is
 
@@ -252,6 +258,29 @@ package body ArchivesViews.Commands is
       return 0;
    end Show_Find_Dialog_Command;
 
+   function Close_Dialog_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Close_Dialog_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc);
+      Dialog: Tk_Toplevel;
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+   begin
+      Dialog.Interp := MainWindow.Interp;
+      Dialog.Name := New_String(CArgv.Arg(Argv, 1));
+      Destroy(Dialog);
+      if Status(MainWindow) = "1" then
+         Forget(MainWindow);
+      end if;
+      return 0;
+   end Close_Dialog_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -277,6 +306,7 @@ package body ArchivesViews.Commands is
       AddCommand("Sort", Sort_Command'Access);
       AddCommand("TestArchive", Test_Archive_Command'Access);
       AddCommand("ShowFindDialog", Show_Find_Dialog_Command'Access);
+      AddCommand("CloseDialog", Close_Dialog_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

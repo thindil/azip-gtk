@@ -443,6 +443,7 @@ package body ArchivesViews is
          Trim(Positive'Image(Width), Both) & "x" &
          Trim(Positive'Image(Height), Both) & "+" &
          Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
+      Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
    end SetDialog;
 
    procedure TestArchive is
@@ -467,7 +468,6 @@ package body ArchivesViews is
            ".filesframe.fileslist");
       Create(Tokens, Children(FilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then
-         Tcl.Tk.Ada.Busy.Forget(MainWindow);
          Destroy(ProgressDialog);
          return;
       end if;
@@ -486,7 +486,6 @@ package body ArchivesViews is
             "-values [list " & To_String(Values) & " OK ]");
          Step(ProgressBar);
       end loop;
-      Tcl.Tk.Ada.Busy.Forget(MainWindow);
       Destroy(ProgressDialog);
    end TestArchive;
 
@@ -521,7 +520,10 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 3 -sticky we");
       Button := Create(".finddialog.buttonbox.ok", "-text Ok");
       Tcl.Tk.Ada.Grid.Grid(Button);
-      Button := Create(".finddialog.buttonbox.cancel", "-text Cancel");
+      Button :=
+        Create
+          (".finddialog.buttonbox.cancel",
+           "-text Cancel -command {CloseDialog .finddialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
       Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 1 -row 4 -sticky e");
    end ShowFindDialog;

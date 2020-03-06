@@ -490,14 +490,25 @@ package body ArchivesViews is
    end TestArchive;
 
    procedure ShowFindDialog is
-      FindDialog: constant Tk_Toplevel :=
-        Create(".finddialog", "-class Dialog");
+      FindDialog: Tk_Toplevel := Create(".finddialog", "-class Dialog");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       Label: Ttk_Label;
       TEntry: Ttk_Entry;
       ButtonBox: constant Ttk_Frame := Create(".finddialog.buttonbox");
       Button: Ttk_Button;
+      Tokens: Slice_Set;
+      FilesView: Ttk_Tree_View;
    begin
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Create(Tokens, Children(FilesView, "{}"), " ");
+      if Slice(Tokens, 1) = "" then
+         Destroy(FindDialog);
+         return;
+      end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       SetDialog(FindDialog, "AZip - find in archive", 300, 200);
       Label := Create(".finddialog.findimage", "-image .toolbar.findicon");
@@ -518,7 +529,8 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
       TEntry := Create(".finddialog.entrycontent");
       Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 3 -sticky we");
-      Button := Create(".finddialog.buttonbox.ok", "-text Ok");
+      Button :=
+        Create(".finddialog.buttonbox.ok", "-text Ok -command FindInArchive");
       Tcl.Tk.Ada.Grid.Grid(Button);
       Button :=
         Create
@@ -527,5 +539,54 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
       Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 1 -row 4 -sticky e");
    end ShowFindDialog;
+
+   procedure FindInArchive is
+      FindDialog: Tk_Toplevel;
+      TextEntry: Ttk_Entry;
+      Name, Content, Values, FileName: Unbounded_String;
+      Tokens: Slice_Set;
+      FilesView: Ttk_Tree_View;
+      Result: Natural;
+   begin
+      FindDialog.Interp := Get_Context;
+      FindDialog.Name := New_String(".finddialog");
+      TextEntry.Interp := FindDialog.Interp;
+      TextEntry.Name := New_String(".finddialog.entryname");
+      Name := To_Unbounded_String(Get(TextEntry));
+      TextEntry.Name := New_String(".finddialog.entrycontent");
+      Content := To_Unbounded_String(Get(TextEntry));
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Create(Tokens, Children(FilesView, "{}"), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         Values :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+         FileName :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Ada.Text_IO.Put_Line
+           ("Looking for name: " & To_String(Name) & " in " &
+            To_String(FileName));
+         if Name = Null_Unbounded_String then
+            Result := 1;
+         else
+            Result := Count(FileName, To_String(Name));
+         end if;
+         Ada.Text_IO.Put_Line
+           ("Looking for content: " & To_String(Content) & " in " &
+            To_String(FileName));
+         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
+         Values :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Item
+           (FilesView, Slice(Tokens, I),
+            "-values [list " & To_String(Values) & "" & Natural'Image(Result) &
+            " ]");
+      end loop;
+      Destroy(FindDialog);
+   end FindInArchive;
 
 end ArchivesViews;

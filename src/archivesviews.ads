@@ -38,5 +38,6 @@ private
    procedure SortArchive(Column: String);
    procedure TestArchive;
    procedure ShowFindDialog;
+   procedure FindInArchive;
 
 end ArchivesViews;

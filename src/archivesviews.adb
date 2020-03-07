@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Containers.Generic_Array_Sort;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
@@ -543,7 +544,7 @@ package body ArchivesViews is
    procedure FindInArchive is
       FindDialog: Tk_Toplevel;
       TextEntry: Ttk_Entry;
-      Name, Content, Values, FileName: Unbounded_String;
+      Name, Content, Values, FileName, Answer: Unbounded_String;
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       Result: Natural;
@@ -587,6 +588,13 @@ package body ArchivesViews is
             " ]");
       end loop;
       Destroy(FindDialog);
+      Answer :=
+        To_Unbounded_String
+          (MessageBox
+             ("-message {Search completed. " & LF & LF &
+              "Occurences found: 0 " & LF &
+              "Total entries: 0} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}"));
+      Ada.Text_IO.Put_Line("Answer was: " & To_String(Answer));
    end FindInArchive;
 
 end ArchivesViews;

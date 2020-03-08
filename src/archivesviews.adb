@@ -66,33 +66,32 @@ package body ArchivesViews is
 
    procedure SetActive(NewActive: Positive) is
       Header: Ttk_Frame;
+      OldName: constant String :=
+        ".mdi.archive" & Trim(Natural'Image(ActiveArchive), Both);
+      NewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(NewActive), Both);
    begin
       Header.Interp := Get_Context;
       if ActiveArchive > 0 then
-         Header.Name :=
-           New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-              ".header");
+         Header.Name := New_String(OldName & ".header");
          if Winfo_Get(Header, "exists") = "1" then
             configure(Header, "-style TFrame");
-            Header.Name :=
-              New_String
-                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-                 ".header.label");
+            Header.Name := New_String(OldName & ".header.label");
             configure(Header, "-style TLabel");
          end if;
       end if;
-      Header.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(NewActive), Both) & ".header");
+      Header.Name := New_String(NewName & ".header");
       configure(Header, "-style aziptk.TFrame");
-      Header.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(NewActive), Both) &
-           ".header.label");
+      Header.Name := New_String(NewName & ".header.label");
       configure(Header, "-style aziptk.TLabel");
       ActiveArchive := NewActive;
       SetCloseCommand(ActiveArchive);
+      Header.Name := New_String(NewName & ".directoryframe");
+      if Winfo_Get(Header, "ismapped") = "1" then
+         Tcl_SetVar(Header.Interp, "viewtype", "tree");
+      else
+         Tcl_SetVar(Header.Interp, "viewtype", "flat");
+      end if;
    end SetActive;
 
    procedure CreateView is

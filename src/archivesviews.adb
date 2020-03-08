@@ -597,4 +597,9 @@ package body ArchivesViews is
       Ada.Text_IO.Put_Line("Answer was: " & To_String(Answer));
    end FindInArchive;
 
+   procedure ToggleView is
+   begin
+      Ada.Text_IO.Put_Line(Tcl_GetVar(Get_Context, "viewtype"));
+   end ToggleView;
+
 end ArchivesViews;

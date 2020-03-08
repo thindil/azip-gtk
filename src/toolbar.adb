@@ -78,7 +78,8 @@ package body Toolbar is
       AddButton(".toolbar.update", 160, "Update archive");
       AddButton(".toolbar.recompress", 288, "Recompress archive");
       AddSeparator("4");
-      AddButton(".toolbar.view", 384, "Toggle flat/tree view");
+      AddButton
+        (".toolbar.view", 384, "Toggle flat/tree view", "ToggleView button");
       AddSeparator("5");
       AddButton(".toolbar.properties", 224, "Properties");
       Tcl.Tk.Ada.Pack.Pack(Toolbar, "-fill x");

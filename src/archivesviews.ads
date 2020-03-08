@@ -39,5 +39,6 @@ private
    procedure TestArchive;
    procedure ShowFindDialog;
    procedure FindInArchive;
+   procedure ToggleView;
 
 end ArchivesViews;

@@ -297,6 +297,29 @@ package body ArchivesViews.Commands is
       return 0;
    end Find_In_Archive_Command;
 
+   function Toggle_View_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Toggle_View_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc);
+   begin
+      if CArgv.Arg(Argv, 1) /= "menu" then
+         if Tcl.Ada.Tcl_GetVar(Interp, "viewtype") = "flat" then
+            Tcl.Ada.Tcl_SetVar(Interp, "viewtype", "tree");
+         else
+            Tcl.Ada.Tcl_SetVar(Interp, "viewtype", "flat");
+         end if;
+      end if;
+      ToggleView;
+      return 0;
+   end Toggle_View_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -324,6 +347,7 @@ package body ArchivesViews.Commands is
       AddCommand("ShowFindDialog", Show_Find_Dialog_Command'Access);
       AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("FindInArchive", Find_In_Archive_Command'Access);
+      AddCommand("ToggleView", Toggle_View_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

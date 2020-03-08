@@ -142,10 +142,10 @@ package body MenuBar is
         (".menubar.view", "View",
          ((To_Unbounded_String("radiobutton"),
            To_Unbounded_String
-             ("-label ""Flat view"" -underline 0 -variable viewtype -value flat")),
+             ("-label ""Flat view"" -underline 0 -variable viewtype -value flat -command {ToggleView menu}")),
           (To_Unbounded_String("radiobutton"),
            To_Unbounded_String
-             ("-label ""Tree view"" -underline 0 -variable viewtype -value tree")),
+             ("-label ""Tree view"" -underline 0 -variable viewtype -value tree -command {ToggleView menu}")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String("-label ""No sorting"" -underline 0")),

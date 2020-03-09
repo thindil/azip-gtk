@@ -56,15 +56,15 @@ package body ArchivesViews is
 
    ArchiveNumber: Positive;
    ActiveArchive: Natural := 0;
-   ColumnsNames: constant array(1 .. 11) of Unbounded_String :=
+   ColumnsNames: constant array(1 .. 12) of Unbounded_String :=
      (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
       To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
       To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
       To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
-      To_Unbounded_String("CRC 32"), To_Unbounded_String("Name encoding"),
-      To_Unbounded_String("Result"));
+      To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
+      To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
 
-   procedure SetActive(NewActive: Positive) is
+   procedure SetActive(NewActive: Positive; Created: Boolean := False) is
       Header: Ttk_Frame;
       OldName: constant String :=
         ".mdi.archive" & Trim(Natural'Image(ActiveArchive), Both);
@@ -87,10 +87,12 @@ package body ArchivesViews is
       ActiveArchive := NewActive;
       SetCloseCommand(ActiveArchive);
       Header.Name := New_String(NewName & ".directoryframe");
-      if Winfo_Get(Header, "ismapped") = "1" then
-         Tcl_SetVar(Header.Interp, "viewtype", "tree");
-      else
-         Tcl_SetVar(Header.Interp, "viewtype", "flat");
+      if not Created then
+         if Winfo_Get(Header, "ismapped") = "1" then
+            Tcl_SetVar(Header.Interp, "viewtype", "tree");
+         else
+            Tcl_SetVar(Header.Interp, "viewtype", "flat");
+         end if;
       end if;
    end SetActive;
 
@@ -142,9 +144,10 @@ package body ArchivesViews is
       FilesList: constant Ttk_Tree_View :=
         Create
           (Widget_Image(FilesFrame) & ".fileslist",
-           "-show headings -columns [list 1 2 3 4 5 6 7 8 9 10 11] -xscrollcommand """ &
+           "-show headings -columns [list 1 2 3 4 5 6 7 8 9 10 11 12] -xscrollcommand """ &
            Widget_Image(FilesXScroll) & " set"" -yscrollcommand """ &
            Widget_Image(FilesYScroll) & " set""");
+      ViewType: constant String := Tcl_GetVar(FilesList.Interp, "viewtype");
    begin
       for I in ColumnsNames'Range loop
          Heading
@@ -152,21 +155,30 @@ package body ArchivesViews is
             "-text {" & To_String(ColumnsNames(I)) & "} -command {Sort {" &
             To_String(ColumnsNames(I)) & "}}");
       end loop;
-      Heading(FilesList, "#0", "-image ""arrow-down""");
+      if ViewType = "flat" then
+         configure
+           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
+      else
+         configure
+           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
+      end if;
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
-      Add(Paned, DirectoryFrame, "-weight 1");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
+      if ViewType = "tree" then
+         Add(Paned, DirectoryFrame, "-weight 1");
+         Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
+         Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
+         Tcl.Tk.Ada.Pack.Pack
+           (DirectoryTree, "-side top -fill both -expand true");
+      end if;
       Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Pack.Pack(FilesXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
       Tcl.Tk.Ada.Pack.Pack(FilesList, "-side top -fill both -expand true");
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
-      SetActive(ArchiveNumber);
+      SetActive(ArchiveNumber, True);
       Bind
         (Header, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
@@ -224,15 +236,17 @@ package body ArchivesViews is
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
+      if Tcl_GetVar(DirectoryTree.Interp, "viewtype") = "tree" then
+         Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      end if;
       FilesList.Interp := Get_Context;
       FilesList.Name :=
         New_String(To_String(ViewName) & ".filesframe.fileslist");
-      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
       -- Some example data
       Insert
         (FilesList,
          "{} end -values [list {" & Simple_Name(FileName) &
-         "} 0 0 0 0 0 0 0 0 0 0 0]");
+         "} 0 0 0 0 0 0 0 0 0 0 0 0]");
    end LoadArchive;
 
    function GetArchiveName return String is
@@ -291,7 +305,7 @@ package body ArchivesViews is
          Insert
            (FilesList,
             "{} end -values [list {" & Simple_Name(Slice(Tokens, I)) &
-            "} 0 0 0 0 0 0 0 0 0 0 0]");
+            "} 0 0 0 0 0 0 0 0 0 0 0 0]");
       end loop;
    end AddFiles;
 
@@ -478,7 +492,7 @@ package body ArchivesViews is
          FileName :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
+         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
          Values :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Item
@@ -578,7 +592,7 @@ package body ArchivesViews is
          Ada.Text_IO.Put_Line
            ("Looking for content: " & To_String(Content) & " in " &
             To_String(FileName));
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 9");
+         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
          Values :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Item

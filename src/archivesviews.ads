@@ -28,7 +28,7 @@ private
 
    MDI: Ttk_PanedWindow;
 
-   procedure SetActive(NewActive: Positive);
+   procedure SetActive(NewActive: Positive; Created: Boolean := False);
    procedure CreateView;
    procedure LoadArchive(FileName: String);
    procedure ExtractArchive(Directory: String);

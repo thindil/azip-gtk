@@ -96,22 +96,10 @@ package body ArchivesViews is
       end if;
    end SetActive;
 
-   procedure CreateView is
+   procedure AddDirectoryTree is
       ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
-      ArchiveView: constant Ttk_Frame := Create(ViewName);
-      Header: constant Ttk_Frame := Create(ViewName & ".header");
-      CloseButton: constant Ttk_Button :=
-        Create
-          (ViewName & ".header.close",
-           "-text x -style Toolbutton -command ""Close" &
-           Positive'Image(ArchiveNumber) & """");
-      NameLabel: constant Ttk_Label :=
-        Create
-          (ViewName & ".header.label",
-           "-text ""New Archive" & Positive'Image(ArchiveNumber) & """");
-      Paned: constant Ttk_PanedWindow :=
-        Create(ViewName & ".paned", "-orient horizontal");
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      Paned: Ttk_PanedWindow;
       DirectoryFrame: constant Ttk_Frame :=
         Create(ViewName & ".directoryframe");
       DirectoryXScroll: constant Ttk_Scrollbar :=
@@ -130,6 +118,34 @@ package body ArchivesViews is
            "-show tree -xscrollcommand """ & Widget_Image(DirectoryXScroll) &
            " set"" -yscrollcommand """ & Widget_Image(DirectoryYScroll) &
            " set""");
+   begin
+      Paned.Interp := DirectoryFrame.Interp;
+      Paned.Name := New_String(ViewName & ".paned");
+      Insert(Paned, "0", DirectoryFrame, "-weight 1");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
+      Bind
+        (DirectoryTree, "<1>",
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+   end AddDirectoryTree;
+
+   procedure CreateView is
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
+      ArchiveView: constant Ttk_Frame := Create(ViewName);
+      Header: constant Ttk_Frame := Create(ViewName & ".header");
+      CloseButton: constant Ttk_Button :=
+        Create
+          (ViewName & ".header.close",
+           "-text x -style Toolbutton -command ""Close" &
+           Positive'Image(ArchiveNumber) & """");
+      NameLabel: constant Ttk_Label :=
+        Create
+          (ViewName & ".header.label",
+           "-text ""New Archive" & Positive'Image(ArchiveNumber) & """");
+      Paned: constant Ttk_PanedWindow :=
+        Create(ViewName & ".paned", "-orient horizontal");
       FilesFrame: constant Ttk_Frame := Create(ViewName & ".filesframe");
       FilesXScroll: constant Ttk_Scrollbar :=
         Create
@@ -165,13 +181,6 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
-      if ViewType = "tree" then
-         Add(Paned, DirectoryFrame, "-weight 1");
-         Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
-         Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
-         Tcl.Tk.Ada.Pack.Pack
-           (DirectoryTree, "-side top -fill both -expand true");
-      end if;
       Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Pack.Pack(FilesXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
@@ -179,11 +188,11 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
       SetActive(ArchiveNumber, True);
+      if ViewType = "tree" then
+         AddDirectoryTree;
+      end if;
       Bind
         (Header, "<1>",
-         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
-      Bind
-        (DirectoryTree, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
       Bind
         (FilesList, "<1>",
@@ -237,7 +246,8 @@ package body ArchivesViews is
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
       if Tcl_GetVar(DirectoryTree.Interp, "viewtype") = "tree" then
-         Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+         Insert
+           (DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
       end if;
       FilesList.Interp := Get_Context;
       FilesList.Name :=

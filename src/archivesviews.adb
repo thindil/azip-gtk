@@ -96,40 +96,6 @@ package body ArchivesViews is
       end if;
    end SetActive;
 
-   procedure AddDirectoryTree is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      Paned: Ttk_PanedWindow;
-      DirectoryFrame: constant Ttk_Frame :=
-        Create(ViewName & ".directoryframe");
-      DirectoryXScroll: constant Ttk_Scrollbar :=
-        Create
-          (Widget_Image(DirectoryFrame) & ".scrollx",
-           "-orient horizontal -command [list " &
-           Widget_Image(DirectoryFrame) & ".directorytree xview]");
-      DirectoryYScroll: constant Ttk_Scrollbar :=
-        Create
-          (Widget_Image(DirectoryFrame) & ".scrolly",
-           "-orient vertical -command [list " & Widget_Image(DirectoryFrame) &
-           ".directorytree yview]");
-      DirectoryTree: constant Ttk_Tree_View :=
-        Create
-          (Widget_Image(DirectoryFrame) & ".directorytree",
-           "-show tree -xscrollcommand """ & Widget_Image(DirectoryXScroll) &
-           " set"" -yscrollcommand """ & Widget_Image(DirectoryYScroll) &
-           " set""");
-   begin
-      Paned.Interp := DirectoryFrame.Interp;
-      Paned.Name := New_String(ViewName & ".paned");
-      Insert(Paned, "0", DirectoryFrame, "-weight 1");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
-      Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
-      Bind
-        (DirectoryTree, "<1>",
-         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
-   end AddDirectoryTree;
-
    procedure CreateView is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
@@ -164,6 +130,24 @@ package body ArchivesViews is
            Widget_Image(FilesXScroll) & " set"" -yscrollcommand """ &
            Widget_Image(FilesYScroll) & " set""");
       ViewType: constant String := Tcl_GetVar(FilesList.Interp, "viewtype");
+      DirectoryFrame: constant Ttk_Frame :=
+        Create(ViewName & ".directoryframe");
+      DirectoryXScroll: constant Ttk_Scrollbar :=
+        Create
+          (Widget_Image(DirectoryFrame) & ".scrollx",
+           "-orient horizontal -command [list " &
+           Widget_Image(DirectoryFrame) & ".directorytree xview]");
+      DirectoryYScroll: constant Ttk_Scrollbar :=
+        Create
+          (Widget_Image(DirectoryFrame) & ".scrolly",
+           "-orient vertical -command [list " & Widget_Image(DirectoryFrame) &
+           ".directorytree yview]");
+      DirectoryTree: constant Ttk_Tree_View :=
+        Create
+          (Widget_Image(DirectoryFrame) & ".directorytree",
+           "-show tree -xscrollcommand """ & Widget_Image(DirectoryXScroll) &
+           " set"" -yscrollcommand """ & Widget_Image(DirectoryYScroll) &
+           " set""");
    begin
       for I in ColumnsNames'Range loop
          Heading
@@ -181,6 +165,12 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
+      Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
+      if ViewType = "tree" then
+         Add(Paned, DirectoryFrame, "-weight 1");
+      end if;
       Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Pack.Pack(FilesXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
@@ -188,11 +178,11 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
       SetActive(ArchiveNumber, True);
-      if ViewType = "tree" then
-         AddDirectoryTree;
-      end if;
       Bind
         (Header, "<1>",
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+      Bind
+        (DirectoryTree, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
       Bind
         (FilesList, "<1>",
@@ -621,8 +611,28 @@ package body ArchivesViews is
    end FindInArchive;
 
    procedure ToggleView is
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      DirectoryFrame: Ttk_Frame;
+      Paned: Ttk_PanedWindow;
+      FilesList: Ttk_Tree_View;
    begin
-      Ada.Text_IO.Put_Line(Tcl_GetVar(Get_Context, "viewtype"));
+      DirectoryFrame.Interp := Get_Context;
+      DirectoryFrame.Name := New_String(ViewName & ".directoryframe");
+      Paned.Interp := DirectoryFrame.Interp;
+      Paned.Name := New_String(ViewName & ".paned");
+      FilesList.Interp := DirectoryFrame.Interp;
+      FilesList.Name := New_String(ViewName & ".filesframe.fileslist");
+      if Tcl_GetVar(Get_Context, "viewtype") = "tree"
+        and then Winfo_Get(DirectoryFrame, "ismapped") = "0" then
+         Insert(Paned, "0", DirectoryFrame, "-weight 1");
+         configure
+           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
+      elsif Winfo_Get(DirectoryFrame, "ismapped") = "1" then
+         Forget(Paned, DirectoryFrame);
+         configure
+           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
+      end if;
    end ToggleView;
 
 end ArchivesViews;

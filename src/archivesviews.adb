@@ -209,10 +209,27 @@ package body ArchivesViews is
       CreateView;
    end CreateMDI;
 
+   procedure AddFile(FileName, Path: String) is
+      FilesList: Ttk_Tree_View;
+   begin
+      FilesList.Interp := Get_Context;
+      FilesList.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      -- Some example data. All file data are in values list in order:
+      -- Name of the file, type, modified, attributes, size, packed, ratio,
+      -- format, crc32, path, name encoding, result
+      Insert
+        (FilesList,
+         "{} end -values [list {" & Simple_Name(FileName) &
+         "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]");
+   end AddFile;
+
    procedure LoadArchive(FileName: String) is
       Label: Ttk_Label;
       LabelText: Unbounded_String;
-      DirectoryTree, FilesList: Ttk_Tree_View;
+      DirectoryTree: Ttk_Tree_View;
       ViewName: Unbounded_String :=
         To_Unbounded_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
@@ -235,18 +252,10 @@ package body ArchivesViews is
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
-      if Tcl_GetVar(DirectoryTree.Interp, "viewtype") = "tree" then
          Insert
            (DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
-      end if;
-      FilesList.Interp := Get_Context;
-      FilesList.Name :=
-        New_String(To_String(ViewName) & ".filesframe.fileslist");
-      -- Some example data
-      Insert
-        (FilesList,
-         "{} end -values [list {" & Simple_Name(FileName) &
-         "} 0 0 0 0 0 0 0 0 0 0 0 0]");
+      -- Some testing data
+      AddFile(FileName, "");
    end LoadArchive;
 
    function GetArchiveName return String is
@@ -271,7 +280,6 @@ package body ArchivesViews is
 
    procedure AddFiles(FileName: String; Encrypted: Boolean) is
       Tokens: Slice_Set;
-      FilesList: Ttk_Tree_View;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
    begin
       if FileName = "" then
@@ -286,11 +294,6 @@ package body ArchivesViews is
         and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          return;
       end if;
-      FilesList.Interp := Get_Context;
-      FilesList.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
          if not Encrypted then
@@ -302,10 +305,7 @@ package body ArchivesViews is
               ("Adding file " & Slice(Tokens, I) & " to archive " &
                To_String(ArchiveName) & " with encryption");
          end if;
-         Insert
-           (FilesList,
-            "{} end -values [list {" & Simple_Name(Slice(Tokens, I)) &
-            "} 0 0 0 0 0 0 0 0 0 0 0 0]");
+         AddFile(Slice(Tokens, I), "");
       end loop;
    end AddFiles;
 

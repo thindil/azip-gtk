@@ -320,6 +320,32 @@ package body ArchivesViews.Commands is
       return 0;
    end Toggle_View_Command;
 
+   function Add_Folder_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Add_Folder_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc);
+      Encrypted: Boolean;
+   begin
+      if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
+        CArgv.Arg(Argv, 1) = "yes" then
+         Encrypted := True;
+      else
+         Encrypted := False;
+      end if;
+      AddDirectory
+        (Choose_Directory
+           ("-parent . -title ""Select the directory to add to the archive"""),
+         Encrypted);
+      return 0;
+   end Add_Folder_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -348,6 +374,7 @@ package body ArchivesViews.Commands is
       AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("FindInArchive", Find_In_Archive_Command'Access);
       AddCommand("ToggleView", Toggle_View_Command'Access);
+      AddCommand("AddFolder", Add_Folder_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

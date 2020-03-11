@@ -102,14 +102,16 @@ package body MenuBar is
              ("-label ""Delete entries"" -accelerator Del/- -command DeleteItems")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Add files..."" -underline 1 -accelerator + -command ""AddFiles false""")),
+             ("-label ""Add files..."" -underline 1 -accelerator + -command {AddFiles false}")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Add files with encryption..."" -underline 19 -command ""AddFiles true""")),
+             ("-label ""Add files with encryption..."" -underline 19 -command {AddFiles true}")),
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Add folder...""")),
+           To_Unbounded_String
+             ("-label ""Add folder..."" -command {AddFolder false}")),
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Add folder with encryption..."""))));
+           To_Unbounded_String
+             ("-label ""Add folder with encryption..."" -command {AddFolder true}"))));
       CreateSubMenu
         (".menubar.tools", "Tools",
          ((To_Unbounded_String("command"),

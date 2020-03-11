@@ -252,8 +252,7 @@ package body ArchivesViews is
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
-         Insert
-           (DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
       -- Some testing data
       AddFile(FileName, "");
    end LoadArchive;
@@ -634,5 +633,31 @@ package body ArchivesViews is
            (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
       end if;
    end ToggleView;
+
+   procedure AddDirectory(DirectoryName: String; Encrypted: Boolean) is
+      ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
+   begin
+      if DirectoryName = "" then
+         return;
+      end if;
+      if Length(ArchiveName) > 10
+        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+         SaveArchiveAs;
+      end if;
+      ArchiveName := To_Unbounded_String(GetArchiveName);
+      if Length(ArchiveName) > 10
+        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+         return;
+      end if;
+      if not Encrypted then
+         Ada.Text_IO.Put_Line
+           ("Adding directory " & DirectoryName & " to archive " &
+            To_String(ArchiveName) & " without encryption");
+      else
+         Ada.Text_IO.Put_Line
+           ("Adding directory " & DirectoryName & " to archive " &
+            To_String(ArchiveName) & " with encryption");
+      end if;
+   end AddDirectory;
 
 end ArchivesViews;

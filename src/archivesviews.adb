@@ -253,6 +253,8 @@ package body ArchivesViews is
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
       Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      Selection_Set
+        (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
       -- Some testing data
       AddFile(FileName, "");
    end LoadArchive;

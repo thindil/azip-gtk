@@ -27,6 +27,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
@@ -655,6 +657,30 @@ package body ArchivesViews is
 
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean) is
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
+      procedure AddDir(DirName: String) is
+         Directory: Dir_Type;
+         Last: Natural;
+         FileName: String(1 .. 1024);
+      begin
+         Open(Directory, DirName);
+         loop
+            Read(Directory, FileName, Last);
+            exit when Last = 0;
+            if FileName(1 .. Last) in "." | ".." then
+               goto End_Of_Loop;
+            end if;
+            if Is_Directory
+                (DirName & Directory_Separator & FileName(1 .. Last)) then
+               AddDir(DirName & Directory_Separator & FileName(1 .. Last));
+            else
+               AddFile
+                 (DirName & Directory_Separator & FileName(1 .. Last),
+                  Simple_Name(DirName));
+            end if;
+            <<End_Of_Loop>>
+         end loop;
+         Close(Directory);
+      end AddDir;
    begin
       if DirectoryName = "" then
          return;
@@ -662,11 +688,11 @@ package body ArchivesViews is
       if Length(ArchiveName) > 10
         and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          SaveArchiveAs;
-      end if;
-      ArchiveName := To_Unbounded_String(GetArchiveName);
-      if Length(ArchiveName) > 10
-        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
-         return;
+         ArchiveName := To_Unbounded_String(GetArchiveName);
+         if Length(ArchiveName) > 10
+           and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+            return;
+         end if;
       end if;
       if not Encrypted then
          Ada.Text_IO.Put_Line
@@ -677,6 +703,7 @@ package body ArchivesViews is
            ("Adding directory " & DirectoryName & " to archive " &
             To_String(ArchiveName) & " with encryption");
       end if;
+      AddDir(DirectoryName);
    end AddDirectory;
 
 end ArchivesViews;

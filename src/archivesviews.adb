@@ -311,15 +311,15 @@ package body ArchivesViews is
    end AddFiles;
 
    procedure SaveArchiveAs is
-      NewFileName: Unbounded_String;
+      NewFileName, ArchiveName, Directories: Unbounded_String;
       HeaderLabel: Ttk_Label;
-      ArchiveName: Unbounded_String;
+      DirectoryTree: Ttk_Tree_View;
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      Tokens: Slice_Set;
    begin
       HeaderLabel.Interp := Get_Context;
-      HeaderLabel.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".header.label");
+      HeaderLabel.Name := New_String(ViewName & ".header.label");
       ArchiveName := To_Unbounded_String(cget(HeaderLabel, "-text"));
       NewFileName :=
         To_Unbounded_String
@@ -333,6 +333,23 @@ package body ArchivesViews is
       Ada.Text_IO.Put_Line
         ("Saving " & To_String(ArchiveName) & " as " & To_String(NewFileName));
       configure(HeaderLabel, "-text """ & To_String(NewFileName) & """");
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      Directories := To_Unbounded_String(Children(DirectoryTree, "{}"));
+      if Directories /= Null_Unbounded_String then
+         Create(Tokens, To_String(Directories), " ");
+         Item
+           (DirectoryTree, Slice(Tokens, 1),
+            "-text {" & Simple_Name(To_String(NewFileName)) & "}");
+      else
+         Insert
+           (DirectoryTree,
+            "{} end -text {" & Simple_Name(To_String(NewFileName)) & "}");
+         Selection_Set
+           (DirectoryTree,
+            "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
+      end if;
    end SaveArchiveAs;
 
    procedure DeleteItems is

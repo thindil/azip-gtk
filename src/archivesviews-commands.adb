@@ -56,7 +56,7 @@ package body ArchivesViews.Commands is
       if Panes(MDI) = "" then
          CreateView;
       end if;
-      return 0;
+      return TCL_OK;
    end Close_Command;
 
    function Create_Command
@@ -72,7 +72,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       CreateView;
-      return 0;
+      return TCL_OK;
    end Create_Command;
 
    function SetActive_Command
@@ -88,7 +88,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc);
    begin
       SetActive(Integer'Value(CArgv.Arg(Argv, 1)));
-      return 0;
+      return TCL_OK;
    end SetActive_Command;
 
    function Close_All_Command
@@ -113,7 +113,7 @@ package body ArchivesViews.Commands is
          end if;
       end loop;
       CreateView;
-      return 0;
+      return TCL_OK;
    end Close_All_Command;
 
    function Load_Command
@@ -131,7 +131,7 @@ package body ArchivesViews.Commands is
       LoadArchive
         (Get_Open_File
            ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false"));
-      return 0;
+      return TCL_OK;
    end Load_Command;
 
    function Extract_Command
@@ -149,7 +149,7 @@ package body ArchivesViews.Commands is
       ExtractArchive
         (Choose_Directory
            ("-parent . -title ""Select directory to which extract the archive"""));
-      return 0;
+      return TCL_OK;
    end Extract_Command;
 
    function Add_Files_Command
@@ -175,7 +175,7 @@ package body ArchivesViews.Commands is
         (Get_Open_File
            ("-title ""Select the files to add to the archive"" -parent . -multiple true"),
          Encrypted);
-      return 0;
+      return TCL_OK;
    end Add_Files_Command;
 
    function Save_As_Command
@@ -191,7 +191,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       SaveArchiveAs;
-      return 0;
+      return TCL_OK;
    end Save_As_Command;
 
    function Delete_Items_Command
@@ -207,7 +207,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       DeleteItems;
-      return 0;
+      return TCL_OK;
    end Delete_Items_Command;
 
    function Sort_Command
@@ -223,7 +223,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc);
    begin
       SortArchive(CArgv.Arg(Argv, 1));
-      return 0;
+      return TCL_OK;
    end Sort_Command;
 
    function Test_Archive_Command
@@ -239,7 +239,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       TestArchive;
-      return 0;
+      return TCL_OK;
    end Test_Archive_Command;
 
    function Show_Find_Dialog_Command
@@ -255,7 +255,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       ShowFindDialog;
-      return 0;
+      return TCL_OK;
    end Show_Find_Dialog_Command;
 
    function Close_Dialog_Command
@@ -278,7 +278,7 @@ package body ArchivesViews.Commands is
       if Status(MainWindow) = "1" then
          Forget(MainWindow);
       end if;
-      return 0;
+      return TCL_OK;
    end Close_Dialog_Command;
 
    function Find_In_Archive_Command
@@ -294,7 +294,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
       FindInArchive;
-      return 0;
+      return TCL_OK;
    end Find_In_Archive_Command;
 
    function Toggle_View_Command
@@ -317,7 +317,7 @@ package body ArchivesViews.Commands is
          end if;
       end if;
       ToggleView;
-      return 0;
+      return TCL_OK;
    end Toggle_View_Command;
 
    function Add_Folder_Command
@@ -343,7 +343,7 @@ package body ArchivesViews.Commands is
         (Choose_Directory
            ("-parent . -title ""Select the directory to add to the archive"""),
          Encrypted);
-      return 0;
+      return TCL_OK;
    end Add_Folder_Command;
 
    procedure AddCommands is

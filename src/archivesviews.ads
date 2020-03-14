@@ -32,7 +32,7 @@ private
    procedure CreateView;
    procedure LoadArchive(FileName: String);
    procedure ExtractArchive(Directory: String);
-   procedure AddFiles(FileName: String; Encrypted: Boolean);
+   procedure AddFiles(FileName: String; Encrypted: Boolean; Path: String := "");
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure SortArchive(Column: String);

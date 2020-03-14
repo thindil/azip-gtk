@@ -281,7 +281,8 @@ package body ArchivesViews is
       Ada.Text_IO.Put_Line("Extracting: " & FileName & " into: " & Directory);
    end ExtractArchive;
 
-   procedure AddFiles(FileName: String; Encrypted: Boolean) is
+   procedure AddFiles
+     (FileName: String; Encrypted: Boolean; Path: String := "") is
       Tokens: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
    begin
@@ -291,11 +292,11 @@ package body ArchivesViews is
       if Length(ArchiveName) > 10
         and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          SaveArchiveAs;
-      end if;
-      ArchiveName := To_Unbounded_String(GetArchiveName);
-      if Length(ArchiveName) > 10
-        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
-         return;
+         ArchiveName := To_Unbounded_String(GetArchiveName);
+         if Length(ArchiveName) > 10
+           and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+            return;
+         end if;
       end if;
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
@@ -308,7 +309,7 @@ package body ArchivesViews is
               ("Adding file " & Slice(Tokens, I) & " to archive " &
                To_String(ArchiveName) & " with encryption");
          end if;
-         AddFile(Slice(Tokens, I), "");
+         AddFile(Slice(Tokens, I), Path);
       end loop;
    end AddFiles;
 
@@ -671,11 +672,20 @@ package body ArchivesViews is
             end if;
             if Is_Directory
                 (DirName & Directory_Separator & FileName(1 .. Last)) then
+               if not Encrypted then
+                  Ada.Text_IO.Put_Line
+                    ("Adding directory " & DirName & " to archive " &
+                     To_String(ArchiveName) & " without encryption");
+               else
+                  Ada.Text_IO.Put_Line
+                    ("Adding directory " & DirName & " to archive " &
+                     To_String(ArchiveName) & " with encryption");
+               end if;
                AddDir(DirName & Directory_Separator & FileName(1 .. Last));
             else
-               AddFile
+               AddFiles
                  (DirName & Directory_Separator & FileName(1 .. Last),
-                  Simple_Name(DirName));
+                  Encrypted, Simple_Name(DirName));
             end if;
             <<End_Of_Loop>>
          end loop;
@@ -693,15 +703,6 @@ package body ArchivesViews is
            and then Slice(ArchiveName, 1, 10) = "New Archiv" then
             return;
          end if;
-      end if;
-      if not Encrypted then
-         Ada.Text_IO.Put_Line
-           ("Adding directory " & DirectoryName & " to archive " &
-            To_String(ArchiveName) & " without encryption");
-      else
-         Ada.Text_IO.Put_Line
-           ("Adding directory " & DirectoryName & " to archive " &
-            To_String(ArchiveName) & " with encryption");
       end if;
       AddDir(DirectoryName);
    end AddDirectory;

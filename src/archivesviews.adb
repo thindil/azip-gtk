@@ -658,6 +658,9 @@ package body ArchivesViews is
 
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean) is
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
+      DirectoryTree: Ttk_Tree_View;
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       procedure AddDir(DirName: String) is
          Directory: Dir_Type;
          Last: Natural;
@@ -704,6 +707,13 @@ package body ArchivesViews is
             return;
          end if;
       end if;
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      Insert
+        (DirectoryTree,
+         "[lindex {" & Children(DirectoryTree, "{}") & "} 0] end -text {" &
+         Simple_Name(DirectoryName) & "}");
       AddDir(DirectoryName);
    end AddDirectory;
 

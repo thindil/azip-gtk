@@ -697,7 +697,10 @@ package body ArchivesViews is
             else
                AddFiles
                  (DirName & Directory_Separator & FileName(1 .. Last),
-                  Encrypted, Simple_Name(DirName));
+                  Encrypted,
+                  DirName
+                    (Index(DirName, Simple_Name(DirectoryName)) ..
+                         DirName'Last));
             end if;
             <<End_Of_Loop>>
          end loop;

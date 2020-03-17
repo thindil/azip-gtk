@@ -211,8 +211,9 @@ package body ArchivesViews is
       CreateView;
    end CreateMDI;
 
-   procedure AddFile(FileName, Path: String) is
+   procedure AddFile(FileName, Path: String; Hide: Boolean := False) is
       FilesList: Ttk_Tree_View;
+      FileIndex: Unbounded_String;
    begin
       FilesList.Interp := Get_Context;
       FilesList.Name :=
@@ -222,10 +223,15 @@ package body ArchivesViews is
       -- Some example data. All file data are in values list in order:
       -- Name of the file, type, modified, attributes, size, packed, ratio,
       -- format, crc32, path, name encoding, result
-      Insert
-        (FilesList,
-         "{} end -values [list {" & Simple_Name(FileName) &
-         "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]");
+      FileIndex :=
+        To_Unbounded_String
+          (Insert
+             (FilesList,
+              "{} end -values [list {" & Simple_Name(FileName) &
+              "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]"));
+      if Hide then
+         Detach(FilesList, To_String(FileIndex));
+      end if;
    end AddFile;
 
    procedure LoadArchive(FileName: String) is
@@ -282,7 +288,8 @@ package body ArchivesViews is
    end ExtractArchive;
 
    procedure AddFiles
-     (FileName: String; Encrypted: Boolean; Path: String := "") is
+     (FileName: String; Encrypted: Boolean; Path: String := "";
+      Hide: Boolean := False) is
       Tokens: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
    begin
@@ -309,7 +316,7 @@ package body ArchivesViews is
               ("Adding file " & Slice(Tokens, I) & " to archive " &
                To_String(ArchiveName) & " with encryption");
          end if;
-         AddFile(Slice(Tokens, I), Path);
+         AddFile(Slice(Tokens, I), Path, Hide);
       end loop;
    end AddFiles;
 
@@ -700,7 +707,8 @@ package body ArchivesViews is
                   Encrypted,
                   DirName
                     (Index(DirName, Simple_Name(DirectoryName)) ..
-                         DirName'Last));
+                         DirName'Last),
+                  True);
             end if;
             <<End_Of_Loop>>
          end loop;

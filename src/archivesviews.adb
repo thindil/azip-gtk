@@ -147,9 +147,9 @@ package body ArchivesViews is
       DirectoryTree: constant Ttk_Tree_View :=
         Create
           (Widget_Image(DirectoryFrame) & ".directorytree",
-           "-show tree -xscrollcommand """ & Widget_Image(DirectoryXScroll) &
-           " set"" -yscrollcommand """ & Widget_Image(DirectoryYScroll) &
-           " set""");
+           "-show tree -selectmode browse -xscrollcommand """ &
+           Widget_Image(DirectoryXScroll) & " set"" -yscrollcommand """ &
+           Widget_Image(DirectoryYScroll) & " set""");
    begin
       for I in ColumnsNames'Range loop
          Heading

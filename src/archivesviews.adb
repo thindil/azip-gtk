@@ -668,6 +668,8 @@ package body ArchivesViews is
       DirectoryTree: Ttk_Tree_View;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      MainNode: Unbounded_String;
+      Tokens: Slice_Set;
       procedure AddDir(DirName, Parent: String) is
          Directory: Dir_Type;
          Last: Natural;
@@ -730,12 +732,26 @@ package body ArchivesViews is
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(ViewName & ".directoryframe.directorytree");
+      MainNode := To_Unbounded_String(Children(DirectoryTree, "{}"));
+      Create(Tokens, Children(DirectoryTree, To_String(MainNode)), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         if Slice(Tokens, I) /= ""
+           and then Item(DirectoryTree, Slice(Tokens, I), "-text") =
+             Simple_Name(DirectoryName) then
+            if MessageBox
+                ("-message {Directory " & Simple_Name(DirectoryName) &
+                 " exists in the selected archive} -icon error -type ok") /=
+              "" then
+               return;
+            end if;
+         end if;
+      end loop;
       AddDir
         (DirectoryName,
          Insert
            (DirectoryTree,
-            "[lindex {" & Children(DirectoryTree, "{}") & "} 0] end -text {" &
-            Simple_Name(DirectoryName) & "}"));
+            To_String(MainNode) & " end -text {" & Simple_Name(DirectoryName) &
+            "}"));
    end AddDirectory;
 
 end ArchivesViews;

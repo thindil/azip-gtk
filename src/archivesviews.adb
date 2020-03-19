@@ -670,6 +670,19 @@ package body ArchivesViews is
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       MainNode: Unbounded_String;
       Tokens: Slice_Set;
+      function GetInsertIndex(Parent, DirName: String) return String is
+         Tokens2: Slice_Set;
+      begin
+         Create(Tokens2, Children(DirectoryTree, Parent), " ");
+         for I in 1 .. Slice_Count(Tokens2) loop
+            if Slice(Tokens2, I) /= ""
+              and then Item(DirectoryTree, Slice(Tokens2, I), "-text") >
+                DirName then
+               return Index(DirectoryTree, Slice(Tokens2, I));
+            end if;
+         end loop;
+         return "end";
+      end GetInsertIndex;
       procedure AddDir(DirName, Parent: String) is
          Directory: Dir_Type;
          Last: Natural;
@@ -698,8 +711,10 @@ package body ArchivesViews is
                  To_Unbounded_String
                    (Insert
                       (DirectoryTree,
-                       Parent & " end -text {" &
-                       Simple_Name(FileName(1 .. Last)) & "}"));
+                       Parent & " " &
+                       GetInsertIndex
+                         (Parent, Simple_Name(FileName(1 .. Last))) &
+                       " -text {" & Simple_Name(FileName(1 .. Last)) & "}"));
                AddDir
                  (DirName & Directory_Separator & FileName(1 .. Last),
                   To_String(NewParentIndex));
@@ -750,8 +765,9 @@ package body ArchivesViews is
         (DirectoryName,
          Insert
            (DirectoryTree,
-            To_String(MainNode) & " end -text {" & Simple_Name(DirectoryName) &
-            "}"));
+            To_String(MainNode) & " " &
+            GetInsertIndex(To_String(MainNode), Simple_Name(DirectoryName)) &
+            " -text {" & Simple_Name(DirectoryName) & "}"));
    end AddDirectory;
 
 end ArchivesViews;

@@ -346,6 +346,22 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Add_Folder_Command;
 
+   function Directory_Selected_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Directory_Selected_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      ShowFiles;
+      return TCL_OK;
+   end Directory_Selected_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -375,6 +391,7 @@ package body ArchivesViews.Commands is
       AddCommand("FindInArchive", Find_In_Archive_Command'Access);
       AddCommand("ToggleView", Toggle_View_Command'Access);
       AddCommand("AddFolder", Add_Folder_Command'Access);
+      AddCommand("DirectorySelected", Directory_Selected_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

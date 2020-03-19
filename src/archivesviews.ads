@@ -43,5 +43,6 @@ private
    procedure FindInArchive;
    procedure ToggleView;
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
+   procedure ShowFiles;
 
 end ArchivesViews;

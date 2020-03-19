@@ -164,6 +164,7 @@ package body ArchivesViews is
          configure
            (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
       end if;
+      Bind(DirectoryTree, "<<TreeviewSelect>>", "DirectorySelected");
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
@@ -769,5 +770,20 @@ package body ArchivesViews is
             GetInsertIndex(To_String(MainNode), Simple_Name(DirectoryName)) &
             " -text {" & Simple_Name(DirectoryName) & "}"));
    end AddDirectory;
+
+   procedure ShowFiles is
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      DirectoryTree: Ttk_Tree_View;
+      FilesList: Ttk_Tree_View;
+      Path, Parent, Selected: Unbounded_String := Null_Unbounded_String;
+   begin
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      Selected := To_Unbounded_String(Selection(DirectoryTree));
+      FilesList.Interp := DirectoryTree.Interp;
+      FilesList.Name := New_String(ViewName & ".filesframe.fileslist");
+   end ShowFiles;
 
 end ArchivesViews;

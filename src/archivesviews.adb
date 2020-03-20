@@ -776,12 +776,25 @@ package body ArchivesViews is
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       DirectoryTree: Ttk_Tree_View;
       FilesList: Ttk_Tree_View;
-      Path, Parent, Selected: Unbounded_String := Null_Unbounded_String;
+      Path, ParentId, Selected: Unbounded_String := Null_Unbounded_String;
    begin
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
+      loop
+         ParentId :=
+           To_Unbounded_String(Parent(DirectoryTree, To_String(Selected)));
+         exit when ParentId = To_Unbounded_String("");
+         if Path /= Null_Unbounded_String then
+            Path := Directory_Separator & Path;
+         end if;
+         Path :=
+           To_Unbounded_String
+             (Item(DirectoryTree, To_String(Selected), "-text")) &
+           Path;
+         Selected := ParentId;
+      end loop;
       FilesList.Interp := DirectoryTree.Interp;
       FilesList.Name := New_String(ViewName & ".filesframe.fileslist");
    end ShowFiles;

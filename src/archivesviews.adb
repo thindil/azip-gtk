@@ -391,13 +391,17 @@ package body ArchivesViews is
       ArrowName, OldArrowName, Values: Unbounded_String;
       Tokens: Slice_Set;
       Ascending: Boolean := True;
+      MaxColumn: Positive := 12;
    begin
       FilesView.Interp := Get_Context;
       FilesView.Name :=
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      for I in ColumnsNames'Range loop
+      if Tcl_GetVar(Get_Context, "viewtype") = "tree" then
+         MaxColumn := 11;
+      end if;
+      for I in 1 .. MaxColumn loop
          ArrowName :=
            To_Unbounded_String
              (Heading

@@ -775,8 +775,10 @@ package body ArchivesViews is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       DirectoryTree: Ttk_Tree_View;
-      FilesList: Ttk_Tree_View;
-      Path, ParentId, Selected: Unbounded_String := Null_Unbounded_String;
+      FilesView: Ttk_Tree_View;
+      Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
+        Null_Unbounded_String;
+      Tokens: Slice_Set;
    begin
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
@@ -795,8 +797,19 @@ package body ArchivesViews is
            Path;
          Selected := ParentId;
       end loop;
-      FilesList.Interp := DirectoryTree.Interp;
-      FilesList.Name := New_String(ViewName & ".filesframe.fileslist");
+      FilesView.Interp := DirectoryTree.Interp;
+      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
+      Create(Tokens, Children(FilesView, "{}"), " ");
+      if Slice(Tokens, 1) = "" then
+         return;
+      end if;
+      for I in 1 .. Slice_Count(Tokens) loop
+         Values :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+         FilePath :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+      end loop;
    end ShowFiles;
 
 end ArchivesViews;

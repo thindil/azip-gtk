@@ -291,8 +291,10 @@ package body ArchivesViews is
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False) is
-      Tokens: Slice_Set;
+      Tokens, Tokens2: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
+      FilesView: Ttk_Tree_View;
+      Values, ExistingFileName: Unbounded_String;
    begin
       if FileName = "" then
          return;
@@ -306,8 +308,33 @@ package body ArchivesViews is
             return;
          end if;
       end if;
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
+         Create(Tokens2, Children(FilesView, "{}"), " ");
+         for J in 1 .. Slice_Count(Tokens2) loop
+            if Slice(Tokens2, J) /= "" then
+               Values :=
+                 To_Unbounded_String
+                   (Item(FilesView, Slice(Tokens2, J), "-values"));
+               Tcl_Eval
+                 (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+               ExistingFileName :=
+                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+               if To_String(ExistingFileName) = Simple_Name(Slice(Tokens, I))
+                 and then
+                   MessageBox
+                     ("-message {File " & Simple_Name(Slice(Tokens, I)) &
+                      " exists in the selected archive} -icon error -type ok") /=
+                   "" then
+                  return;
+               end if;
+            end if;
+         end loop;
          if not Encrypted then
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &

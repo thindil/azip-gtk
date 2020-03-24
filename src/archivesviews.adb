@@ -418,29 +418,24 @@ package body ArchivesViews is
       ArrowName, OldArrowName, Values: Unbounded_String;
       Tokens: Slice_Set;
       Ascending: Boolean := True;
-      MaxColumn: Positive := 12;
    begin
       FilesView.Interp := Get_Context;
       FilesView.Name :=
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      if Tcl_GetVar(Get_Context, "viewtype") = "tree" then
-         MaxColumn := 11;
-      end if;
-      for I in 1 .. MaxColumn loop
+      Create(Tokens, cget(FilesView, "-displaycolumns"), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
          ArrowName :=
-           To_Unbounded_String
-             (Heading
-                (FilesView, "#" & Trim(Natural'Image(I), Both), "-image"));
+           To_Unbounded_String(Heading(FilesView, Slice(Tokens, I), "-image"));
          if ArrowName /= Null_Unbounded_String then
-            OldSortColumn := I;
+            OldSortColumn := Positive'Value(Slice(Tokens, I));
             OldArrowName := ArrowName;
-            Heading
-              (FilesView, "#" & Trim(Natural'Image(I), Both), "-image {}");
+            Heading(FilesView, Slice(Tokens, I), "-image {}");
          end if;
-         if ColumnsNames(I) = To_Unbounded_String(Column) then
-            ColumnIndex := I;
+         if ColumnsNames(Positive'Value(Slice(Tokens, I))) =
+           To_Unbounded_String(Column) then
+            ColumnIndex := Positive'Value(Slice(Tokens, I));
          end if;
       end loop;
       ArrowName := To_Unbounded_String("arrow-down");
@@ -450,7 +445,7 @@ package body ArchivesViews is
          Ascending := False;
       end if;
       Heading
-        (FilesView, "#" & Trim(Natural'Image(ColumnIndex), Both),
+        (FilesView, Trim(Natural'Image(ColumnIndex), Both),
          "-image " & To_String(ArrowName));
       Create(Tokens, Children(FilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then

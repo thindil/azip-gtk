@@ -403,7 +403,7 @@ package body ArchivesViews is
    procedure DeleteItems is
       FilesList: Ttk_Tree_View;
       Tokens: Slice_Set;
-      Selected: Unbounded_String;
+      Selected, Values, FileName, Path: Unbounded_String;
    begin
       FilesList.Interp := Get_Context;
       FilesList.Name :=
@@ -416,8 +416,16 @@ package body ArchivesViews is
       end if;
       Create(Tokens, To_String(Selected), " ");
       for I in 1 .. Slice_Count(Tokens) loop
+         Values :=
+           To_Unbounded_String(Item(FilesList, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesList.Interp, "lindex {" & To_String(Values) & "} 0");
+         FileName :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesList.Interp));
+         Tcl_Eval(FilesList.Interp, "lindex {" & To_String(Values) & "} 9");
+         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesList.Interp));
          Ada.Text_IO.Put_Line
-           ("Deleting file " & Item(FilesList, Slice(Tokens, I), "-text"));
+           ("Deleting file " &
+            To_String(Path & Directory_Separator & FileName));
          Delete(FilesList, Slice(Tokens, I));
       end loop;
    end DeleteItems;

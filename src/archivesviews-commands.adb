@@ -53,6 +53,7 @@ package body ArchivesViews.Commands is
       if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
          raise Program_Error with "Can't destroy archive view.";
       end if;
+      Tcl.Ada.Tcl_UnsetVar(Interp, "lastindex" & CArgv.Arg(Argv, 1));
       if Panes(MDI) = "" then
          CreateView;
       end if;

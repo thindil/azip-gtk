@@ -190,6 +190,9 @@ package body ArchivesViews is
       Bind
         (FilesList, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+      Tcl_SetVar
+        (Paned.Interp, "lastindex" & Trim(Positive'Image(ActiveArchive), Both),
+         "1");
       ArchiveNumber := ArchiveNumber + 1;
    end CreateView;
 
@@ -221,18 +224,25 @@ package body ArchivesViews is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
+      FileIndex :=
+        To_Unbounded_String
+          (Tcl_GetVar
+             (FilesList.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
       -- Some example data. All file data are in values list in order:
       -- Name of the file, type, modified, attributes, size, packed, ratio,
       -- format, crc32, path, name encoding, result
-      FileIndex :=
-        To_Unbounded_String
-          (Insert
-             (FilesList,
-              "{} end -values [list {" & Simple_Name(FileName) &
-              "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]"));
+      Insert
+        (FilesList,
+         "{} end -id " & To_String(FileIndex) & " -values [list {" &
+         Simple_Name(FileName) & "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]");
       if Hide then
          Detach(FilesList, To_String(FileIndex));
       end if;
+      Tcl_SetVar
+        (FilesList.Interp,
+         "lastindex" & Trim(Positive'Image(ActiveArchive), Both),
+         Positive'Image(Positive'Value(To_String(FileIndex)) + 1));
    end AddFile;
 
    procedure LoadArchive(FileName: String) is

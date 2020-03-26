@@ -415,6 +415,13 @@ package body ArchivesViews is
          return;
       end if;
       Create(Tokens, To_String(Selected), " ");
+      if MessageBox
+          ("-message {Do you want to remove the" &
+           Slice_Number'Image(Slice_Count(Tokens)) &
+           " selected item(s)? } -icon question -type yesno") =
+        "no" then
+         return;
+      end if;
       for I in 1 .. Slice_Count(Tokens) loop
          Values :=
            To_Unbounded_String(Item(FilesList, Slice(Tokens, I), "-values"));

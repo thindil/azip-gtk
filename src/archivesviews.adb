@@ -720,6 +720,7 @@ package body ArchivesViews is
          configure
            (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
       end if;
+      ShowFiles;
    end ToggleView;
 
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean) is
@@ -836,6 +837,7 @@ package body ArchivesViews is
       FilesView: Ttk_Tree_View;
       Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
         Null_Unbounded_String;
+      FlatView: Boolean := False;
    begin
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
@@ -856,16 +858,21 @@ package body ArchivesViews is
       end loop;
       FilesView.Interp := DirectoryTree.Interp;
       FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
-      for I in
-        1 ..
-          Positive'Value
-            (Tcl_GetVar
-               (FilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
-            Detach(FilesView, Positive'Image(I));
-         end if;
-      end loop;
+      if Tcl_GetVar(FilesView.Interp, "viewtype") = "flat" then
+         FlatView := True;
+      else
+         for I in
+           1 ..
+             Positive'Value
+               (Tcl_GetVar
+                  (FilesView.Interp,
+                   "lastindex" &
+                   Trim(Positive'Image(ActiveArchive), Both))) loop
+            if Exists(FilesView, Positive'Image(I)) = "1" then
+               Detach(FilesView, Positive'Image(I));
+            end if;
+         end loop;
+      end if;
       for I in
         1 ..
           Positive'Value
@@ -879,7 +886,7 @@ package body ArchivesViews is
             Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
             FilePath :=
               To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            if FilePath = Path then
+            if (FilePath = Path) or FlatView then
                Move(FilesView, Positive'Image(I), "{}", Positive'Image(I));
             end if;
          end if;

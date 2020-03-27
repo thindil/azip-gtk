@@ -304,7 +304,7 @@ package body ArchivesViews is
       Tokens, Tokens2: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
       FilesView: Ttk_Tree_View;
-      Values, ExistingFileName: Unbounded_String;
+      Values, ExistingFileName, ExistingPath: Unbounded_String;
    begin
       if FileName = "" then
          return;
@@ -335,7 +335,14 @@ package body ArchivesViews is
                  (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
                ExistingFileName :=
                  To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-               if To_String(ExistingFileName) = Simple_Name(Slice(Tokens, I))
+               Tcl_Eval
+                 (FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+               ExistingPath :=
+                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+               if
+                 (To_String(ExistingFileName) =
+                  Simple_Name(Slice(Tokens, I)) and
+                  To_String(ExistingPath) = Path)
                  and then
                    MessageBox
                      ("-message {File " & Simple_Name(Slice(Tokens, I)) &

@@ -647,7 +647,7 @@ package body ArchivesViews is
       Name, Content, Values, FileName, Answer: Unbounded_String;
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
-      Result: Natural;
+      EntriesFound, Occurences, OverallResult, Result: Natural := 0;
    begin
       FindDialog.Interp := Get_Context;
       FindDialog.Name := New_String(".finddialog");
@@ -674,26 +674,36 @@ package body ArchivesViews is
          if Name = Null_Unbounded_String then
             Result := 1;
          else
-            Result := Count(FileName, To_String(Name));
+            if Index(FileName, To_String(Name)) > 0 then
+               Result := 1;
+            else
+               Result := 0;
+            end if;
          end if;
+         EntriesFound := EntriesFound + Result;
+         OverallResult := Result;
          Ada.Text_IO.Put_Line
            ("Looking for content: " & To_String(Content) & " in " &
             To_String(FileName));
+         Result := 0;
+         Occurences := Occurences + Result;
+         OverallResult := OverallResult + Result;
          Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
          Values :=
            To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
          Item
            (FilesView, Slice(Tokens, I),
-            "-values [list " & To_String(Values) & "" & Natural'Image(Result) &
-            " ]");
+            "-values [list " & To_String(Values) & "" &
+            Natural'Image(OverallResult) & " ]");
       end loop;
       Destroy(FindDialog);
       Answer :=
         To_Unbounded_String
           (MessageBox
-             ("-message {Search completed. " & LF & LF &
-              "Occurences found: 0 " & LF &
-              "Total entries: 0} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}"));
+             ("-message {Search completed. " & LF & LF & "Occurences found:" &
+              Natural'Image(Occurences) & " " & LF & "Total entries:" &
+              Natural'Image(EntriesFound) &
+              "} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}"));
       Ada.Text_IO.Put_Line("Answer was: " & To_String(Answer));
    end FindInArchive;
 

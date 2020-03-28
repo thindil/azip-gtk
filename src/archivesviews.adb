@@ -843,6 +843,9 @@ package body ArchivesViews is
       DirectoryTree.Name :=
         New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
+      if Selected = Null_Unbounded_String then
+         return;
+      end if;
       loop
          ParentId :=
            To_Unbounded_String(Parent(DirectoryTree, To_String(Selected)));

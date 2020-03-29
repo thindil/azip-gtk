@@ -644,7 +644,7 @@ package body ArchivesViews is
    procedure FindInArchive is
       FindDialog: Tk_Toplevel;
       TextEntry: Ttk_Entry;
-      Name, Content, Values, FileName, Answer: Unbounded_String;
+      Name, Content, Values, FileName: Unbounded_String;
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       EntriesFound, Occurences, OverallResult, Result: Natural := 0;
@@ -697,14 +697,17 @@ package body ArchivesViews is
             Natural'Image(OverallResult) & " ]");
       end loop;
       Destroy(FindDialog);
-      Answer :=
-        To_Unbounded_String
-          (MessageBox
-             ("-message {Search completed. " & LF & LF & "Occurences found:" &
-              Natural'Image(Occurences) & " " & LF & "Total entries:" &
-              Natural'Image(EntriesFound) &
-              "} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}"));
-      Ada.Text_IO.Put_Line("Answer was: " & To_String(Answer));
+      if MessageBox
+          ("-message {Search completed. " & LF & LF & "Occurences found:" &
+           Natural'Image(Occurences) & " " & LF & "Total entries:" &
+           Natural'Image(EntriesFound) &
+           "} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}") =
+        "yes" then
+         Tcl_SetVar(FilesView.Interp, "viewtype", "flat");
+         ToggleView;
+         Heading(FilesView, "12", "-image arrow-down");
+         SortArchive("Result");
+      end if;
    end FindInArchive;
 
    procedure ToggleView is
@@ -731,6 +734,9 @@ package body ArchivesViews is
            (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
       end if;
       ShowFiles;
+      for I in 1 .. 12 loop
+         Heading(FilesList, Positive'Image(I), "-image {}");
+      end loop;
    end ToggleView;
 
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean) is

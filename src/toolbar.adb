@@ -75,7 +75,7 @@ package body Toolbar is
       AddButton(".toolbar.test", 128, "Test archive", "TestArchive");
       AddButton(".toolbar.find", 96, "Find in archive", "ShowFindDialog");
       AddSeparator("3");
-      AddButton(".toolbar.update", 160, "Update archive");
+      AddButton(".toolbar.update", 160, "Update archive", "UpdateArchive");
       AddButton(".toolbar.recompress", 288, "Recompress archive");
       AddSeparator("4");
       AddButton

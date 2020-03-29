@@ -44,5 +44,6 @@ private
    procedure ToggleView;
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
    procedure ShowFiles;
+   procedure UpdateArchive;
 
 end ArchivesViews;

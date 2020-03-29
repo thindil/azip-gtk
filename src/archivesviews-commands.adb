@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
@@ -363,6 +364,27 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Directory_Selected_Command;
 
+   function Update_Archive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Update_Archive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      if MessageBox
+          ("-message {You are about to start an archive update." & LF &
+           "Files than are newer and diffrent (according to their CRC32 code) will replace those in the archive} -icon question -type yesno -detail {Proceed?}") =
+        "yes" then
+         UpdateArchive;
+      end if;
+      return TCL_OK;
+   end Update_Archive_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -393,6 +415,7 @@ package body ArchivesViews.Commands is
       AddCommand("ToggleView", Toggle_View_Command'Access);
       AddCommand("AddFolder", Add_Folder_Command'Access);
       AddCommand("DirectorySelected", Directory_Selected_Command'Access);
+      AddCommand("UpdateArchive", Update_Archive_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

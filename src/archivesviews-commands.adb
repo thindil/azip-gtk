@@ -385,6 +385,29 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Update_Archive_Command;
 
+   function Recompress_Archive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Recompress_Archive_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      if MessageBox
+          ("-message {You are about to recompress this archive." & LF &
+           "Contents will remain identical, but data compression may be better. " &
+           LF &
+           "This operation  can take a long time depending on data size and content.} -icon question -type yesno -detail {Proceed?}") =
+        "yes" then
+         RecompressArchive;
+      end if;
+      return TCL_OK;
+   end Recompress_Archive_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -416,6 +439,7 @@ package body ArchivesViews.Commands is
       AddCommand("AddFolder", Add_Folder_Command'Access);
       AddCommand("DirectorySelected", Directory_Selected_Command'Access);
       AddCommand("UpdateArchive", Update_Archive_Command'Access);
+      AddCommand("RecompressArchive", Recompress_Archive_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

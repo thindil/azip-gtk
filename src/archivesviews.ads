@@ -45,5 +45,6 @@ private
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
    procedure ShowFiles;
    procedure UpdateArchive;
+   procedure RecompressArchive;
 
 end ArchivesViews;

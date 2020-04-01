@@ -1036,4 +1036,24 @@ package body ArchivesViews is
       end if;
    end RecompressArchive;
 
+   procedure ShowProperties is
+      PropertiesDialog: constant Tk_Toplevel :=
+        Create(".propertiesdialog", "-class Dialog");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      ButtonBox: constant Ttk_Frame := Create(".propertiesdialog.buttonbox");
+      Button: Ttk_Button;
+   begin
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
+      Button :=
+        Create
+          (".propertiesdialog.buttonbox.ok",
+           "-text Ok -command {destroy .propertiesdialog}");
+      Tcl.Tk.Ada.Grid.Grid(Button);
+      Button :=
+        Create(".propertiesdialog.buttonbox.about", "-text {About AZip}");
+      Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
+      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 2 -sticky we");
+   end ShowProperties;
+
 end ArchivesViews;

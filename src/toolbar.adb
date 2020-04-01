@@ -83,7 +83,7 @@ package body Toolbar is
       AddButton
         (".toolbar.view", 384, "Toggle flat/tree view", "ToggleView button");
       AddSeparator("5");
-      AddButton(".toolbar.properties", 224, "Properties");
+      AddButton(".toolbar.properties", 224, "Properties", "ShowProperties");
       Tcl.Tk.Ada.Pack.Pack(Toolbar, "-fill x");
       Delete(Image);
    end CreateToolbar;

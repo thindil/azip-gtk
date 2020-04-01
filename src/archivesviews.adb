@@ -555,9 +555,13 @@ package body ArchivesViews is
           (".progressdialog.progressbar",
            "-orient horizontal -length 250 -value 0");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       SetDialog(ProgressDialog, "Azip - Test archive progress", 275, 50);
@@ -567,25 +571,28 @@ package body ArchivesViews is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      Create(Tokens, Children(FilesView, "{}"), " ");
-      if Slice(Tokens, 1) = "" then
+      if LastIndex = 1 then
          Destroy(ProgressDialog);
          return;
       end if;
-      for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-         Values :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Item
-           (FilesView, Slice(Tokens, I),
-            "-values [list " & To_String(Values) & " OK ]");
-         Step(ProgressBar);
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            Step(ProgressBar);
+         end if;
       end loop;
       Destroy(ProgressDialog);
    end TestArchive;
@@ -645,7 +652,6 @@ package body ArchivesViews is
       FindDialog: Tk_Toplevel;
       TextEntry: Ttk_Entry;
       Name, Content, Values, FileName: Unbounded_String;
-      Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       EntriesFound, Occurences, OverallResult, Result: Natural := 0;
    begin
@@ -661,40 +667,48 @@ package body ArchivesViews is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      Create(Tokens, Children(FilesView, "{}"), " ");
-      for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Ada.Text_IO.Put_Line
-           ("Looking for name: " & To_String(Name) & " in " &
-            To_String(FileName));
-         if Name = Null_Unbounded_String then
-            Result := 1;
-         else
-            if Index(FileName, To_String(Name)) > 0 then
+      for I in
+        1 ..
+          Positive'Value
+            (Tcl_GetVar
+               (FilesView.Interp,
+                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line
+              ("Looking for name: " & To_String(Name) & " in " &
+               To_String(FileName));
+            if Name = Null_Unbounded_String then
                Result := 1;
             else
-               Result := 0;
+               if Index(FileName, To_String(Name)) > 0 then
+                  Result := 1;
+               else
+                  Result := 0;
+               end if;
             end if;
+            EntriesFound := EntriesFound + Result;
+            OverallResult := Result;
+            Ada.Text_IO.Put_Line
+              ("Looking for content: " & To_String(Content) & " in " &
+               To_String(FileName));
+            Result := 0;
+            Occurences := Occurences + Result;
+            OverallResult := OverallResult + Result;
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & "" &
+               Natural'Image(OverallResult) & " ]");
          end if;
-         EntriesFound := EntriesFound + Result;
-         OverallResult := Result;
-         Ada.Text_IO.Put_Line
-           ("Looking for content: " & To_String(Content) & " in " &
-            To_String(FileName));
-         Result := 0;
-         Occurences := Occurences + Result;
-         OverallResult := OverallResult + Result;
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-         Values :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Item
-           (FilesView, Slice(Tokens, I),
-            "-values [list " & To_String(Values) & "" &
-            Natural'Image(OverallResult) & " ]");
       end loop;
       Destroy(FindDialog);
       if MessageBox
@@ -920,9 +934,13 @@ package body ArchivesViews is
           (".progressdialog.progressbar",
            "-orient horizontal -length 250 -value 0");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       SetDialog(ProgressDialog, "Azip - Update archive progress", 275, 50);
@@ -932,25 +950,28 @@ package body ArchivesViews is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      Create(Tokens, Children(FilesView, "{}"), " ");
-      if Slice(Tokens, 1) = "" then
+      if LastIndex = 1 then
          Destroy(ProgressDialog);
          return;
       end if;
-      for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Ada.Text_IO.Put_Line("Updating file: " & To_String(FileName));
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-         Values :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Item
-           (FilesView, Slice(Tokens, I),
-            "-values [list " & To_String(Values) & " OK ]");
-         Step(ProgressBar);
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Updating file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            Step(ProgressBar);
+         end if;
       end loop;
       Destroy(ProgressDialog);
       if MessageBox
@@ -968,9 +989,13 @@ package body ArchivesViews is
           (".progressdialog.progressbar",
            "-orient horizontal -length 250 -value 0");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
       Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       SetDialog(ProgressDialog, "Azip - Update archive progress", 275, 50);
@@ -980,25 +1005,28 @@ package body ArchivesViews is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      Create(Tokens, Children(FilesView, "{}"), " ");
-      if Slice(Tokens, 1) = "" then
+      if LastIndex = 1 then
          Destroy(ProgressDialog);
          return;
       end if;
-      for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Ada.Text_IO.Put_Line("Recompresing file: " & To_String(FileName));
-         Tcl_Eval(FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-         Values :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Item
-           (FilesView, Slice(Tokens, I),
-            "-values [list " & To_String(Values) & " OK ]");
-         Step(ProgressBar);
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Recompresing file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            Step(ProgressBar);
+         end if;
       end loop;
       Destroy(ProgressDialog);
       if MessageBox

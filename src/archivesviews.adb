@@ -1042,18 +1042,33 @@ package body ArchivesViews is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       ButtonBox: constant Ttk_Frame := Create(".propertiesdialog.buttonbox");
       Button: Ttk_Button;
+      PropertiesTree: constant Ttk_Tree_View := Create(".propertiesdialog.tree", "-show headings -selectmode none -columns [list format entries percent ratio]");
+      Label: Ttk_Label;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      Label := Create(".propertiesdialog.uncompressedtext", "-text {Uncompressed size:}");
+      Tcl.Tk.Ada.Grid.Grid(Label);
+      Heading(PropertiesTree, "format", "-text {Format (""method"")}");
+      Column(PropertiesTree, "format", "-width 140");
+      Heading(PropertiesTree, "entries", "-text {Entries}");
+      Column(PropertiesTree, "entries", "-width 100");
+      Heading(PropertiesTree, "percent", "-text {% of data}");
+      Column(PropertiesTree, "percent", "-width 110");
+      Heading(PropertiesTree, "ratio", "-text {Ratio}");
+      Column(PropertiesTree, "ratio", "-width 100");
       SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
+      Tcl.Tk.Ada.Grid.Grid(PropertiesTree, "-column 0 -row 1 -sticky we -columnspan 2");
       Button :=
         Create
           (".propertiesdialog.buttonbox.ok",
-           "-text Ok -command {destroy .propertiesdialog}");
+           "-text Ok -command {CloseDialog .propertiesdialog}");
       Tcl.Tk.Ada.Grid.Grid(Button);
       Button :=
-        Create(".propertiesdialog.buttonbox.about", "-text {About AZip}");
+        Create
+          (".propertiesdialog.buttonbox.about",
+           "-text {About AZip} -command {CloseDialog .propertiesdialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
-      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 2 -sticky we");
+      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 2 -sticky we -columnspan 2");
    end ShowProperties;
 
 end ArchivesViews;

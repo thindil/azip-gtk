@@ -1042,12 +1042,30 @@ package body ArchivesViews is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       ButtonBox: constant Ttk_Frame := Create(".propertiesdialog.buttonbox");
       Button: Ttk_Button;
-      PropertiesTree: constant Ttk_Tree_View := Create(".propertiesdialog.tree", "-show headings -selectmode none -columns [list format entries percent ratio]");
+      PropertiesTree: constant Ttk_Tree_View :=
+        Create
+          (".propertiesdialog.tree",
+           "-show headings -selectmode none -columns [list format entries percent ratio]");
       Label: Ttk_Label;
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      Label := Create(".propertiesdialog.uncompressedtext", "-text {Uncompressed size:}");
+      Label :=
+        Create
+          (".propertiesdialog.uncompressedtext", "-text {Uncompressed size}");
       Tcl.Tk.Ada.Grid.Grid(Label);
+      Label := Create(".propertiesdialog.uncompressed", "-text {0 bytes}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1");
+      Label :=
+        Create(".propertiesdialog.compressedtext", "-text {Compressed size}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
+      Label := Create(".propertiesdialog.compressed", "-text {0 bytes}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 1");
+      Label := Create(".propertiesdialog.ratio");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 3 -row 1");
+      Label := Create(".propertiesdialog.entriestext", "-text {Entries}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 2");
+      Label := Create(".propertiesdialog.entries", "-text {0 bytes}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 2");
       Heading(PropertiesTree, "format", "-text {Format (""method"")}");
       Column(PropertiesTree, "format", "-width 140");
       Heading(PropertiesTree, "entries", "-text {Entries}");
@@ -1057,7 +1075,10 @@ package body ArchivesViews is
       Heading(PropertiesTree, "ratio", "-text {Ratio}");
       Column(PropertiesTree, "ratio", "-width 100");
       SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
-      Tcl.Tk.Ada.Grid.Grid(PropertiesTree, "-column 0 -row 1 -sticky we -columnspan 2");
+      Tcl.Tk.Ada.Grid.Grid
+        (PropertiesTree, "-column 0 -row 3 -sticky we -columnspan 3");
+      -- Some test data
+      Insert(PropertiesTree, "{} end -values [list deflate 0 0% 0%]");
       Button :=
         Create
           (".propertiesdialog.buttonbox.ok",
@@ -1068,7 +1089,8 @@ package body ArchivesViews is
           (".propertiesdialog.buttonbox.about",
            "-text {About AZip} -command {CloseDialog .propertiesdialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
-      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 2 -sticky we -columnspan 2");
+      Tcl.Tk.Ada.Grid.Grid
+        (ButtonBox, "-column 1 -row 4 -sticky we -columnspan 3");
    end ShowProperties;
 
 end ArchivesViews;

@@ -1074,7 +1074,6 @@ package body ArchivesViews is
       Column(PropertiesTree, "percent", "-width 110");
       Heading(PropertiesTree, "ratio", "-text {Ratio}");
       Column(PropertiesTree, "ratio", "-width 100");
-      SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
       Tcl.Tk.Ada.Grid.Grid
         (PropertiesTree, "-column 0 -row 3 -sticky we -columnspan 3");
       -- Some test data
@@ -1087,10 +1086,36 @@ package body ArchivesViews is
       Button :=
         Create
           (".propertiesdialog.buttonbox.about",
-           "-text {About AZip} -command {CloseDialog .propertiesdialog}");
+           "-text {About AZip} -command {CloseDialog .propertiesdialog; ShowAbout}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
       Tcl.Tk.Ada.Grid.Grid
         (ButtonBox, "-column 1 -row 4 -sticky we -columnspan 3");
+      SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
    end ShowProperties;
+
+   procedure ShowAbout is
+      AboutDialog: constant Tk_Toplevel :=
+        Create(".aboutdialog", "-class Dialog");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      ButtonBox: constant Ttk_Frame := Create(".aboutdialog.buttonbox");
+      Button: Ttk_Button;
+   begin
+      if Tcl.Tk.Ada.Busy.Status(MainWindow) = "0" then
+         Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      end if;
+      Button :=
+        Create
+          (".aboutdialog.buttonbox.credits",
+           "-text Credits -command {CloseDialog .aboutdialog}");
+      Tcl.Tk.Ada.Grid.Grid(Button);
+      Button :=
+        Create
+          (".aboutdialog.buttonbox.close",
+           "-text Close -command {CloseDialog .aboutdialog}");
+      Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
+      Tcl.Tk.Ada.Grid.Grid
+        (ButtonBox, "-column 1 -row 4 -sticky we -columnspan 3");
+      SetDialog(AboutDialog, "About AZip", 500, 400);
+   end ShowAbout;
 
 end ArchivesViews;

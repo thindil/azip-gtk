@@ -424,6 +424,22 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Show_Properties_Command;
 
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      ShowAbout;
+      return TCL_OK;
+   end Show_About_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -457,6 +473,7 @@ package body ArchivesViews.Commands is
       AddCommand("UpdateArchive", Update_Archive_Command'Access);
       AddCommand("RecompressArchive", Recompress_Archive_Command'Access);
       AddCommand("ShowProperties", Show_Properties_Command'Access);
+      AddCommand("ShowAbout", Show_About_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

@@ -181,7 +181,8 @@ package body MenuBar is
            To_Unbounded_String("-label ""AZip news"" -underline 5")),
           Separator,
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""About AZip"" -underline 0"))));
+           To_Unbounded_String
+             ("-label {About AZip} -underline 0 -command ShowAbout"))));
       configure(MainWindow, "-menu .menubar");
    end CreateMenuBar;
 

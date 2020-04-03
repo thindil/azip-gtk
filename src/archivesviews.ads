@@ -47,5 +47,6 @@ private
    procedure UpdateArchive;
    procedure RecompressArchive;
    procedure ShowProperties;
+   procedure ShowAbout;
 
 end ArchivesViews;

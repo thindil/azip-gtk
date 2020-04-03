@@ -32,6 +32,7 @@ with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 
 package body ArchivesViews.Commands is
 
@@ -277,7 +278,8 @@ package body ArchivesViews.Commands is
       Dialog.Interp := MainWindow.Interp;
       Dialog.Name := New_String(CArgv.Arg(Argv, 1));
       Destroy(Dialog);
-      if Status(MainWindow) = "1" then
+      if Winfo_Get(MainWindow, "exists") = "1"
+        and then Status(MainWindow) = "1" then
          Forget(MainWindow);
       end if;
       return TCL_OK;

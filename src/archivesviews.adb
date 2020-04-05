@@ -39,7 +39,6 @@ with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -1092,30 +1091,5 @@ package body ArchivesViews is
         (ButtonBox, "-column 1 -row 4 -sticky we -columnspan 3");
       SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
    end ShowProperties;
-
-   procedure ShowAbout is
-      AboutDialog: constant Tk_Toplevel :=
-        Create(".aboutdialog", "-class Dialog");
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      ButtonBox: constant Ttk_Frame := Create(".aboutdialog.buttonbox");
-      Button: Ttk_Button;
-   begin
-      if Tcl.Tk.Ada.Busy.Status(MainWindow) = "0" then
-         Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      end if;
-      Button :=
-        Create
-          (".aboutdialog.buttonbox.credits",
-           "-text Credits -command {CloseDialog .aboutdialog}");
-      Tcl.Tk.Ada.Grid.Grid(Button);
-      Button :=
-        Create
-          (".aboutdialog.buttonbox.close",
-           "-text Close -command {CloseDialog .aboutdialog}");
-      Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
-      Tcl.Tk.Ada.Grid.Grid
-        (ButtonBox, "-column 1 -row 4 -sticky we -columnspan 3");
-      SetDialog(AboutDialog, "About AZip", 500, 400);
-   end ShowAbout;
 
 end ArchivesViews;

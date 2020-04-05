@@ -18,37 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
-with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
+package AboutDialog is
 
-package ArchivesViews is
+   procedure ShowAbout;
 
-   procedure CreateMDI;
-   procedure SetDialog
-     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive);
-
-private
-
-   MDI: Ttk_PanedWindow;
-
-   procedure SetActive(NewActive: Positive; Created: Boolean := False);
-   procedure CreateView;
-   procedure LoadArchive(FileName: String);
-   procedure ExtractArchive(Directory: String);
-   procedure AddFiles
-     (FileName: String; Encrypted: Boolean; Path: String := "";
-      Hide: Boolean := False);
-   procedure SaveArchiveAs;
-   procedure DeleteItems;
-   procedure SortArchive(Column: String);
-   procedure TestArchive;
-   procedure ShowFindDialog;
-   procedure FindInArchive;
-   procedure ToggleView;
-   procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
-   procedure ShowFiles;
-   procedure UpdateArchive;
-   procedure RecompressArchive;
-   procedure ShowProperties;
-
-end ArchivesViews;
+end AboutDialog;

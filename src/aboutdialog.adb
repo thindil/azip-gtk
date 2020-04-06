@@ -29,6 +29,7 @@ use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
+with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with ArchivesViews; use ArchivesViews;
 
 package body AboutDialog is
@@ -42,8 +43,14 @@ package body AboutDialog is
       Label: Ttk_Label;
       InfoFrame: constant Ttk_Frame := Create(".aboutdialog.infoframe");
       OsName: constant String := Tcl_GetVar(Get_Context, "tcl_platform(os)");
-      procedure AddLinkButton(Name, URL: String; Row: Natural) is
-         Command: Unbounded_String;
+      LibrariesFrame: constant Ttk_LabelFrame :=
+        Create
+          (".aboutdialog.librariesframe",
+           "-text {AZip is made with the following free, open source components}");
+      procedure AddLinkButton
+        (Name, URL: String; Row: Natural; Column: Natural := 1;
+         Text: String := "") is
+         Command, ButtonText: Unbounded_String;
       begin
          if OsName = "Windows" then
             Command := To_Unbounded_String("start");
@@ -52,12 +59,20 @@ package body AboutDialog is
          elsif OsName = "Darwin" then
             Command := To_Unbounded_String("open");
          end if;
+         if Text = "" then
+            ButtonText := To_Unbounded_String(URL);
+         else
+            ButtonText := To_Unbounded_String(Text);
+         end if;
          Button :=
            Create
              (Name,
-              "-text {" & URL & "} -style Toolbutton -command {exec " &
-              To_String(Command) & " " & URL & "}");
-         Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row" & Natural'Image(Row));
+              "-text {" & To_String(ButtonText) &
+              "} -style Toolbutton -command {exec " & To_String(Command) &
+              " " & URL & "}");
+         Tcl.Tk.Ada.Grid.Grid
+           (Button,
+            "-column" & Natural'Image(Column) & " -row" & Natural'Image(Row));
       end AddLinkButton;
    begin
       if Tcl.Tk.Ada.Busy.Status(MainWindow) = "0" then
@@ -89,6 +104,40 @@ package body AboutDialog is
       Label := Create(".aboutdialog.infoframe.versionnumber", "-text {2.36}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 4");
       Tcl.Tk.Ada.Grid.Grid(InfoFrame, "-column 1 -row 0");
+      AddLinkButton
+        (".aboutdialog.librariesframe.gnatlink",
+         "https://www.adacore.com/community", 0, 0,
+         "GNAT - free Ada compiler");
+      Label :=
+        Create
+          (".aboutdialog.librariesframe.gnatversion",
+           "-text {version GPL 2017 (20170515-63)}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
+      AddLinkButton
+        (".aboutdialog.librariesframe.gnavi",
+         "https://sourceforge.net/projects/gnavi/", 1, 0, "GNAVI / GWindows");
+      AddLinkButton
+        (".aboutdialog.librariesframe.reseditlink", "http://www.resedit.net/",
+         2, 0, "ResEdit");
+      Label :=
+        Create
+          (".aboutdialog.librariesframe.reseditinfo",
+           "-text {(freeware, not open-source)}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
+      AddLinkButton
+        (".aboutdialog.librariesframe.zipadalink",
+         "https://unzip-ada.sourceforge.io/", 3, 0, "Zip-Ada");
+      Label :=
+        Create
+          (".aboutdialog.librariesframe.zipadaversion",
+           "-text {version 55, ref 22-Now-2018}");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 3");
+      AddLinkButton
+        (".aboutdialog.librariesframe.inifilelink",
+         "https://sourceforge.net/projects/ini-files/", 4, 0,
+         "Ini file manager");
+      Tcl.Tk.Ada.Grid.Grid
+        (LibrariesFrame, "-column 0 -row 1 -columnspan 2 -sticky we");
       Button :=
         Create
           (".aboutdialog.buttonbox.credits",

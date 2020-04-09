@@ -1053,18 +1053,18 @@ package body ArchivesViews is
           (".propertiesdialog.uncompressedtext", "-text {Uncompressed size}");
       Tcl.Tk.Ada.Grid.Grid(Label);
       Label := Create(".propertiesdialog.uncompressed", "-text {0 bytes}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
       Label :=
         Create(".propertiesdialog.compressedtext", "-text {Compressed size}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
       Label := Create(".propertiesdialog.compressed", "-text {0 bytes}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 1");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 1");
       Label := Create(".propertiesdialog.ratio");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 3 -row 1");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 1");
       Label := Create(".propertiesdialog.entriestext", "-text {Entries}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 2");
       Label := Create(".propertiesdialog.entries", "-text {0 bytes}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 2");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
       Heading(PropertiesTree, "format", "-text {Format (""method"")}");
       Column(PropertiesTree, "format", "-width 140");
       Heading(PropertiesTree, "entries", "-text {Entries}");

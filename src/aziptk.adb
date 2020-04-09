@@ -40,6 +40,7 @@ with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with Tcl.Tklib.Ada.Tooltip; use Tcl.Tklib.Ada.Tooltip;
+with AboutDialog; use AboutDialog;
 with ArchivesViews; use ArchivesViews;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
@@ -125,6 +126,7 @@ begin
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;
+   CreateAbout;
    Set_Directory(CurrentDir);
 
    --  Loop inside Tk, waiting for commands to execute.

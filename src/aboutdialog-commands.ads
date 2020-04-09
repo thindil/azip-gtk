@@ -18,9 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-package AboutDialog is
+package AboutDialog.Commands is
 
-   procedure CreateAbout;
-   procedure ShowAbout;
+   procedure AddCommands;
 
-end AboutDialog;
+end AboutDialog.Commands;

@@ -30,9 +30,15 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
+with AboutDialog.Commands; use AboutDialog.Commands;
 with ArchivesViews; use ArchivesViews;
 
 package body AboutDialog is
+
+   procedure CreateAbout is
+   begin
+      AddCommands;
+   end CreateAbout;
 
    procedure ShowAbout is
       AboutDialog: constant Tk_Toplevel :=
@@ -141,7 +147,7 @@ package body AboutDialog is
       Button :=
         Create
           (".aboutdialog.buttonbox.credits",
-           "-text Credits -command {CloseDialog .aboutdialog}");
+           "-text Credits -command {ShowCredits}");
       Tcl.Tk.Ada.Grid.Grid(Button);
       Button :=
         Create

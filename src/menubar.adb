@@ -80,7 +80,7 @@ package body MenuBar is
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Properties"" -underline 0 -accelerator Ctrl+D")),
+             ("-label ""Properties"" -underline 0 -accelerator Ctrl+D -command ShowProperties")),
           Separator, CreateRecent, Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
@@ -95,7 +95,7 @@ package body MenuBar is
              ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E")),
+             ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E -command Extract")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
@@ -123,10 +123,10 @@ package body MenuBar is
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Update archive"" -underline 0 -accelerator Ctrl+P")),
+             ("-label ""Update archive"" -underline 0 -accelerator Ctrl+P -command UpdateArchive")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Recompress archive"" -underline 0 -accelerator Ctrl+R")),
+             ("-label ""Recompress archive"" -underline 0 -accelerator Ctrl+R -command RecompressArchive")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Touch time stamps"" -underline 1 -state disabled")),

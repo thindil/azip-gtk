@@ -279,7 +279,9 @@ package body ArchivesViews.Commands is
       Dialog.Name := New_String(CArgv.Arg(Argv, 1));
       Destroy(Dialog);
       if Winfo_Get(MainWindow, "exists") = "1"
-        and then Status(MainWindow) = "1" then
+        and then
+        (Status(MainWindow) = "1" and
+         CArgv.Arg(Argv, 1) /= ".creditsdialog") then
          Forget(MainWindow);
       end if;
       return TCL_OK;

@@ -40,6 +40,7 @@ package body AboutDialog.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
+      ShowCredits;
       return TCL_OK;
    end Credits_Command;
 

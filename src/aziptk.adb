@@ -123,6 +123,15 @@ begin
    Bind_To_Main_Window(Interp, "<F12>", "{SaveAs}");
    Bind_To_Main_Window(Interp, "<Control-w>", "{.menubar.file invoke 3}");
    Bind_To_Main_Window(Interp, "<Control-F4>", "{.menubar.file invoke 3}");
+   Bind_To_Main_Window(Interp, "<Control-d>", "{ShowProperties}");
+   Bind_To_Main_Window(Interp, "<Control-e>", "{Extract}");
+   Bind_To_Main_Window(Interp, "<Delete>", "{DeleteItems}");
+   Bind_To_Main_Window(Interp, "<minus>", "{DeleteItems}");
+   Bind_To_Main_Window(Interp, "<plus>", "{AddFiles false}");
+   Bind_To_Main_Window(Interp, "<Control-t>", "{TestArchive}");
+   Bind_To_Main_Window(Interp, "<Control-f>", "{ShowFindDialog}");
+   Bind_To_Main_Window(Interp, "<Control-p>", "{UpdateArchive}");
+   Bind_To_Main_Window(Interp, "<Control-r>", "{RecompressArchive}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;

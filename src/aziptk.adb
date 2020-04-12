@@ -132,6 +132,8 @@ begin
    Bind_To_Main_Window(Interp, "<Control-f>", "{ShowFindDialog}");
    Bind_To_Main_Window(Interp, "<Control-p>", "{UpdateArchive}");
    Bind_To_Main_Window(Interp, "<Control-r>", "{RecompressArchive}");
+   Bind_To_Main_Window(Interp, "<Control-a>", "{ToggleSelect true}");
+   Bind_To_Main_Window(Interp, "<Control-u>", "{ToggleSelect false}");
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;

@@ -1092,14 +1092,18 @@ package body ArchivesViews is
       SetDialog(PropertiesDialog, "AZip - Archive properties", 500, 400);
    end ShowProperties;
 
-   procedure SelectAll is
+   procedure ToggleSelect(SelectAll: Boolean) is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       FilesView: Ttk_Tree_View;
    begin
       FilesView.Interp := Get_Context;
       FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
-      Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
-   end SelectAll;
+      if SelectAll then
+         Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
+      else
+         Selection_Set(FilesView, "{}");
+      end if;
+   end ToggleSelect;
 
 end ArchivesViews;

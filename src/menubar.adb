@@ -89,10 +89,10 @@ package body MenuBar is
         (".menubar.edit", "Edit",
          ((To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Select all"" -underline 7 -accelerator Ctrl+A -command {SelectAll}")),
+             ("-label ""Select all"" -underline 7 -accelerator Ctrl+A -command {ToggleSelect true}")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U")),
+             ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U -command {ToggleSelect false}")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E -command Extract")),

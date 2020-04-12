@@ -50,6 +50,6 @@ private
    procedure UpdateArchive;
    procedure RecompressArchive;
    procedure ShowProperties;
-   procedure SelectAll;
+   procedure ToggleSelect(SelectAll: Boolean);
 
 end ArchivesViews;

@@ -444,21 +444,26 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Show_About_Command;
 
-   function Select_All_Command
+   function Toggle_Select_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
 
-   function Select_All_Command
+   function Toggle_Select_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Interp, Argc);
    begin
-      SelectAll;
+      if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
+        CArgv.Arg(Argv, 1) = "yes" then
+         ToggleSelect(True);
+      else
+         ToggleSelect(False);
+      end if;
       return TCL_OK;
-   end Select_All_Command;
+   end Toggle_Select_Command;
 
    procedure AddCommands is
       procedure AddCommand
@@ -494,7 +499,7 @@ package body ArchivesViews.Commands is
       AddCommand("RecompressArchive", Recompress_Archive_Command'Access);
       AddCommand("ShowProperties", Show_Properties_Command'Access);
       AddCommand("ShowAbout", Show_About_Command'Access);
-      AddCommand("SelectAll", Select_All_Command'Access);
+      AddCommand("ToggleSelect", Toggle_Select_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

@@ -289,12 +289,60 @@ package body ArchivesViews is
    end GetArchiveName;
 
    procedure ExtractArchive(Directory: String) is
-      FileName: constant String := GetArchiveName;
+      ArchiveName: constant String := GetArchiveName;
+      FilesView, DirectoryTree: Ttk_Tree_View;
+      Values, FilePath, Selected, ParentId, Path, FileName: Unbounded_String;
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
    begin
       if Directory = "" then
          return;
       end if;
-      Ada.Text_IO.Put_Line("Extracting: " & FileName & " into: " & Directory);
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      Selected := To_Unbounded_String(Selection(DirectoryTree));
+      if Selected = Null_Unbounded_String then
+         return;
+      end if;
+      loop
+         ParentId :=
+           To_Unbounded_String(Parent(DirectoryTree, To_String(Selected)));
+         exit when ParentId = To_Unbounded_String("");
+         if Path /= Null_Unbounded_String then
+            Path := Directory_Separator & Path;
+         end if;
+         Path :=
+           To_Unbounded_String
+             (Item(DirectoryTree, To_String(Selected), "-text")) &
+           Path;
+         Selected := ParentId;
+      end loop;
+      FilesView.Interp := Get_Context;
+      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
+      for I in
+        1 ..
+          Positive'Value
+            (Tcl_GetVar
+               (FilesView.Interp,
+                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+            FilePath :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            if FilePath = Path then
+               Ada.Text_IO.Put_Line
+                 ("Extracting: " & ArchiveName & " file: " &
+                  To_String(FileName) & " into: " & Directory);
+            end if;
+         end if;
+      end loop;
    end ExtractArchive;
 
    procedure AddFiles

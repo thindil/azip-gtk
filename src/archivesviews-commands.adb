@@ -151,7 +151,7 @@ package body ArchivesViews.Commands is
    begin
       ExtractArchive
         (Choose_Directory
-           ("-parent . -title ""Select directory to which extract the archive"""));
+           ("-parent . -title {Extract current folder's content to...}"));
       return TCL_OK;
    end Extract_Command;
 

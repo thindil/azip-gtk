@@ -336,10 +336,14 @@ package body ArchivesViews is
             Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
             FilePath :=
               To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            if FilePath = Path then
+            if FilePath = Path or
+              (Length(FilePath) > Length(FilePath)
+               and then Head(FilePath, Length(Path)) = Path) or
+              Path = Null_Unbounded_String then
                Ada.Text_IO.Put_Line
                  ("Extracting: " & ArchiveName & " file: " &
-                  To_String(FileName) & " into: " & Directory);
+                  To_String(FilePath) & To_String(FileName) & " into: " &
+                  Directory);
             end if;
          end if;
       end loop;

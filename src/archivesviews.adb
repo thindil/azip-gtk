@@ -337,9 +337,12 @@ package body ArchivesViews is
             FilePath :=
               To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
             if FilePath = Path or
-              (Length(FilePath) > Length(FilePath)
+              (Length(FilePath) > Length(Path)
                and then Head(FilePath, Length(Path)) = Path) or
               Path = Null_Unbounded_String then
+               if Length(FilePath) > 0 then
+                  Append(FilePath, Directory_Separator);
+               end if;
                Ada.Text_IO.Put_Line
                  ("Extracting: " & ArchiveName & " file: " &
                   To_String(FilePath) & To_String(FileName) & " into: " &

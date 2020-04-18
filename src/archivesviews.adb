@@ -291,7 +291,8 @@ package body ArchivesViews is
    procedure ExtractArchive(Directory: String) is
       ArchiveName: constant String := GetArchiveName;
       FilesView, DirectoryTree: Ttk_Tree_View;
-      Values, FilePath, Selected, ParentId, Path, FileName: Unbounded_String;
+      Values, FilePath, Selected, ParentId, Path, FileName, Answer,
+      NewDirectory: Unbounded_String;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
    begin
@@ -303,6 +304,13 @@ package body ArchivesViews is
         New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
       if Selected = Null_Unbounded_String then
+         return;
+      end if;
+      Answer :=
+        To_Unbounded_String
+          (MessageBox
+             ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
+      if Answer = To_Unbounded_String("cancel") then
          return;
       end if;
       loop
@@ -318,6 +326,16 @@ package body ArchivesViews is
            Path;
          Selected := ParentId;
       end loop;
+      if Answer = To_Unbounded_String("yes") then
+         NewDirectory :=
+           Directory & Directory_Separator &
+           Ada.Directories.Base_Name(ArchiveName) & Directory_Separator & Path;
+         if not Exists(To_String(NewDirectory)) then
+            Create_Path(To_String(NewDirectory));
+         end if;
+      else
+         NewDirectory := To_Unbounded_String(Directory);
+      end if;
       FilesView.Interp := Get_Context;
       FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       for I in
@@ -346,7 +364,7 @@ package body ArchivesViews is
                Ada.Text_IO.Put_Line
                  ("Extracting: " & ArchiveName & " file: " &
                   To_String(FilePath) & To_String(FileName) & " into: " &
-                  Directory);
+                  To_String(NewDirectory));
             end if;
          end if;
       end loop;

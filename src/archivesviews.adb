@@ -288,6 +288,29 @@ package body ArchivesViews is
       return cget(HeaderLabel, "-text");
    end GetArchiveName;
 
+   procedure SetDialog
+     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
+      X, Y: Integer;
+   begin
+      Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
+      Wm_Set(Dialog, "transient", ".");
+      Wm_Set(Dialog, "attributes", "-type dialog");
+      X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
+      if X < 0 then
+         X := 0;
+      end if;
+      Y := (Positive'Value(Winfo_Get(Dialog, "vrootheight")) - Height) / 2;
+      if Y < 0 then
+         Y := 0;
+      end if;
+      Wm_Set
+        (Dialog, "geometry",
+         Trim(Positive'Image(Width), Both) & "x" &
+         Trim(Positive'Image(Height), Both) & "+" &
+         Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
+      Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
+   end SetDialog;
+
    procedure ExtractArchive(Directory: String) is
       ArchiveName: constant String := GetArchiveName;
       FilesView, DirectoryTree: Ttk_Tree_View;
@@ -295,15 +318,26 @@ package body ArchivesViews is
       NewDirectory: Unbounded_String;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      ProgressDialog: Tk_Toplevel :=
+        Create(".progressdialog", "-class Dialog");
+      ProgressBar: constant Ttk_ProgressBar :=
+        Create
+          (".progressdialog.progressbar",
+           "-orient horizontal -length 250 -value 0");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
       if Directory = "" then
          return;
       end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      SetDialog(ProgressDialog, "Azip - Extract progress", 275, 50);
+      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
       if Selected = Null_Unbounded_String then
+         Destroy(ProgressDialog);
          return;
       end if;
       Answer :=
@@ -311,6 +345,7 @@ package body ArchivesViews is
           (MessageBox
              ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
       if Answer = To_Unbounded_String("cancel") then
+         Destroy(ProgressDialog);
          return;
       end if;
       loop
@@ -330,9 +365,7 @@ package body ArchivesViews is
          NewDirectory :=
            Directory & Directory_Separator &
            Ada.Directories.Base_Name(ArchiveName) & Directory_Separator & Path;
-         if not Exists(To_String(NewDirectory)) then
-            Create_Path(To_String(NewDirectory));
-         end if;
+         Create_Path(To_String(NewDirectory));
       else
          NewDirectory := To_Unbounded_String(Directory);
       end if;
@@ -365,9 +398,11 @@ package body ArchivesViews is
                  ("Extracting: " & ArchiveName & " file: " &
                   To_String(FilePath) & To_String(FileName) & " into: " &
                   To_String(NewDirectory));
+               Step(ProgressBar);
             end if;
          end if;
       end loop;
+      Destroy(ProgressDialog);
    end ExtractArchive;
 
    procedure AddFiles
@@ -595,29 +630,6 @@ package body ArchivesViews is
          end loop;
       end;
    end SortArchive;
-
-   procedure SetDialog
-     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
-      X, Y: Integer;
-   begin
-      Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
-      Wm_Set(Dialog, "transient", ".");
-      Wm_Set(Dialog, "attributes", "-type dialog");
-      X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
-      if X < 0 then
-         X := 0;
-      end if;
-      Y := (Positive'Value(Winfo_Get(Dialog, "vrootheight")) - Height) / 2;
-      if Y < 0 then
-         Y := 0;
-      end if;
-      Wm_Set
-        (Dialog, "geometry",
-         Trim(Positive'Image(Width), Both) & "x" &
-         Trim(Positive'Image(Height), Both) & "+" &
-         Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
-      Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
-   end SetDialog;
 
    procedure TestArchive is
       ProgressDialog: Tk_Toplevel :=

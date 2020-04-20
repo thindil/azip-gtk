@@ -294,7 +294,9 @@ package body ArchivesViews is
    begin
       Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
       Wm_Set(Dialog, "transient", ".");
-      Wm_Set(Dialog, "attributes", "-type dialog");
+      if Tcl_GetVar(Get_Context, "tcl_platform(os)") = "Linux" then
+         Wm_Set(Dialog, "attributes", "-type dialog");
+      end if;
       X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
       if X < 0 then
          X := 0;

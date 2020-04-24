@@ -365,11 +365,11 @@ package body ArchivesViews is
       end loop;
       if Answer = To_Unbounded_String("yes") then
          NewDirectory :=
-           Directory & Directory_Separator &
-           Ada.Directories.Base_Name(ArchiveName) & Directory_Separator & Path;
-         Create_Path(To_String(NewDirectory));
+           To_Unbounded_String
+             (Directory & Directory_Separator &
+              Ada.Directories.Base_Name(ArchiveName) & Directory_Separator);
       else
-         NewDirectory := To_Unbounded_String(Directory);
+         NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
       end if;
       FilesView.Interp := Get_Context;
       FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
@@ -396,10 +396,11 @@ package body ArchivesViews is
                if Length(FilePath) > 0 then
                   Append(FilePath, Directory_Separator);
                end if;
+               Create_Path(To_String(NewDirectory & FilePath));
                Ada.Text_IO.Put_Line
                  ("Extracting: " & ArchiveName & " file: " &
                   To_String(FilePath) & To_String(FileName) & " into: " &
-                  To_String(NewDirectory));
+                  To_String(NewDirectory & FilePath));
                Step(ProgressBar);
             end if;
          end if;

@@ -39,6 +39,7 @@ with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -164,6 +165,7 @@ package body ArchivesViews is
            (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
       end if;
       Bind(DirectoryTree, "<<TreeviewSelect>>", "DirectorySelected");
+      Bind(DirectoryTree, "<3>", "{tk_popup .directorymenu %X %Y}");
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
@@ -189,6 +191,7 @@ package body ArchivesViews is
       Bind
         (FilesList, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+      Bind(FilesList, "<3>", "{tk_popup .filesmenu %X %Y}");
       Tcl_SetVar
         (Paned.Interp, "lastindex" & Trim(Positive'Image(ActiveArchive), Both),
          "1");
@@ -198,6 +201,9 @@ package body ArchivesViews is
    procedure CreateMDI is
       Arrow: Tk_Bitmap;
       pragma Unreferenced(Arrow);
+      DirectoryMenu: constant Tk_Menu :=
+        Create(".directorymenu", "-tearoff false");
+      FilesMenu: constant Tk_Menu := Create(".filesmenu", "-tearoff false");
    begin
       Arrow :=
         Create
@@ -207,6 +213,14 @@ package body ArchivesViews is
         Create
           ("arrow-down",
            "-data {#define arrowDown_width 7  #define arrowDown_height 4 static char arrowDown_bits[] = { 0x7f, 0x3e, 0x1c, 0x08 };}");
+      Add
+        (DirectoryMenu, "command",
+         "-label {Extract folder} -underline 0 -command Extract");
+      Add(DirectoryMenu, "command", "-label {Delete folder} -underline 0");
+      Add(FilesMenu, "command", "-label {Extract files(s)} -underline 0");
+      Add
+        (FilesMenu, "command",
+         "-label {Delete files(s)} -underline 0 -command DeleteItems");
       ArchiveNumber := 1;
       MDI := Create(".mdi", "-orient vertical");
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");

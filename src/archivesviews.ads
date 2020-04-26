@@ -51,5 +51,6 @@ private
    procedure RecompressArchive;
    procedure ShowProperties;
    procedure ToggleSelect(SelectAll: Boolean);
+   procedure DeleteDirectory;
 
 end ArchivesViews;

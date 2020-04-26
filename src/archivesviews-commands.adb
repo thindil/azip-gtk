@@ -465,6 +465,22 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Toggle_Select_Command;
 
+   function Delete_Directory_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Delete_Directory_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      DeleteDirectory;
+      return TCL_OK;
+   end Delete_Directory_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -500,6 +516,7 @@ package body ArchivesViews.Commands is
       AddCommand("ShowProperties", Show_Properties_Command'Access);
       AddCommand("ShowAbout", Show_About_Command'Access);
       AddCommand("ToggleSelect", Toggle_Select_Command'Access);
+      AddCommand("DeleteDirectory", Delete_Directory_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

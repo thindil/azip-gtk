@@ -216,7 +216,9 @@ package body ArchivesViews is
       Add
         (DirectoryMenu, "command",
          "-label {Extract folder} -underline 0 -command Extract");
-      Add(DirectoryMenu, "command", "-label {Delete folder} -underline 0");
+      Add
+        (DirectoryMenu, "command",
+         "-label {Delete folder} -underline 0 -command DeleteDirectory");
       Add(FilesMenu, "command", "-label {Extract files(s)} -underline 0");
       Add
         (FilesMenu, "command",
@@ -1207,5 +1209,21 @@ package body ArchivesViews is
          Selection_Set(FilesView, "{}");
       end if;
    end ToggleSelect;
+
+   procedure DeleteDirectory is
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      FilesView: Ttk_Tree_View;
+      DirectoryTree: Ttk_Tree_View;
+   begin
+      FilesView.Interp := Get_Context;
+      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
+      Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
+      DeleteItems;
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      Delete(DirectoryTree, Selection(DirectoryTree));
+   end DeleteDirectory;
 
 end ArchivesViews;

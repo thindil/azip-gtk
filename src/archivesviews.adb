@@ -219,7 +219,9 @@ package body ArchivesViews is
       Add
         (DirectoryMenu, "command",
          "-label {Delete folder} -underline 0 -command DeleteDirectory");
-      Add(FilesMenu, "command", "-label {Extract files(s)} -underline 0");
+      Add
+        (FilesMenu, "command",
+         "-label {Extract files(s)} -underline 0 -command ExtractFile");
       Add
         (FilesMenu, "command",
          "-label {Delete files(s)} -underline 0 -command DeleteItems");
@@ -1225,5 +1227,67 @@ package body ArchivesViews is
         New_String(ViewName & ".directoryframe.directorytree");
       Delete(DirectoryTree, Selection(DirectoryTree));
    end DeleteDirectory;
+
+   procedure ExtractFile(Directory: String) is
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      ArchiveName: constant String := GetArchiveName;
+      FilesView: Ttk_Tree_View;
+      Path, Selected, FileName, Values, NewDirectory, Answer: Unbounded_String;
+      Tokens: Slice_Set;
+      ProgressDialog: Tk_Toplevel :=
+        Create(".progressdialog", "-class Dialog");
+      ProgressBar: constant Ttk_ProgressBar :=
+        Create
+          (".progressdialog.progressbar",
+           "-orient horizontal -length 250 -value 0");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+   begin
+      FilesView.Interp := Get_Context;
+      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
+      Selected := To_Unbounded_String(Selection(FilesView));
+      if Selected = Null_Unbounded_String then
+         Destroy(ProgressDialog);
+         return;
+      end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      SetDialog(ProgressDialog, "Azip - Extract progress", 275, 50);
+      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
+      Answer :=
+        To_Unbounded_String
+          (MessageBox
+             ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
+      if Answer = To_Unbounded_String("cancel") then
+         Destroy(ProgressDialog);
+         return;
+      end if;
+      if Answer = To_Unbounded_String("yes") then
+         NewDirectory :=
+           To_Unbounded_String
+             (Directory & Directory_Separator &
+              Ada.Directories.Base_Name(ArchiveName) & Directory_Separator);
+      else
+         NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
+      end if;
+      Create(Tokens, To_String(Selected), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         Values :=
+           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+         FileName :=
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+         if Length(Path) > 0 then
+            Append(Path, Directory_Separator);
+         end if;
+         Create_Path(To_String(NewDirectory & Path));
+         Ada.Text_IO.Put_Line
+           ("Extracting: " & ArchiveName & " file: " & To_String(Path) &
+            To_String(FileName) & " into: " & To_String(NewDirectory & Path));
+         Step(ProgressBar);
+      end loop;
+      Destroy(ProgressDialog);
+   end ExtractFile;
 
 end ArchivesViews;

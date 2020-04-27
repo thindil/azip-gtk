@@ -52,5 +52,6 @@ private
    procedure ShowProperties;
    procedure ToggleSelect(SelectAll: Boolean);
    procedure DeleteDirectory;
+   procedure ExtractFile(Directory: String);
 
 end ArchivesViews;

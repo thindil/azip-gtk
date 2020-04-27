@@ -481,6 +481,24 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Delete_Directory_Command;
 
+   function Extract_File_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Extract_File_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      ExtractFile
+        (Choose_Directory
+           ("-parent . -title {Extract the selected items to...}"));
+      return TCL_OK;
+   end Extract_File_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -517,6 +535,7 @@ package body ArchivesViews.Commands is
       AddCommand("ShowAbout", Show_About_Command'Access);
       AddCommand("ToggleSelect", Toggle_Select_Command'Access);
       AddCommand("DeleteDirectory", Delete_Directory_Command'Access);
+      AddCommand("ExtractFile", Extract_File_Command'Access);
    end AddCommands;
 
 end ArchivesViews.Commands;

@@ -104,6 +104,9 @@ begin
    -- Set default type of tiling for archives
    Tcl.Ada.Tcl_SetVar(Interp, "tiletype", "horizontal");
 
+   -- Enable sorting of the files in the archives by default
+   Tcl.Ada.Tcl_SetVar(Interp, "nosorting", "0");
+
    -- Set color for active archive header
    Style_Configure
      ("aziptk.TFrame", "-background [ttk::style lookup . -selectbackground]");

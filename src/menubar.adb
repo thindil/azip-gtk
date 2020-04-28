@@ -149,8 +149,9 @@ package body MenuBar is
            To_Unbounded_String
              ("-label ""Tree view"" -underline 0 -variable viewtype -value tree -command {ToggleView menu}")),
           Separator,
-          (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""No sorting"" -underline 0")),
+          (To_Unbounded_String("checkbutton"),
+           To_Unbounded_String
+             ("-label ""No sorting"" -underline 0 -variable nosorting")),
           (To_Unbounded_String("command"),
            To_Unbounded_String("-label ""Select columns"" -underline 0"))));
       CreateSubMenu

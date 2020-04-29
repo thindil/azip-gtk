@@ -265,7 +265,7 @@ package body ArchivesViews is
    procedure LoadArchive(FileName: String) is
       Label: Ttk_Label;
       LabelText: Unbounded_String;
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree, FilesView: Ttk_Tree_View;
       ViewName: Unbounded_String :=
         To_Unbounded_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
@@ -293,6 +293,14 @@ package body ArchivesViews is
         (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
       -- Some testing data
       AddFile(FileName, "");
+      -- Sort archive if enabled
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String(To_String(ViewName) & ".filesframe.fileslist");
+      if Tcl_GetVar(Get_Context, "nosorting") = "0" then
+         Heading(FilesView, "1", "-image {}");
+         SortArchive("1");
+      end if;
    end LoadArchive;
 
    function GetArchiveName return String is
@@ -491,6 +499,11 @@ package body ArchivesViews is
          end if;
          AddFile(Slice(Tokens, I), Path, Hide);
       end loop;
+      -- Sort archive if enabled
+      if Tcl_GetVar(Get_Context, "nosorting") = "0" then
+         Heading(FilesView, "1", "-image {}");
+         SortArchive("Name");
+      end if;
    end AddFiles;
 
    procedure SaveArchiveAs is
@@ -1029,6 +1042,11 @@ package body ArchivesViews is
             end if;
          end if;
       end loop;
+      -- Sort archive if enabled
+      if Tcl_GetVar(Get_Context, "nosorting") = "0" then
+         Heading(FilesView, "1", "-image {}");
+         SortArchive("Name");
+      end if;
    end ShowFiles;
 
    procedure UpdateArchive is

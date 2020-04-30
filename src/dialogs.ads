@@ -24,5 +24,6 @@ package Dialogs is
 
    procedure SetDialog
      (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive);
+   procedure AddCommands;
 
 end Dialogs;

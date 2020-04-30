@@ -31,14 +31,14 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
-with AboutDialog.Commands; use AboutDialog.Commands;
+with AboutDialog.Commands;
 with Dialogs; use Dialogs;
 
 package body AboutDialog is
 
    procedure CreateAbout is
    begin
-      AddCommands;
+      AboutDialog.Commands.AddCommands;
    end CreateAbout;
 
    procedure ShowAbout is

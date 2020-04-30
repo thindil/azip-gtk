@@ -51,7 +51,7 @@ with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
 with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
-with ArchivesViews.Commands; use ArchivesViews.Commands;
+with ArchivesViews.Commands;
 with Dialogs; use Dialogs;
 with MenuBar; use MenuBar;
 
@@ -229,7 +229,8 @@ package body ArchivesViews is
       ArchiveNumber := 1;
       MDI := Create(".mdi", "-orient vertical");
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
-      AddCommands;
+      ArchivesViews.Commands.AddCommands;
+      Dialogs.AddCommands;
       CreateView;
    end CreateMDI;
 

@@ -21,6 +21,7 @@
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
+with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
@@ -29,6 +30,8 @@ with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 
 package body Dialogs is
+
+   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    procedure SetDialog
      (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
@@ -54,5 +57,36 @@ package body Dialogs is
          Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
       Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
    end SetDialog;
+
+   function Set_Visible_Columns_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Set_Visible_Columns_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      return TCL_OK;
+   end Set_Visible_Columns_Command;
+
+   procedure AddCommands is
+      procedure AddCommand
+        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
+         Command: Tcl.Tcl_Command;
+      begin
+         Command :=
+           CreateCommands.Tcl_CreateCommand
+             (Get_Context, Name, AdaCommand, 0, null);
+         if Command = null then
+            raise Program_Error with "Can't add command " & Name;
+         end if;
+      end AddCommand;
+   begin
+      AddCommand("SetVisibleColumns", Set_Visible_Columns_Command'Access);
+   end AddCommands;
 
 end Dialogs;

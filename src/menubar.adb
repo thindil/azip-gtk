@@ -153,7 +153,8 @@ package body MenuBar is
            To_Unbounded_String
              ("-label ""No sorting"" -underline 0 -variable nosorting")),
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""Select columns"" -underline 0"))));
+           To_Unbounded_String
+             ("-label ""Select columns"" -underline 0 -command SetVisibleColumns"))));
       CreateSubMenu
         (".menubar.options", "Options",
          (1 =>

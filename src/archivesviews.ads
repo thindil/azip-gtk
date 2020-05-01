@@ -18,9 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
 
 package ArchivesViews is
+
+   ColumnsNames: constant array(1 .. 12) of Unbounded_String :=
+     (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
+      To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
+      To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
+      To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
+      To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
+      To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
 
    procedure CreateMDI;
 

@@ -20,14 +20,20 @@
 
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
+with Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
+use Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
+with ArchivesViews; use ArchivesViews;
 
 package body Dialogs is
 
@@ -69,7 +75,21 @@ package body Dialogs is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      ColumnsDialog: constant Tk_Toplevel :=
+        Create(".columnsdialog", "-class Dialog");
+      CheckButton: Ttk_CheckButton;
+      CloseButton: constant Ttk_Button :=
+        Create(".columnsdialog.closebutton", "-text Done");
    begin
+      for I in ColumnsNames'Range loop
+         CheckButton :=
+           Create
+             (".columnsdialog.checkbutton" & Trim(Positive'Image(I), Both),
+              "-text {" & To_String(ColumnsNames(I)) & "}");
+         Tcl.Tk.Ada.Pack.Pack(CheckButton);
+      end loop;
+      Tcl.Tk.Ada.Pack.Pack(CloseButton);
+      SetDialog(ColumnsDialog, "Azip - Select displayed columns", 200, 450);
       return TCL_OK;
    end Set_Visible_Columns_Command;
 

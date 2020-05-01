@@ -23,7 +23,6 @@ with Ada.Containers.Generic_Array_Sort;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
@@ -59,13 +58,6 @@ package body ArchivesViews is
 
    ArchiveNumber: Positive;
    ActiveArchive: Natural := 0;
-   ColumnsNames: constant array(1 .. 12) of Unbounded_String :=
-     (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
-      To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
-      To_Unbounded_String("Size"), To_Unbounded_String("Packed"),
-      To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
-      To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
-      To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
 
    procedure SetActive(NewActive: Positive; Created: Boolean := False) is
       Header: Ttk_Frame;

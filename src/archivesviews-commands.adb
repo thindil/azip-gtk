@@ -262,32 +262,6 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Show_Find_Dialog_Command;
 
-   function Close_Dialog_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int with
-      Convention => C;
-
-   function Close_Dialog_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc);
-      Dialog: Tk_Toplevel;
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-   begin
-      Dialog.Interp := MainWindow.Interp;
-      Dialog.Name := New_String(CArgv.Arg(Argv, 1));
-      Destroy(Dialog);
-      if Winfo_Get(MainWindow, "exists") = "1"
-        and then
-        (Status(MainWindow) = "1" and
-         CArgv.Arg(Argv, 1) /= ".creditsdialog") then
-         Forget(MainWindow);
-      end if;
-      return TCL_OK;
-   end Close_Dialog_Command;
-
    function Find_In_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -525,7 +499,6 @@ package body ArchivesViews.Commands is
       AddCommand("Sort", Sort_Command'Access);
       AddCommand("TestArchive", Test_Archive_Command'Access);
       AddCommand("ShowFindDialog", Show_Find_Dialog_Command'Access);
-      AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("FindInArchive", Find_In_Archive_Command'Access);
       AddCommand("ToggleView", Toggle_View_Command'Access);
       AddCommand("AddFolder", Add_Folder_Command'Access);

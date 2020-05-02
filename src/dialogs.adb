@@ -26,8 +26,11 @@ with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Busy; use Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
+use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
 use Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
@@ -38,6 +41,32 @@ with ArchivesViews; use ArchivesViews;
 package body Dialogs is
 
    package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
+
+   function Close_Dialog_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Close_Dialog_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc);
+      Dialog: Tk_Toplevel;
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
+   begin
+      Dialog.Interp := Interp;
+      Dialog.Name := New_String(CArgv.Arg(Argv, 1));
+      Destroy(Dialog);
+      if Winfo_Get(MainWindow, "exists") = "1"
+        and then
+        (Status(MainWindow) = "1" and
+         CArgv.Arg(Argv, 1) /= ".creditsdialog") then
+         Forget(MainWindow);
+      end if;
+      return TCL_OK;
+   end Close_Dialog_Command;
 
    procedure SetDialog
      (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
@@ -106,6 +135,7 @@ package body Dialogs is
          end if;
       end AddCommand;
    begin
+      AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("SetVisibleColumns", Set_Visible_Columns_Command'Access);
    end AddCommands;
 

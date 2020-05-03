@@ -31,6 +31,8 @@ package ArchivesViews is
       To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
       To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
 
+   ActiveArchive: Natural := 0;
+
    procedure CreateMDI;
 
 private

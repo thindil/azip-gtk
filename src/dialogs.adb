@@ -22,6 +22,7 @@ with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
+with GNAT.String_Split; use GNAT.String_Split;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
@@ -34,6 +35,7 @@ use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
 use Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
+with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with ArchivesViews; use ArchivesViews;
@@ -103,24 +105,61 @@ package body Dialogs is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Argc, Argv);
       ColumnsDialog: constant Tk_Toplevel :=
         Create(".columnsdialog", "-class Dialog");
       CheckButton: Ttk_CheckButton;
       CloseButton: constant Ttk_Button :=
-        Create(".columnsdialog.closebutton", "-text Done");
+        Create
+          (".columnsdialog.closebutton",
+           "-text Done -command {SetColumns .columnsdialog}");
+      Tokens: Slice_Set;
+      FilesView: Ttk_Tree_View;
    begin
+      FilesView.Interp := Interp;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      Create
+        (Tokens, Tcl.Tk.Ada.Widgets.cget(FilesView, "-displaycolumns"), " ");
       for I in ColumnsNames'Range loop
          CheckButton :=
            Create
-             (".columnsdialog.checkbutton" & Trim(Positive'Image(I), Both),
+             (".columnsdialog.checkbutton" & Trim(Positive'Image(I), Left),
               "-text {" & To_String(ColumnsNames(I)) & "}");
+         for J in 1 .. Slice_Count(Tokens) loop
+            if Slice(Tokens, J) = Trim(Positive'Image(I), Left) then
+               Tcl_SetVar
+                 (Interp,
+                  ".columnsdialog.checkbutton" & Trim(Positive'Image(I), Left),
+                  "1");
+               exit;
+            end if;
+         end loop;
+         if I in 1 | 10 | 12 then
+            Tcl.Tk.Ada.Widgets.configure(CheckButton, "-state disabled");
+         end if;
          Tcl.Tk.Ada.Pack.Pack(CheckButton);
       end loop;
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog(ColumnsDialog, "Azip - Select displayed columns", 200, 450);
       return TCL_OK;
    end Set_Visible_Columns_Command;
+
+   function Set_Columns_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Set_Columns_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+   begin
+      return Close_Dialog_Command(ClientData, Interp, Argc, Argv);
+   end Set_Columns_Command;
 
    procedure AddCommands is
       procedure AddCommand
@@ -137,6 +176,7 @@ package body Dialogs is
    begin
       AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("SetVisibleColumns", Set_Visible_Columns_Command'Access);
+      AddCommand("SetColumns", Set_Columns_Command'Access);
    end AddCommands;
 
 end Dialogs;

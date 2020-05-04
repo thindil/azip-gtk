@@ -112,7 +112,7 @@ package body Dialogs is
       CloseButton: constant Ttk_Button :=
         Create
           (".columnsdialog.closebutton",
-           "-text Done -command {SetColumns .columnsdialog}");
+           "-text Done -command {CloseDialog .columnsdialog}");
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
    begin
@@ -127,7 +127,8 @@ package body Dialogs is
          CheckButton :=
            Create
              (".columnsdialog.checkbutton" & Trim(Positive'Image(I), Left),
-              "-text {" & To_String(ColumnsNames(I)) & "}");
+              "-text {" & To_String(ColumnsNames(I)) &
+              "} -command SetColumns");
          for J in 1 .. Slice_Count(Tokens) loop
             if Slice(Tokens, J) = Trim(Positive'Image(I), Left) then
                Tcl_SetVar
@@ -157,8 +158,31 @@ package body Dialogs is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc, Argv);
+      DisplayColumns: Unbounded_String := To_Unbounded_String("[list");
+      FilesView: Ttk_Tree_View;
    begin
-      return Close_Dialog_Command(ClientData, Interp, Argc, Argv);
+      for I in ColumnsNames'Range loop
+         if Tcl_GetVar
+             (Interp,
+              ".columnsdialog.checkbutton" & Trim(Positive'Image(I), Left)) =
+           "1" then
+            Append(DisplayColumns, Positive'Image(I));
+         end if;
+      end loop;
+      Append(DisplayColumns, "]");
+      FilesView.Interp := Interp;
+      for I in 1 .. ArchiveNumber loop
+         FilesView.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(I), Left) &
+              ".filesframe.fileslist");
+         if Winfo_Get(FilesView, "exists") = "1" then
+            Tcl.Tk.Ada.Widgets.configure
+              (FilesView, "-displaycolumns " & To_String(DisplayColumns));
+         end if;
+      end loop;
+      return TCL_OK;
    end Set_Columns_Command;
 
    procedure AddCommands is

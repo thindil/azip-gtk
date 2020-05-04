@@ -32,6 +32,8 @@ package ArchivesViews is
       To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
 
    ActiveArchive: Natural := 0;
+   ArchiveNumber: Positive;
+
 
    procedure CreateMDI;
 

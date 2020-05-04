@@ -56,8 +56,6 @@ with MenuBar; use MenuBar;
 
 package body ArchivesViews is
 
-   ArchiveNumber: Positive;
-
    procedure SetActive(NewActive: Positive; Created: Boolean := False) is
       Header: Ttk_Frame;
       OldName: constant String :=

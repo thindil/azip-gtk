@@ -809,31 +809,43 @@ package body ArchivesViews is
    end FindInArchive;
 
    procedure ToggleView is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       DirectoryFrame: Ttk_Frame;
       Paned: Ttk_PanedWindow;
       FilesList: Ttk_Tree_View;
    begin
       DirectoryFrame.Interp := Get_Context;
-      DirectoryFrame.Name := New_String(ViewName & ".directoryframe");
       Paned.Interp := DirectoryFrame.Interp;
-      Paned.Name := New_String(ViewName & ".paned");
       FilesList.Interp := DirectoryFrame.Interp;
-      FilesList.Name := New_String(ViewName & ".filesframe.fileslist");
-      if Tcl_GetVar(Get_Context, "viewtype") = "tree"
-        and then Winfo_Get(DirectoryFrame, "ismapped") = "0" then
-         Insert(Paned, "0", DirectoryFrame, "-weight 1");
-         configure
-           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
-      elsif Winfo_Get(DirectoryFrame, "ismapped") = "1" then
-         Forget(Paned, DirectoryFrame);
-         configure
-           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
-      end if;
-      ShowFiles;
-      for I in 1 .. 12 loop
-         Heading(FilesList, Positive'Image(I), "-image {}");
+      for I in 1 .. ArchiveNumber loop
+         FilesList.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(I), Left) &
+              ".filesframe.fileslist");
+         if Winfo_Get(FilesList, "exists") = "0" then
+            goto End_Of_Loop;
+         end if;
+         DirectoryFrame.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(I), Left) &
+              ".directoryframe");
+         Paned.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(I), Left) & ".paned");
+         if Tcl_GetVar(Get_Context, "viewtype") = "tree"
+           and then Winfo_Get(DirectoryFrame, "ismapped") = "0" then
+            Insert(Paned, "0", DirectoryFrame, "-weight 1");
+            configure
+              (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
+         elsif Winfo_Get(DirectoryFrame, "ismapped") = "1" then
+            Forget(Paned, DirectoryFrame);
+            configure
+              (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
+         end if;
+         ShowFiles;
+         for I in 1 .. 12 loop
+            Heading(FilesList, Positive'Image(I), "-image {}");
+         end loop;
+         <<End_Of_Loop>>
       end loop;
    end ToggleView;
 

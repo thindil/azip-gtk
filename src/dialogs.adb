@@ -159,7 +159,7 @@ package body Dialogs is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Argc, Argv);
-      DisplayColumns: Unbounded_String := To_Unbounded_String("[list");
+      DisplayColumns: Unbounded_String;
       FilesView: Ttk_Tree_View;
    begin
       for I in ColumnsNames'Range loop
@@ -170,7 +170,8 @@ package body Dialogs is
             Append(DisplayColumns, Positive'Image(I));
          end if;
       end loop;
-      Append(DisplayColumns, "]");
+      Trim(DisplayColumns, Left);
+      Tcl_SetVar(Interp, "visiblecolumns", To_String(DisplayColumns));
       FilesView.Interp := Interp;
       for I in 1 .. ArchiveNumber loop
          FilesView.Name :=
@@ -179,7 +180,7 @@ package body Dialogs is
               ".filesframe.fileslist");
          if Winfo_Get(FilesView, "exists") = "1" then
             Tcl.Tk.Ada.Widgets.configure
-              (FilesView, "-displaycolumns " & To_String(DisplayColumns));
+              (FilesView, "-displaycolumns [split $visiblecolumns]");
          end if;
       end loop;
       return TCL_OK;

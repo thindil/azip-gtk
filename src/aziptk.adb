@@ -107,6 +107,9 @@ begin
    -- Enable sorting of the files in the archives by default
    Tcl.Ada.Tcl_SetVar(Interp, "nosorting", "0");
 
+   -- List of visible columns
+   Tcl.Ada.Tcl_SetVar(Interp, "visiblecolumns", "1 2 3 4 5 6 7 8 9 11 12");
+
    -- Set color for active archive header
    Style_Configure
      ("aziptk.TFrame", "-background [ttk::style lookup . -selectbackground]");

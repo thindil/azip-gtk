@@ -118,9 +118,9 @@ package body ArchivesViews is
       FilesList: constant Ttk_Tree_View :=
         Create
           (Widget_Image(FilesFrame) & ".fileslist",
-           "-show headings -columns [list 1 2 3 4 5 6 7 8 9 10 11 12] -xscrollcommand """ &
-           Widget_Image(FilesXScroll) & " set"" -yscrollcommand """ &
-           Widget_Image(FilesYScroll) & " set""");
+           "-show headings -columns [list 1 2 3 4 5 6 7 8 9 10 11 12] -xscrollcommand {" &
+           Widget_Image(FilesXScroll) & " set} -yscrollcommand {" &
+           Widget_Image(FilesYScroll) & " set}");
       ViewType: constant String := Tcl_GetVar(FilesList.Interp, "viewtype");
       DirectoryFrame: constant Ttk_Frame :=
         Create(ViewName & ".directoryframe");
@@ -147,13 +147,7 @@ package body ArchivesViews is
             "-text {" & To_String(ColumnsNames(I)) & "} -command {Sort {" &
             To_String(ColumnsNames(I)) & "}}");
       end loop;
-      if ViewType = "flat" then
-         configure
-           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
-      else
-         configure
-           (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
-      end if;
+      configure(FilesList, "-displaycolumns [split $visiblecolumns]");
       Bind(DirectoryTree, "<<TreeviewSelect>>", "DirectorySelected");
       Bind(DirectoryTree, "<3>", "{tk_popup .directorymenu %X %Y}");
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
@@ -812,10 +806,28 @@ package body ArchivesViews is
       DirectoryFrame: Ttk_Frame;
       Paned: Ttk_PanedWindow;
       FilesList: Ttk_Tree_View;
+      VisibleColumns: Unbounded_String;
+      Tokens: Slice_Set;
    begin
       DirectoryFrame.Interp := Get_Context;
       Paned.Interp := DirectoryFrame.Interp;
       FilesList.Interp := DirectoryFrame.Interp;
+      if Tcl_GetVar(Get_Context, "viewtype") = "tree" then
+         Create(Tokens, Tcl_GetVar(Get_Context, "visiblecolumns"), " ");
+         for I in 1 .. Slice_Count(Tokens) loop
+            if Slice(Tokens, I) /= "10" then
+               Append(VisibleColumns, Slice(Tokens, I) & " ");
+            end if;
+         end loop;
+         Trim(VisibleColumns, Right);
+      else
+         VisibleColumns :=
+           To_Unbounded_String(Tcl_GetVar(Get_Context, "visiblecolumns"));
+         if Index(VisibleColumns, "10") = 0 then
+            Append(VisibleColumns, " 10");
+         end if;
+      end if;
+      Tcl_SetVar(Get_Context, "visiblecolumns", To_String(VisibleColumns));
       for I in 1 .. ArchiveNumber loop
          FilesList.Name :=
            New_String
@@ -834,13 +846,10 @@ package body ArchivesViews is
          if Tcl_GetVar(Get_Context, "viewtype") = "tree"
            and then Winfo_Get(DirectoryFrame, "ismapped") = "0" then
             Insert(Paned, "0", DirectoryFrame, "-weight 1");
-            configure
-              (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 11 12]");
          elsif Winfo_Get(DirectoryFrame, "ismapped") = "1" then
             Forget(Paned, DirectoryFrame);
-            configure
-              (FilesList, "-displaycolumns [list 1 2 3 4 5 6 7 8 9 10 11 12]");
          end if;
+         configure(FilesList, "-displaycolumns [split $visiblecolumns]");
          ShowFiles;
          for I in 1 .. 12 loop
             Heading(FilesList, Positive'Image(I), "-image {}");

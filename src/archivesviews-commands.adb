@@ -20,20 +20,12 @@
 
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Interfaces.C;
-with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
-with Tcl.Tk.Ada.Busy; use Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
-with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
-with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
-with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
-use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
-with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
-with AboutDialog; use AboutDialog;
 
 package body ArchivesViews.Commands is
 
@@ -403,22 +395,6 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Show_Properties_Command;
 
-   function Show_About_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int with
-      Convention => C;
-
-   function Show_About_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-   begin
-      ShowAbout;
-      return TCL_OK;
-   end Show_About_Command;
-
    function Toggle_Select_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -506,7 +482,6 @@ package body ArchivesViews.Commands is
       AddCommand("UpdateArchive", Update_Archive_Command'Access);
       AddCommand("RecompressArchive", Recompress_Archive_Command'Access);
       AddCommand("ShowProperties", Show_Properties_Command'Access);
-      AddCommand("ShowAbout", Show_About_Command'Access);
       AddCommand("ToggleSelect", Toggle_Select_Command'Access);
       AddCommand("DeleteDirectory", Delete_Directory_Command'Access);
       AddCommand("ExtractFile", Extract_File_Command'Access);

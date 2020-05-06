@@ -28,6 +28,22 @@ package body AboutDialog.Commands is
 
    package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+   begin
+      ShowAbout;
+      return TCL_OK;
+   end Show_About_Command;
+
    function Credits_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -57,6 +73,7 @@ package body AboutDialog.Commands is
          end if;
       end AddCommand;
    begin
+      AddCommand("ShowAbout", Show_About_Command'Access);
       AddCommand("ShowCredits", Credits_Command'Access);
    end AddCommands;
 

@@ -159,7 +159,8 @@ package body MenuBar is
         (".menubar.options", "Options",
          (1 =>
             (To_Unbounded_String("command"),
-             To_Unbounded_String("-label ""General options"" -underline 0"))));
+             To_Unbounded_String
+               ("-label ""General options"" -underline 0 -command ShowOptions"))));
       CreateSubMenu
         (".menubar.window", "Window",
          ((To_Unbounded_String("radiobutton"),

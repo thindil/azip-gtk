@@ -24,9 +24,12 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Grid;
+with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
+with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
+with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with Dialogs; use Dialogs;
 
 package body OptionsDialog is
@@ -38,20 +41,26 @@ package body OptionsDialog is
         Create(".optionsdialog", "-class Dialog");
       ButtonBox: constant Ttk_Frame := Create(".optionsdialog.buttonbox");
       Button: Ttk_Button;
-   begin
-      Button :=
+      DirectoryFrame: constant Ttk_LabelFrame :=
         Create
-          (".optionsdialog.buttonbox.ok",
-           "-text Ok");
+          (".optionsdialog.directoryframe",
+           "-text {Directory suggested for archive extraction (if empty: archive's location)}");
+      DirectoryEntry: constant Ttk_Entry :=
+        Create(".optionsdialog.directoryframe.entry");
+   begin
+      Tcl.Tk.Ada.Pack.Pack(DirectoryEntry, "-expand true -fill x -side left");
+      Button := Create(".optionsdialog.directoryframe.button", "-text Choose");
+      Tcl.Tk.Ada.Pack.Pack(Button);
+      Tcl.Tk.Ada.Grid.Grid(DirectoryFrame, "-sticky we");
+      Button := Create(".optionsdialog.buttonbox.ok", "-text Ok");
       Tcl.Tk.Ada.Grid.Grid(Button);
       Button :=
         Create
           (".optionsdialog.buttonbox.close",
            "-text Close -command {CloseDialog .optionsdialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
-      Tcl.Tk.Ada.Grid.Grid
-        (ButtonBox, "-column 0 -row 1 -sticky s");
-      SetDialog(OptionsDialog, "AZip - General Options", 500, 400);
+      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 1");
+      SetDialog(OptionsDialog, "AZip - General Options", 550, 100);
    end ShowOptions;
 
    function Show_Options_Command

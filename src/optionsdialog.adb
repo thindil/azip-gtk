@@ -19,10 +19,12 @@
 -- SOFTWARE.
 
 with Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
@@ -49,7 +51,10 @@ package body OptionsDialog is
         Create(".optionsdialog.directoryframe.entry");
    begin
       Tcl.Tk.Ada.Pack.Pack(DirectoryEntry, "-expand true -fill x -side left");
-      Button := Create(".optionsdialog.directoryframe.button", "-text Choose");
+      Button :=
+        Create
+          (".optionsdialog.directoryframe.button",
+           "-text Choose -command SelectDirectory");
       Tcl.Tk.Ada.Pack.Pack(Button);
       Tcl.Tk.Ada.Grid.Grid(DirectoryFrame, "-sticky we");
       Button := Create(".optionsdialog.buttonbox.ok", "-text Ok");
@@ -79,6 +84,32 @@ package body OptionsDialog is
       return TCL_OK;
    end Show_Options_Command;
 
+   function Select_Directory_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Select_Directory_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc, Argv);
+      SelectedDirectory: constant String :=
+        Choose_Directory
+          ("-parent . -title {Choose extract directory} -mustexist true");
+      DirectoryEntry: Ttk_Entry;
+   begin
+      if SelectedDirectory = "" then
+         return TCL_OK;
+      end if;
+      DirectoryEntry.Interp := Interp;
+      DirectoryEntry.Name := New_String(".optionsdialog.directoryframe.entry");
+      Delete(DirectoryEntry, "0", "end");
+      Insert(DirectoryEntry, "0", SelectedDirectory);
+      return TCL_OK;
+   end Select_Directory_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -93,6 +124,7 @@ package body OptionsDialog is
       end AddCommand;
    begin
       AddCommand("ShowOptions", Show_Options_Command'Access);
+      AddCommand("SelectDirectory", Select_Directory_Command'Access);
    end AddCommands;
 
    procedure CreateOptions is

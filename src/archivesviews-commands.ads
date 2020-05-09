@@ -20,6 +20,8 @@
 
 package ArchivesViews.Commands is
 
+   ExtractingDirectory: Unbounded_String;
+
    procedure AddCommands;
 
 end ArchivesViews.Commands;

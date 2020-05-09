@@ -18,6 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with CArgv;
@@ -33,6 +34,7 @@ with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with Dialogs; use Dialogs;
+with ArchivesViews.Commands; use ArchivesViews.Commands;
 
 package body OptionsDialog is
 
@@ -57,7 +59,8 @@ package body OptionsDialog is
            "-text Choose -command SelectDirectory");
       Tcl.Tk.Ada.Pack.Pack(Button);
       Tcl.Tk.Ada.Grid.Grid(DirectoryFrame, "-sticky we");
-      Button := Create(".optionsdialog.buttonbox.ok", "-text Ok");
+      Button :=
+        Create(".optionsdialog.buttonbox.ok", "-text Ok -command SetOptions");
       Tcl.Tk.Ada.Grid.Grid(Button);
       Button :=
         Create
@@ -110,6 +113,31 @@ package body OptionsDialog is
       return TCL_OK;
    end Select_Directory_Command;
 
+   function Set_Options_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Set_Options_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Argc, Argv);
+      DirectoryEntry: Ttk_Entry;
+      Button: Ttk_Button;
+   begin
+      DirectoryEntry.Interp := Interp;
+      DirectoryEntry.Name := New_String(".optionsdialog.directoryframe.entry");
+      ExtractingDirectory := To_Unbounded_String(Get(DirectoryEntry));
+      Button.Interp := Interp;
+      Button.Name := New_String(".optionsdialog.buttonbox.close");
+      if Invoke(Button) /= "0" then
+         raise Program_Error with "Can't close options dialog";
+      end if;
+      return TCL_OK;
+   end Set_Options_Command;
+
    procedure AddCommands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
@@ -125,6 +153,7 @@ package body OptionsDialog is
    begin
       AddCommand("ShowOptions", Show_Options_Command'Access);
       AddCommand("SelectDirectory", Select_Directory_Command'Access);
+      AddCommand("SetOptions", Set_Options_Command'Access);
    end AddCommands;
 
    procedure CreateOptions is

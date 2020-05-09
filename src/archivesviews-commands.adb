@@ -142,9 +142,16 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
    begin
-      ExtractArchive
-        (Choose_Directory
-           ("-parent . -title {Extract current folder's content to...}"));
+      if ExtractingDirectory /= Null_Unbounded_String then
+         ExtractArchive
+           (Choose_Directory
+              ("-parent . -title {Extract current folder's content to...} -initialdir {" &
+               To_String(ExtractingDirectory) & "}"));
+      else
+         ExtractArchive
+           (Choose_Directory
+              ("-parent . -title {Extract current folder's content to...}"));
+      end if;
       return TCL_OK;
    end Extract_Command;
 

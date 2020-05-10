@@ -315,6 +315,7 @@ package body ArchivesViews is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
       if Directory = "" then
+         Destroy(ProgressDialog);
          return;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);

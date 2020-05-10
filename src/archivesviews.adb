@@ -284,7 +284,7 @@ package body ArchivesViews is
         New_String(To_String(ViewName) & ".filesframe.fileslist");
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
          Heading(FilesView, "1", "-image {}");
-         SortArchive("1");
+         SortArchive("Name");
       end if;
    end LoadArchive;
 

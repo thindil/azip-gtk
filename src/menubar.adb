@@ -176,7 +176,7 @@ package body MenuBar is
         (".menubar.help", "Help",
          ((To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Quick help"" -underline 0 -accelerator F1")),
+             ("-label ""Quick help"" -underline 0 -accelerator F1 -command ShowHelp")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""AZip Web page(contact, support)"" -underline 5")),

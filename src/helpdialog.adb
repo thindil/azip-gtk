@@ -24,8 +24,11 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Pack;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
+with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
+with Tcl.Tk.Ada.Widgets.TtkNotebook; use Tcl.Tk.Ada.Widgets.TtkNotebook;
 with Dialogs; use Dialogs;
 
 package body HelpDialog is
@@ -39,7 +42,16 @@ package body HelpDialog is
         Create
           (".helpdialog.closebutton",
            "-text Close -command {CloseDialog .helpdialog}");
+      HelpNoteBook: constant Ttk_Notebook := Create(".helpdialog.notebook");
+      HelpFrame: Ttk_Frame;
    begin
+      HelpFrame := Create(".helpdialog.notebook.userinterface");
+      Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {User Interface}");
+      HelpFrame := Create(".helpdialog.notebook.installation");
+      Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Installation}");
+      HelpFrame := Create(".helpdialog.notebook.commandline");
+      Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Command-line}");
+      Tcl.Tk.Ada.Pack.Pack(HelpNoteBook);
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog
         (OptionsDialog, "AZip - Quick Help, general tips and hints", 600, 400);

@@ -51,43 +51,64 @@ package body HelpDialog is
            "-text Close -command {CloseDialog .helpdialog}");
       HelpNoteBook: constant Ttk_Notebook := Create(".helpdialog.notebook");
       HelpFrame: Ttk_Frame;
-      procedure AddSubFrame(FrameName, ImageName, Text: String) is
+      procedure AddSubFrame(FrameName, FrameTitle, ImageName, Text: String) is
          SubHelpFrame: Ttk_LabelFrame;
          Label: Ttk_Label;
          Image: Tk_Photo;
+         Length: Positive := 600;
       begin
-         SubHelpFrame := Create(FrameName, "-text {Adding files and folders}");
-         Image :=
-           Create
-             (ImageName & "icon",
-              "-file {" & Containing_Directory(Command_Name) &
-              Directory_Separator & "plus.gif}");
-         Label :=
-           Create
-             (Widget_Image(SubHelpFrame) & ".image",
-              "-image " & Widget_Image(Image));
-         Tcl.Tk.Ada.Pack.Pack(Label, "-side left");
+         SubHelpFrame := Create(FrameName, "-text {" & FrameTitle & "}");
+         if ImageName /= "" then
+            Image :=
+              Create
+                (ImageName & "icon",
+                 "-file {" & Containing_Directory(Command_Name) &
+                 Directory_Separator & ImageName & "}");
+            Label :=
+              Create
+                (Widget_Image(SubHelpFrame) & ".image",
+                 "-image " & Widget_Image(Image));
+            Tcl.Tk.Ada.Pack.Pack(Label, "-side left");
+            Length := 550;
+         end if;
          Label :=
            Create
              (Widget_Image(SubHelpFrame) & ".label",
-              "-text {" & Text & "} -wraplength 550");
+              "-text {" & Text & "} -wraplength" & Positive'Image(Length));
          Tcl.Tk.Ada.Pack.Pack(Label, "-side right");
          Tcl.Tk.Ada.Pack.Pack(SubHelpFrame);
       end AddSubFrame;
    begin
       HelpFrame := Create(".helpdialog.notebook.userinterface");
       AddSubFrame
-        (Widget_Image(HelpFrame) & ".adding", "plus.gif",
+        (Widget_Image(HelpFrame) & ".adding", "Adding files and folders",
+         "plus.gif",
          "You can add files, or individual folders through menu commands (+) or buttons. BUT: you can also do it easily via Drag && Drop, from a Windows Explorer window or the Desktop, onto an AZip archive window. Any mix of dragged folders and files is supported.");
+      AddSubFrame
+        (Widget_Image(HelpFrame) & ".unpacking", "Unpacking files",
+         "drag_unpack.gif",
+         "You can extract selected files, the selected folder, or the entire archive via the Extract command (Ctrl+E) or a button. BUT: you can also extract files via Drag && Drop to a Windows Explorer window or to the Desktop.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {User Interface}");
       HelpFrame := Create(".helpdialog.notebook.installation");
+      AddSubFrame
+        (Widget_Image(HelpFrame) & ".stealth",
+         "Using AZip as a portable software - stealth mode", "no_regedit.gif",
+         "For convenience, by default, AZip writes user settings in the registry, as standard Windows software does. If you want the registry NOT being written to, you can add a file, azip.cfg (can be empty), in the same directory as azip*.exe. User settings will be recorded there. If the file is read-only, it simply won't be changed, and settings won't be saved.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Installation}");
       HelpFrame := Create(".helpdialog.notebook.commandline");
+      AddSubFrame
+        (Widget_Image(HelpFrame) & ".parameters", "Command-line parameters",
+         "",
+         "The activation of AZip with command-line parameters for specific operations is under construction");
+      AddSubFrame
+        (Widget_Image(HelpFrame) & ".tools",
+         "Command-line tools with console output", "za_console.gif",
+         "Pure command-line tools corresponding to AZip are located in the Zip-Ada project (zipada, unzipada, rezip, find_zip, comp_zip). Follow hyperlink in the About box for download.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Command-line}");
       Tcl.Tk.Ada.Pack.Pack(HelpNoteBook);
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog
-        (OptionsDialog, "AZip - Quick Help, general tips and hints", 600, 400);
+        (OptionsDialog, "AZip - Quick Help, general tips and hints", 600, 300);
    end ShowHelp;
 
    function Show_Help_Command

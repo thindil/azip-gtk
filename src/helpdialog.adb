@@ -18,16 +18,23 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Directories; use Ada.Directories;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Interfaces.C;
 with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
+with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
+with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
+with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with Tcl.Tk.Ada.Widgets.TtkNotebook; use Tcl.Tk.Ada.Widgets.TtkNotebook;
 with Dialogs; use Dialogs;
 
@@ -44,8 +51,34 @@ package body HelpDialog is
            "-text Close -command {CloseDialog .helpdialog}");
       HelpNoteBook: constant Ttk_Notebook := Create(".helpdialog.notebook");
       HelpFrame: Ttk_Frame;
+      procedure AddSubFrame(FrameName, ImageName, Text: String) is
+         SubHelpFrame: Ttk_LabelFrame;
+         Label: Ttk_Label;
+         Image: Tk_Photo;
+      begin
+         SubHelpFrame := Create(FrameName, "-text {Adding files and folders}");
+         Image :=
+           Create
+             (ImageName & "icon",
+              "-file {" & Containing_Directory(Command_Name) &
+              Directory_Separator & "plus.gif}");
+         Label :=
+           Create
+             (Widget_Image(SubHelpFrame) & ".image",
+              "-image " & Widget_Image(Image));
+         Tcl.Tk.Ada.Pack.Pack(Label, "-side left");
+         Label :=
+           Create
+             (Widget_Image(SubHelpFrame) & ".label",
+              "-text {" & Text & "} -wraplength 550");
+         Tcl.Tk.Ada.Pack.Pack(Label, "-side right");
+         Tcl.Tk.Ada.Pack.Pack(SubHelpFrame);
+      end AddSubFrame;
    begin
       HelpFrame := Create(".helpdialog.notebook.userinterface");
+      AddSubFrame
+        (Widget_Image(HelpFrame) & ".adding", "plus.gif",
+         "You can add files, or individual folders through menu commands (+) or buttons. BUT: you can also do it easily via Drag && Drop, from a Windows Explorer window or the Desktop, onto an AZip archive window. Any mix of dragged folders and files is supported.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {User Interface}");
       HelpFrame := Create(".helpdialog.notebook.installation");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Installation}");

@@ -19,7 +19,6 @@
 -- SOFTWARE.
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Grid;
@@ -49,7 +48,6 @@ package body AboutDialog is
       Button: Ttk_Button;
       Label: Ttk_Label;
       InfoFrame: constant Ttk_Frame := Create(".aboutdialog.infoframe");
-      OsName: constant String := Tcl_GetVar(Get_Context, "tcl_platform(os)");
       LibrariesFrame: constant Ttk_LabelFrame :=
         Create
           (".aboutdialog.librariesframe",
@@ -57,15 +55,8 @@ package body AboutDialog is
       procedure AddLinkButton
         (Name, URL: String; Row: Natural; Column: Natural := 1;
          Text: String := "") is
-         Command, ButtonText: Unbounded_String;
+         ButtonText: Unbounded_String;
       begin
-         if OsName = "Windows" then
-            Command := To_Unbounded_String("start");
-         elsif OsName = "Linux" then
-            Command := To_Unbounded_String("xdg-open");
-         elsif OsName = "Darwin" then
-            Command := To_Unbounded_String("open");
-         end if;
          if Text = "" then
             ButtonText := To_Unbounded_String(URL);
          else
@@ -75,7 +66,7 @@ package body AboutDialog is
            Create
              (Name,
               "-text {" & To_String(ButtonText) &
-              "} -style Toolbutton -command {exec " & To_String(Command) &
+              "} -style Toolbutton -command {OpenLink " &
               " " & URL & "}");
          Tcl.Tk.Ada.Grid.Grid
            (Button,

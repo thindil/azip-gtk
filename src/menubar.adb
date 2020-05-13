@@ -179,9 +179,10 @@ package body MenuBar is
              ("-label ""Quick help"" -underline 0 -accelerator F1 -command ShowHelp")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""AZip Web page(contact, support)"" -underline 5")),
+             ("-label ""AZip Web page(contact, support)"" -underline 5 -command {OpenLink https://azip.sourceforge.io/}")),
           (To_Unbounded_String("command"),
-           To_Unbounded_String("-label ""AZip news"" -underline 5")),
+           To_Unbounded_String
+             ("-label ""AZip news"" -underline 5 -command {OpenLink https://sourceforge.net/p/azip/news/}")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String

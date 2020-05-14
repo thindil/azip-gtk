@@ -21,5 +21,6 @@
 package Toolbar is
 
    procedure CreateToolbar;
+   procedure ToggleButtons(Enable: Boolean := True);
 
 end Toolbar;

@@ -53,6 +53,7 @@ with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands;
 with Dialogs; use Dialogs;
 with MenuBar; use MenuBar;
+with Toolbar; use Toolbar;
 
 package body ArchivesViews is
 
@@ -62,6 +63,7 @@ package body ArchivesViews is
         ".mdi.archive" & Trim(Natural'Image(ActiveArchive), Both);
       NewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(NewActive), Both);
+      NameLabel: Ttk_Label;
    begin
       Header.Interp := Get_Context;
       if ActiveArchive > 0 then
@@ -74,8 +76,9 @@ package body ArchivesViews is
       end if;
       Header.Name := New_String(NewName & ".header");
       configure(Header, "-style aziptk.TFrame");
-      Header.Name := New_String(NewName & ".header.label");
-      configure(Header, "-style aziptk.TLabel");
+      NameLabel.Interp := Get_Context;
+      NameLabel.Name := New_String(NewName & ".header.label");
+      configure(NameLabel, "-style aziptk.TLabel");
       ActiveArchive := NewActive;
       SetCloseCommand(ActiveArchive);
       Header.Name := New_String(NewName & ".directoryframe");
@@ -85,6 +88,11 @@ package body ArchivesViews is
          else
             Tcl_SetVar(Header.Interp, "viewtype", "flat");
          end if;
+      end if;
+      if cget(NameLabel, "-text")(1 .. 3) /= "New" then
+         ToggleButtons;
+      else
+         ToggleButtons(False);
       end if;
    end SetActive;
 
@@ -286,6 +294,7 @@ package body ArchivesViews is
          Heading(FilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
+      ToggleButtons;
    end LoadArchive;
 
    function GetArchiveName return String is
@@ -465,6 +474,7 @@ package body ArchivesViews is
          Heading(FilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
+      ToggleButtons;
    end AddFiles;
 
    procedure SaveArchiveAs is

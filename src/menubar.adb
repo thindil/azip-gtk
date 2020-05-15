@@ -89,17 +89,17 @@ package body MenuBar is
         (".menubar.edit", "Edit",
          ((To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Select all"" -underline 7 -accelerator Ctrl+A -command {ToggleSelect true}")),
+             ("-label ""Select all"" -underline 7 -accelerator Ctrl+A -command {ToggleSelect true} -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U -command {ToggleSelect false}")),
+             ("-label ""Unselect all"" -underline 0 -accelerator Ctrl+U -command {ToggleSelect false} -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E -command Extract")),
+             ("-label ""Extract..."" -underline 0 -accelerator Ctrl+E -command Extract -state disabled")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Delete entries"" -accelerator Del/- -command DeleteItems")),
+             ("-label ""Delete entries"" -accelerator Del/- -command DeleteItems -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Add files..."" -underline 1 -accelerator + -command {AddFiles false}")),
@@ -116,17 +116,17 @@ package body MenuBar is
         (".menubar.tools", "Tools",
          ((To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Test archive"" -underline 0 -accelerator Ctrl+T -command TestArchive")),
+             ("-label ""Test archive"" -underline 0 -accelerator Ctrl+T -command TestArchive -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Find in archive..."" -underline 0 -accelerator Ctrl+F -command ShowFindDialog")),
+             ("-label ""Find in archive..."" -underline 0 -accelerator Ctrl+F -command ShowFindDialog -state disabled")),
           Separator,
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Update archive"" -underline 0 -accelerator Ctrl+P -command UpdateArchive")),
+             ("-label ""Update archive"" -underline 0 -accelerator Ctrl+P -command UpdateArchive -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
-             ("-label ""Recompress archive"" -underline 0 -accelerator Ctrl+R -command RecompressArchive")),
+             ("-label ""Recompress archive"" -underline 0 -accelerator Ctrl+R -command RecompressArchive -state disabled")),
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Touch time stamps"" -underline 1 -state disabled")),
@@ -198,5 +198,31 @@ package body MenuBar is
       Entry_Configure
         (FileMenu, "3", "-command ""Close" & Positive'Image(Index) & """");
    end SetCloseCommand;
+
+   procedure ToggleEntries(Enable: Boolean := True) is
+      MenuBar: Tk_Menu;
+   begin
+      MenuBar.Interp := Get_Context;
+      MenuBar.Name := New_String(".menubar.edit");
+      for I in 0 .. 4 loop
+         if I /= 3 then
+            if Enable then
+               Entry_Configure(MenuBar, Natural'Image(I), "-state normal");
+            else
+               Entry_Configure(MenuBar, Natural'Image(I), "-state disabled");
+            end if;
+         end if;
+      end loop;
+      MenuBar.Name := New_String(".menubar.tools");
+      for I in 0 .. 4 loop
+         if I /= 2 then
+            if Enable then
+               Entry_Configure(MenuBar, Natural'Image(I), "-state normal");
+            else
+               Entry_Configure(MenuBar, Natural'Image(I), "-state disabled");
+            end if;
+         end if;
+      end loop;
+   end ToggleEntries;
 
 end MenuBar;

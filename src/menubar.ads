@@ -24,5 +24,6 @@ package MenuBar is
 
    procedure CreateMenuBar(MainWindow: Tk_Toplevel);
    procedure SetCloseCommand(Index: Positive);
+   procedure ToggleEntries(Enable: Boolean := True);
 
 end MenuBar;

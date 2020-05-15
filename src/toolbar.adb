@@ -31,6 +31,7 @@ with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkSeparator; use Tcl.Tk.Ada.Widgets.TtkSeparator;
 with Tcl.Tk.Ada.Widgets.TtkWidget; use Tcl.Tk.Ada.Widgets.TtkWidget;
 with Tcl.Tklib.Ada.Tooltip; use Tcl.Tklib.Ada.Tooltip;
+with MenuBar; use MenuBar;
 
 package body Toolbar is
 
@@ -112,6 +113,7 @@ package body Toolbar is
             State(Toolbutton, "disabled");
          end if;
       end loop;
+      ToggleEntries(Enable);
    end ToggleButtons;
 
 end Toolbar;

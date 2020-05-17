@@ -100,12 +100,14 @@ package body AboutDialog.Commands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
          Command: Tcl.Tcl_Command;
+         Azip_About_Add_Command_Exception: exception;
       begin
          Command :=
            CreateCommands.Tcl_CreateCommand
              (Get_Context, Name, AdaCommand, 0, null);
          if Command = null then
-            raise Program_Error with "Can't add command " & Name;
+            raise Azip_About_Add_Command_Exception
+              with "Can't add command " & Name;
          end if;
       end AddCommand;
    begin

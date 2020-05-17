@@ -44,9 +44,10 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc);
       use type Interfaces.C.int;
       ArchiveName: constant String := ".mdi.archive" & CArgv.Arg(Argv, 1);
+      Azip_Close_Archive_Error: exception;
    begin
       if Tcl.Ada.Tcl_Eval(Interp, "destroy " & ArchiveName) = TCL_ERROR then
-         raise Program_Error with "Can't destroy archive view.";
+         raise Azip_Close_Archive_Error with "Can't destroy archive view.";
       end if;
       Tcl.Ada.Tcl_UnsetVar(Interp, "lastindex" & CArgv.Arg(Argv, 1));
       if Panes(MDI) = "" then
@@ -100,12 +101,14 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc, Argv);
       use type Interfaces.C.int;
       Tokens: Slice_Set;
+      Azip_Close_All_Archives_Error: exception;
    begin
       Create(Tokens, Panes(MDI), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          if Tcl.Ada.Tcl_Eval(Interp, "destroy " & Slice(Tokens, I)) =
            TCL_ERROR then
-            raise Program_Error with "Can't destroy archive view.";
+            raise Azip_Close_All_Archives_Error
+              with "Can't destroy archive view.";
          end if;
       end loop;
       CreateView;
@@ -461,12 +464,14 @@ package body ArchivesViews.Commands is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
          Command: Tcl.Tcl_Command;
+         Azip_Archives_Add_Comman_Error: exception;
       begin
          Command :=
            CreateCommands.Tcl_CreateCommand
              (Get_Context, Name, AdaCommand, 0, null);
          if Command = null then
-            raise Program_Error with "Can't add command " & Name;
+            raise Azip_Archives_Add_Comman_Error
+              with "Can't add command " & Name;
          end if;
       end AddCommand;
    begin

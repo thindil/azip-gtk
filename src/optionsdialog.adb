@@ -126,6 +126,7 @@ package body OptionsDialog is
       pragma Unreferenced(ClientData, Argc, Argv);
       DirectoryEntry: Ttk_Entry;
       Button: Ttk_Button;
+      Azip_Options_Dialog_Error: exception;
    begin
       DirectoryEntry.Interp := Interp;
       DirectoryEntry.Name := New_String(".optionsdialog.directoryframe.entry");
@@ -133,7 +134,7 @@ package body OptionsDialog is
       Button.Interp := Interp;
       Button.Name := New_String(".optionsdialog.buttonbox.close");
       if Invoke(Button) /= "0" then
-         raise Program_Error with "Can't close options dialog";
+         raise Azip_Options_Dialog_Error with "Can't close options dialog";
       end if;
       return TCL_OK;
    end Set_Options_Command;
@@ -142,12 +143,14 @@ package body OptionsDialog is
       procedure AddCommand
         (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
          Command: Tcl.Tcl_Command;
+         Azip_Add_Command_Options_Dialog_Error: exception;
       begin
          Command :=
            CreateCommands.Tcl_CreateCommand
              (Get_Context, Name, AdaCommand, 0, null);
          if Command = null then
-            raise Program_Error with "Can't add command " & Name;
+            raise Azip_Add_Command_Options_Dialog_Error
+              with "Can't add command " & Name;
          end if;
       end AddCommand;
    begin

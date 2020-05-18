@@ -66,8 +66,7 @@ package body AboutDialog is
            Create
              (Name,
               "-text {" & To_String(ButtonText) &
-              "} -style Toolbutton -command {OpenLink " &
-              " " & URL & "}");
+              "} -style Toolbutton -command {OpenLink " & " " & URL & "}");
          Tcl.Tk.Ada.Grid.Grid
            (Button,
             "-column" & Natural'Image(Column) & " -row" & Natural'Image(Row));

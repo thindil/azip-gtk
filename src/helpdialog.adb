@@ -24,7 +24,6 @@ with GNAT.OS_Lib; use GNAT.OS_Lib;
 with Interfaces.C;
 with CArgv;
 with Tcl; use Tcl;
-with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Image; use Tcl.Tk.Ada.Image;
 with Tcl.Tk.Ada.Image.Photo; use Tcl.Tk.Ada.Image.Photo;
@@ -37,10 +36,9 @@ with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with Tcl.Tk.Ada.Widgets.TtkNotebook; use Tcl.Tk.Ada.Widgets.TtkNotebook;
 with Dialogs; use Dialogs;
+with Utils; use Utils;
 
 package body HelpDialog is
-
-   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    procedure ShowHelp is
       OptionsDialog: constant Tk_Toplevel :=
@@ -128,18 +126,6 @@ package body HelpDialog is
    end Show_Help_Command;
 
    procedure AddCommands is
-      procedure AddCommand
-        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-         Command: Tcl.Tcl_Command;
-         Azip_Help_Add_Command_Error: exception;
-      begin
-         Command :=
-           CreateCommands.Tcl_CreateCommand
-             (Get_Context, Name, AdaCommand, 0, null);
-         if Command = null then
-            raise Azip_Help_Add_Command_Error with "Can't add command " & Name;
-         end if;
-      end AddCommand;
    begin
       AddCommand("ShowHelp", Show_Help_Command'Access);
    end AddCommands;

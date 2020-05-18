@@ -25,12 +25,11 @@ with CArgv;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Utils; use Utils;
 
 package body AboutDialog.Commands is
 
    Azip_Execute_Error: exception;
-
-   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    function Show_About_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -97,19 +96,6 @@ package body AboutDialog.Commands is
    end Open_Link_Command;
 
    procedure AddCommands is
-      procedure AddCommand
-        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-         Command: Tcl.Tcl_Command;
-         Azip_About_Add_Command_Exception: exception;
-      begin
-         Command :=
-           CreateCommands.Tcl_CreateCommand
-             (Get_Context, Name, AdaCommand, 0, null);
-         if Command = null then
-            raise Azip_About_Add_Command_Exception
-              with "Can't add command " & Name;
-         end if;
-      end AddCommand;
    begin
       AddCommand("ShowAbout", Show_About_Command'Access);
       AddCommand("ShowCredits", Credits_Command'Access);

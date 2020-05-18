@@ -26,10 +26,9 @@ with Tcl; use Tcl;
 with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
+with Utils; use Utils;
 
 package body ArchivesViews.Commands is
-
-   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    function Close_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -461,19 +460,6 @@ package body ArchivesViews.Commands is
    end Extract_File_Command;
 
    procedure AddCommands is
-      procedure AddCommand
-        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-         Command: Tcl.Tcl_Command;
-         Azip_Archives_Add_Comman_Error: exception;
-      begin
-         Command :=
-           CreateCommands.Tcl_CreateCommand
-             (Get_Context, Name, AdaCommand, 0, null);
-         if Command = null then
-            raise Azip_Archives_Add_Comman_Error
-              with "Can't add command " & Name;
-         end if;
-      end AddCommand;
    begin
       AddCommand("Close", Close_Command'Access);
       AddCommand("Create", Create_Command'Access);

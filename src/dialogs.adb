@@ -39,10 +39,9 @@ with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with ArchivesViews; use ArchivesViews;
+with Utils; use Utils;
 
 package body Dialogs is
-
-   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    function Close_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -187,19 +186,6 @@ package body Dialogs is
    end Set_Columns_Command;
 
    procedure AddCommands is
-      procedure AddCommand
-        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-         Command: Tcl.Tcl_Command;
-         Azip_Dialogs_Add_Command_Error: exception;
-      begin
-         Command :=
-           CreateCommands.Tcl_CreateCommand
-             (Get_Context, Name, AdaCommand, 0, null);
-         if Command = null then
-            raise Azip_Dialogs_Add_Command_Error
-              with "Can't add command " & Name;
-         end if;
-      end AddCommand;
    begin
       AddCommand("CloseDialog", Close_Dialog_Command'Access);
       AddCommand("SetVisibleColumns", Set_Visible_Columns_Command'Access);

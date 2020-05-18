@@ -23,7 +23,6 @@ with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 with CArgv;
 with Tcl; use Tcl;
-with Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Grid;
@@ -33,12 +32,11 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
-with Dialogs; use Dialogs;
 with ArchivesViews.Commands; use ArchivesViews.Commands;
+with Dialogs; use Dialogs;
+with Utils; use Utils;
 
 package body OptionsDialog is
-
-   package CreateCommands is new Tcl.Ada.Generic_Command(Integer);
 
    procedure ShowOptions is
       OptionsDialog: constant Tk_Toplevel :=
@@ -140,19 +138,6 @@ package body OptionsDialog is
    end Set_Options_Command;
 
    procedure AddCommands is
-      procedure AddCommand
-        (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-         Command: Tcl.Tcl_Command;
-         Azip_Add_Command_Options_Dialog_Error: exception;
-      begin
-         Command :=
-           CreateCommands.Tcl_CreateCommand
-             (Get_Context, Name, AdaCommand, 0, null);
-         if Command = null then
-            raise Azip_Add_Command_Options_Dialog_Error
-              with "Can't add command " & Name;
-         end if;
-      end AddCommand;
    begin
       AddCommand("ShowOptions", Show_Options_Command'Access);
       AddCommand("SelectDirectory", Select_Directory_Command'Access);

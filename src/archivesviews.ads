@@ -34,7 +34,6 @@ package ArchivesViews is
    ActiveArchive: Natural := 0;
    ArchiveNumber: Positive;
 
-
    procedure CreateMDI;
 
 private

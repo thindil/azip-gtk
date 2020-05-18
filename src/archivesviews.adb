@@ -255,48 +255,6 @@ package body ArchivesViews is
          Positive'Image(Positive'Value(To_String(FileIndex)) + 1));
    end AddFile;
 
-   procedure LoadArchive(FileName: String) is
-      Label: Ttk_Label;
-      LabelText: Unbounded_String;
-      DirectoryTree, FilesView: Ttk_Tree_View;
-      ViewName: Unbounded_String :=
-        To_Unbounded_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
-   begin
-      if FileName = "" then
-         return;
-      end if;
-      Label.Interp := Get_Context;
-      Label.Name := New_String(To_String(ViewName) & ".header.label");
-      LabelText := To_Unbounded_String(cget(Label, "-text"));
-      if Length(LabelText) > 10
-        and then Slice(LabelText, 1, 10) /= "New Archiv" then
-         CreateView;
-         ViewName :=
-           To_Unbounded_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
-         Label.Name := New_String(To_String(ViewName) & ".header.label");
-      end if;
-      configure(Label, "-text """ & FileName & """");
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(To_String(ViewName) & ".directoryframe.directorytree");
-      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
-      Selection_Set
-        (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
-      -- Some testing data
-      AddFile(FileName, "");
-      -- Sort archive if enabled
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String(To_String(ViewName) & ".filesframe.fileslist");
-      if Tcl_GetVar(Get_Context, "nosorting") = "0" then
-         Heading(FilesView, "1", "-image {}");
-         SortArchive("Name");
-      end if;
-      ToggleButtons;
-   end LoadArchive;
-
    function GetArchiveName return String is
       HeaderLabel: Ttk_Label;
    begin

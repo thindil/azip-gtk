@@ -40,9 +40,9 @@ private
 
    MDI: Ttk_PanedWindow;
 
+   procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
    procedure CreateView;
-   procedure LoadArchive(FileName: String);
    procedure ExtractArchive(Directory: String);
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";

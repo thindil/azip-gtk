@@ -19,13 +19,21 @@
 -- SOFTWARE.
 
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
+with Ada.Directories; use Ada.Directories;
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Interfaces.C;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with GNAT.String_Split; use GNAT.String_Split;
 with CArgv;
 with Tcl; use Tcl;
-with Tcl.Ada;
+with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
+with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
+with Toolbar; use Toolbar;
 with Utils; use Utils;
 
 package body ArchivesViews.Commands is
@@ -125,10 +133,48 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      Label: Ttk_Label;
+      LabelText: Unbounded_String;
+      DirectoryTree, FilesView: Ttk_Tree_View;
+      ViewName: Unbounded_String :=
+        To_Unbounded_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
+      FileName: constant String :=
+        Get_Open_File
+          ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false");
    begin
-      LoadArchive
-        (Get_Open_File
-           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false"));
+      if FileName = "" then
+         return TCL_OK;
+      end if;
+      Label.Interp := Get_Context;
+      Label.Name := New_String(To_String(ViewName) & ".header.label");
+      LabelText := To_Unbounded_String(cget(Label, "-text"));
+      if Length(LabelText) > 10
+        and then Slice(LabelText, 1, 10) /= "New Archiv" then
+         CreateView;
+         ViewName :=
+           To_Unbounded_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
+         Label.Name := New_String(To_String(ViewName) & ".header.label");
+      end if;
+      configure(Label, "-text """ & FileName & """");
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(To_String(ViewName) & ".directoryframe.directorytree");
+      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      Selection_Set
+        (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
+      -- Some testing data
+      AddFile(FileName, "");
+      -- Sort archive if enabled
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String(To_String(ViewName) & ".filesframe.fileslist");
+      if Tcl_GetVar(Get_Context, "nosorting") = "0" then
+         Heading(FilesView, "1", "-image {}");
+         SortArchive("Name");
+      end if;
+      ToggleButtons;
       return TCL_OK;
    end Load_Command;
 

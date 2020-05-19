@@ -43,7 +43,7 @@ private
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
    procedure CreateView;
-   procedure ExtractArchive(Directory: String);
+   function GetArchiveName return String;
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False);

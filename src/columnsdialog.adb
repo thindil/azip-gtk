@@ -41,7 +41,7 @@ with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with ArchivesViews; use ArchivesViews;
 with Utils; use Utils;
 
-package body Dialogs is
+package body ColumnsDialog is
 
    function Close_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -192,4 +192,4 @@ package body Dialogs is
       AddCommand("SetColumns", Set_Columns_Command'Access);
    end AddCommands;
 
-end Dialogs;
+end ColumnsDialog;

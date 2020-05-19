@@ -20,10 +20,10 @@
 
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 
-package Dialogs is
+package ColumnsDialog is
 
    procedure SetDialog
      (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive);
    procedure AddCommands;
 
-end Dialogs;
+end ColumnsDialog;

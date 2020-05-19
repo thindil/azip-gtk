@@ -51,7 +51,7 @@ with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands;
-with Dialogs; use Dialogs;
+with ColumnsDialog; use ColumnsDialog;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
 
@@ -221,7 +221,7 @@ package body ArchivesViews is
       MDI := Create(".mdi", "-orient vertical");
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
       ArchivesViews.Commands.AddCommands;
-      Dialogs.AddCommands;
+      ColumnsDialog.AddCommands;
       CreateView;
    end CreateMDI;
 

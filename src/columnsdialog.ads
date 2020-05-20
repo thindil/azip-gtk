@@ -18,12 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
-
 package ColumnsDialog is
 
-   procedure SetDialog
-     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive);
    procedure AddCommands;
 
 end ColumnsDialog;

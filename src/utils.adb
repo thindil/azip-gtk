@@ -18,8 +18,15 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Interfaces.C.Strings; use Interfaces.C.Strings;
 with Tcl; use Tcl;
+with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
+with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 
 package body Utils is
 
@@ -35,5 +42,30 @@ package body Utils is
          raise Aziptk_Add_Command_Error with "Can't add command " & Name;
       end if;
    end AddCommand;
+
+   procedure SetDialog
+     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
+      X, Y: Integer;
+   begin
+      Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
+      Wm_Set(Dialog, "transient", ".");
+      if Tcl_GetVar(Get_Context, "tcl_platform(os)") = "Linux" then
+         Wm_Set(Dialog, "attributes", "-type dialog");
+      end if;
+      X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
+      if X < 0 then
+         X := 0;
+      end if;
+      Y := (Positive'Value(Winfo_Get(Dialog, "vrootheight")) - Height) / 2;
+      if Y < 0 then
+         Y := 0;
+      end if;
+      Wm_Set
+        (Dialog, "geometry",
+         Trim(Positive'Image(Width), Both) & "x" &
+         Trim(Positive'Image(Height), Both) & "+" &
+         Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
+      Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
+   end SetDialog;
 
 end Utils;

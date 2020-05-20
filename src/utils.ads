@@ -19,6 +19,7 @@
 -- SOFTWARE.
 
 with Tcl.Ada;
+with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 
 package Utils is
 
@@ -26,5 +27,7 @@ package Utils is
 
    procedure AddCommand
      (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc);
+   procedure SetDialog
+     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive);
 
 end Utils;

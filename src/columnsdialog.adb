@@ -30,6 +30,7 @@ with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Busy; use Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
+with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
@@ -37,7 +38,6 @@ with Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
 use Tcl.Tk.Ada.Widgets.TtkButton.TtkCheckButton;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
-with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with ArchivesViews; use ArchivesViews;
 with Utils; use Utils;
 
@@ -68,31 +68,6 @@ package body ColumnsDialog is
       end if;
       return TCL_OK;
    end Close_Dialog_Command;
-
-   procedure SetDialog
-     (Dialog: Tk_Toplevel; DialogTitle: String; Width, Height: Positive) is
-      X, Y: Integer;
-   begin
-      Wm_Set(Dialog, "title", "{" & DialogTitle & "}");
-      Wm_Set(Dialog, "transient", ".");
-      if Tcl_GetVar(Get_Context, "tcl_platform(os)") = "Linux" then
-         Wm_Set(Dialog, "attributes", "-type dialog");
-      end if;
-      X := (Positive'Value(Winfo_Get(Dialog, "vrootwidth")) - Width) / 2;
-      if X < 0 then
-         X := 0;
-      end if;
-      Y := (Positive'Value(Winfo_Get(Dialog, "vrootheight")) - Height) / 2;
-      if Y < 0 then
-         Y := 0;
-      end if;
-      Wm_Set
-        (Dialog, "geometry",
-         Trim(Positive'Image(Width), Both) & "x" &
-         Trim(Positive'Image(Height), Both) & "+" &
-         Trim(Positive'Image(X), Both) & "+" & Trim(Positive'Image(Y), Both));
-      Bind(Dialog, "<Destroy>", "{CloseDialog " & Value(Dialog.Name) & "}");
-   end SetDialog;
 
    function Set_Visible_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

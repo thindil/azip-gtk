@@ -51,9 +51,10 @@ with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands;
-with ColumnsDialog; use ColumnsDialog;
+with ColumnsDialog;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
+with Utils; use Utils;
 
 package body ArchivesViews is
 

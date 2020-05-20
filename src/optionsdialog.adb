@@ -33,7 +33,6 @@ with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
 with ArchivesViews.Commands; use ArchivesViews.Commands;
-with ColumnsDialog; use ColumnsDialog;
 with Utils; use Utils;
 
 package body OptionsDialog is

@@ -41,7 +41,6 @@ use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
-with ColumnsDialog; use ColumnsDialog;
 with Toolbar; use Toolbar;
 with Utils; use Utils;
 

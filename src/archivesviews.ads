@@ -50,7 +50,6 @@ private
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure SortArchive(Column: String);
-   procedure TestArchive;
    procedure ShowFindDialog;
    procedure FindInArchive;
    procedure ToggleView;

@@ -385,8 +385,53 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      ProgressDialog: Tk_Toplevel :=
+        Create(".progressdialog", "-class Dialog");
+      ProgressBar: constant Ttk_ProgressBar :=
+        Create
+          (".progressdialog.progressbar",
+           "-orient horizontal -length 250 -value 0");
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      FilesView: Ttk_Tree_View;
+      Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
-      TestArchive;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      SetDialog(ProgressDialog, "Azip - Test archive progress", 275, 50);
+      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      if LastIndex = 1 then
+         Destroy(ProgressDialog);
+         return TCL_OK;
+      end if;
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            Step(ProgressBar);
+         end if;
+      end loop;
+      Destroy(ProgressDialog);
       return TCL_OK;
    end Test_Archive_Command;
 

@@ -35,6 +35,8 @@ package ArchivesViews is
    ArchiveNumber: Positive;
 
    procedure CreateMDI;
+   procedure SortArchive(Column: String);
+   procedure ToggleView;
 
 private
 
@@ -49,10 +51,6 @@ private
       Hide: Boolean := False);
    procedure SaveArchiveAs;
    procedure DeleteItems;
-   procedure SortArchive(Column: String);
-   procedure ShowFindDialog;
-   procedure FindInArchive;
-   procedure ToggleView;
    procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
    procedure ShowFiles;
    procedure UpdateArchive;

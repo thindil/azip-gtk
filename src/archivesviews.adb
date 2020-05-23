@@ -18,7 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Containers.Generic_Array_Sort;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings; use Ada.Strings;
@@ -43,7 +42,6 @@ with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
-with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
@@ -472,8 +470,8 @@ package body ArchivesViews is
             end if;
          end "<";
          type Files_Array is array(Natural range <>) of File_Record;
-         procedure Sort is new Ada.Containers.Generic_Array_Sort(Natural,
-            File_Record, Files_Array);
+         procedure Sort is new Ada.Containers.Generic_Array_Sort
+           (Natural, File_Record, Files_Array);
          FilesList: Files_Array(1 .. Positive(Slice_Count(Tokens)));
          FileEntry: File_Record;
       begin
@@ -498,133 +496,6 @@ package body ArchivesViews is
          end loop;
       end;
    end SortArchive;
-
-   procedure ShowFindDialog is
-      FindDialog: Tk_Toplevel := Create(".finddialog", "-class Dialog");
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      Label: Ttk_Label;
-      TEntry: Ttk_Entry;
-      ButtonBox: constant Ttk_Frame := Create(".finddialog.buttonbox");
-      Button: Ttk_Button;
-      Tokens: Slice_Set;
-      FilesView: Ttk_Tree_View;
-   begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
-      Create(Tokens, Children(FilesView, "{}"), " ");
-      if Slice(Tokens, 1) = "" then
-         Destroy(FindDialog);
-         return;
-      end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(FindDialog, "AZip - find in archive", 300, 200);
-      Label := Create(".finddialog.findimage", "-image .toolbar.findicon");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
-      Label :=
-        Create
-          (".finddialog.labelname",
-           "-text {Entry name ( if empty: all names )}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
-      TEntry := Create(".finddialog.entryname");
-      Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 1 -sticky we");
-      Label := Create(".finddialog.findimage2", "-image .toolbar.findicon");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 3");
-      Label :=
-        Create
-          (".finddialog.labelcontent",
-           "-text {Content ( if empty: all content )}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
-      TEntry := Create(".finddialog.entrycontent");
-      Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 3 -sticky we");
-      Button :=
-        Create(".finddialog.buttonbox.ok", "-text Ok -command FindInArchive");
-      Tcl.Tk.Ada.Grid.Grid(Button);
-      Button :=
-        Create
-          (".finddialog.buttonbox.cancel",
-           "-text Cancel -command {CloseDialog .finddialog}");
-      Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
-      Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 1 -row 4 -sticky e");
-   end ShowFindDialog;
-
-   procedure FindInArchive is
-      FindDialog: Tk_Toplevel;
-      TextEntry: Ttk_Entry;
-      Name, Content, Values, FileName: Unbounded_String;
-      FilesView: Ttk_Tree_View;
-      EntriesFound, Occurences, OverallResult, Result: Natural := 0;
-   begin
-      FindDialog.Interp := Get_Context;
-      FindDialog.Name := New_String(".finddialog");
-      TextEntry.Interp := FindDialog.Interp;
-      TextEntry.Name := New_String(".finddialog.entryname");
-      Name := To_Unbounded_String(Get(TextEntry));
-      TextEntry.Name := New_String(".finddialog.entrycontent");
-      Content := To_Unbounded_String(Get(TextEntry));
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
-      for I in
-        1 ..
-          Positive'Value
-            (Tcl_GetVar
-               (FilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
-            Values :=
-              To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-            FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            Ada.Text_IO.Put_Line
-              ("Looking for name: " & To_String(Name) & " in " &
-               To_String(FileName));
-            if Name = Null_Unbounded_String then
-               Result := 1;
-            else
-               if Index(FileName, To_String(Name)) > 0 then
-                  Result := 1;
-               else
-                  Result := 0;
-               end if;
-            end if;
-            EntriesFound := EntriesFound + Result;
-            OverallResult := Result;
-            Ada.Text_IO.Put_Line
-              ("Looking for content: " & To_String(Content) & " in " &
-               To_String(FileName));
-            Result := 0;
-            Occurences := Occurences + Result;
-            OverallResult := OverallResult + Result;
-            Tcl_Eval
-              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-            Values :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            Item
-              (FilesView, Positive'Image(I),
-               "-values [list " & To_String(Values) & "" &
-               Natural'Image(OverallResult) & " ]");
-         end if;
-      end loop;
-      Destroy(FindDialog);
-      if MessageBox
-          ("-message {Search completed. " & LF & LF & "Occurences found:" &
-           Natural'Image(Occurences) & " " & LF & "Total entries:" &
-           Natural'Image(EntriesFound) &
-           "} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}") =
-        "yes" then
-         Tcl_SetVar(FilesView.Interp, "viewtype", "flat");
-         ToggleView;
-         Heading(FilesView, "12", "-image arrow-down");
-         SortArchive("Result");
-      end if;
-   end FindInArchive;
 
    procedure ToggleView is
       DirectoryFrame: Ttk_Frame;
@@ -705,7 +576,7 @@ package body ArchivesViews is
       procedure AddDir(DirName, Parent: String) is
          Directory: Dir_Type;
          Last: Natural;
-         FileName: String(1 .. 1024);
+         FileName: String(1 .. 1_024);
          NewParentIndex: Unbounded_String;
       begin
          Open(Directory, DirName);

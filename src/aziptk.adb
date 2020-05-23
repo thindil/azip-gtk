@@ -42,6 +42,7 @@ with Tcl.Tk.Ada.Wm; use Tcl.Tk.Ada.Wm;
 with Tcl.Tklib.Ada.Tooltip; use Tcl.Tklib.Ada.Tooltip;
 with AboutDialog; use AboutDialog;
 with ArchivesViews; use ArchivesViews;
+with FindDialog;
 with HelpDialog; use HelpDialog;
 with MenuBar; use MenuBar;
 with OptionsDialog; use OptionsDialog;
@@ -149,6 +150,7 @@ begin
    CreateAbout;
    CreateOptions;
    CreateHelp;
+   FindDialog.AddCommands;
    Set_Directory(CurrentDir);
 
    --  Loop inside Tk, waiting for commands to execute.

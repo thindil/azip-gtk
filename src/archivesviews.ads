@@ -51,7 +51,6 @@ private
       Hide: Boolean := False);
    procedure SaveArchiveAs;
    procedure DeleteItems;
-   procedure AddDirectory(DirectoryName: String; Encrypted: Boolean);
    procedure ShowFiles;
    procedure UpdateArchive;
    procedure RecompressArchive;

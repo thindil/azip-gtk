@@ -25,6 +25,7 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNAT.String_Split; use GNAT.String_Split;
 with CArgv;
@@ -470,6 +471,73 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
       Encrypted: Boolean;
+      ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
+      DirectoryTree: Ttk_Tree_View;
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      MainNode, DirectoryName: Unbounded_String;
+      Tokens: Slice_Set;
+      function GetInsertIndex(Parent, DirName: String) return String is
+         Tokens2: Slice_Set;
+      begin
+         Create(Tokens2, Children(DirectoryTree, Parent), " ");
+         for I in 1 .. Slice_Count(Tokens2) loop
+            if Slice(Tokens2, I) /= ""
+              and then Item(DirectoryTree, Slice(Tokens2, I), "-text") >
+                DirName then
+               return Index(DirectoryTree, Slice(Tokens2, I));
+            end if;
+         end loop;
+         return "end";
+      end GetInsertIndex;
+      procedure AddDir(DirName, Parent: String) is
+         Directory: Dir_Type;
+         Last: Natural;
+         FileName: String(1 .. 1_024);
+         NewParentIndex: Unbounded_String;
+      begin
+         Open(Directory, DirName);
+         loop
+            Read(Directory, FileName, Last);
+            exit when Last = 0;
+            if FileName(1 .. Last) in "." | ".." then
+               goto End_Of_Loop;
+            end if;
+            if Is_Directory
+                (DirName & Directory_Separator & FileName(1 .. Last)) then
+               if not Encrypted then
+                  Ada.Text_IO.Put_Line
+                    ("Adding directory " & DirName & " to archive " &
+                     To_String(ArchiveName) & " without encryption");
+               else
+                  Ada.Text_IO.Put_Line
+                    ("Adding directory " & DirName & " to archive " &
+                     To_String(ArchiveName) & " with encryption");
+               end if;
+               NewParentIndex :=
+                 To_Unbounded_String
+                   (Insert
+                      (DirectoryTree,
+                       Parent & " " &
+                       GetInsertIndex
+                         (Parent, Simple_Name(FileName(1 .. Last))) &
+                       " -text {" & Simple_Name(FileName(1 .. Last)) & "}"));
+               AddDir
+                 (DirName & Directory_Separator & FileName(1 .. Last),
+                  To_String(NewParentIndex));
+            else
+               AddFiles
+                 (DirName & Directory_Separator & FileName(1 .. Last),
+                  Encrypted,
+                  DirName
+                    (Index(DirName, Simple_Name(To_String(DirectoryName))) ..
+                         DirName'Last),
+                  True);
+            end if;
+            <<End_Of_Loop>>
+         end loop;
+         Close(Directory);
+      end AddDir;
    begin
       if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
         CArgv.Arg(Argv, 1) = "yes" then
@@ -477,10 +545,48 @@ package body ArchivesViews.Commands is
       else
          Encrypted := False;
       end if;
-      AddDirectory
-        (Choose_Directory
-           ("-parent . -title ""Select the directory to add to the archive"""),
-         Encrypted);
+      DirectoryName :=
+        To_Unbounded_String
+          (Choose_Directory
+             ("-parent . -title ""Select the directory to add to the archive"""));
+      if DirectoryName = Null_Unbounded_String then
+         return TCL_OK;
+      end if;
+      if Length(ArchiveName) > 10
+        and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+         SaveArchiveAs;
+         ArchiveName := To_Unbounded_String(GetArchiveName);
+         if Length(ArchiveName) > 10
+           and then Slice(ArchiveName, 1, 10) = "New Archiv" then
+            return TCL_OK;
+         end if;
+      end if;
+      DirectoryTree.Interp := Get_Context;
+      DirectoryTree.Name :=
+        New_String(ViewName & ".directoryframe.directorytree");
+      MainNode := To_Unbounded_String(Children(DirectoryTree, "{}"));
+      Create(Tokens, Children(DirectoryTree, To_String(MainNode)), " ");
+      for I in 1 .. Slice_Count(Tokens) loop
+         if Slice(Tokens, I) /= ""
+           and then Item(DirectoryTree, Slice(Tokens, I), "-text") =
+             Simple_Name(To_String(DirectoryName)) then
+            if MessageBox
+                ("-message {Directory " &
+                 Simple_Name(To_String(DirectoryName)) &
+                 " exists in the selected archive} -icon error -type ok") /=
+              "" then
+               return TCL_OK;
+            end if;
+         end if;
+      end loop;
+      AddDir
+        (To_String(DirectoryName),
+         Insert
+           (DirectoryTree,
+            To_String(MainNode) & " " &
+            GetInsertIndex
+              (To_String(MainNode), Simple_Name(To_String(DirectoryName))) &
+            " -text {" & Simple_Name(To_String(DirectoryName)) & "}"));
       return TCL_OK;
    end Add_Folder_Command;
 

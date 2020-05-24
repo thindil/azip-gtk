@@ -54,7 +54,6 @@ private
    procedure ShowFiles;
    procedure UpdateArchive;
    procedure RecompressArchive;
-   procedure ShowProperties;
    procedure ToggleSelect(SelectAll: Boolean);
    procedure DeleteDirectory;
    procedure ExtractFile(Directory: String);

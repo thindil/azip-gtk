@@ -661,12 +661,17 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
+      ViewName: constant String :=
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      FilesView: Ttk_Tree_View;
    begin
+      FilesView.Interp := Get_Context;
+      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
         CArgv.Arg(Argv, 1) = "yes" then
-         ToggleSelect(True);
+         Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
       else
-         ToggleSelect(False);
+         Selection_Set(FilesView, "{}");
       end if;
       return TCL_OK;
    end Toggle_Select_Command;

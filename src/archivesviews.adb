@@ -732,20 +732,6 @@ package body ArchivesViews is
       end if;
    end RecompressArchive;
 
-   procedure ToggleSelect(SelectAll: Boolean) is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      FilesView: Ttk_Tree_View;
-   begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
-      if SelectAll then
-         Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
-      else
-         Selection_Set(FilesView, "{}");
-      end if;
-   end ToggleSelect;
-
    procedure DeleteDirectory is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);

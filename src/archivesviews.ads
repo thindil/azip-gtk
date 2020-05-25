@@ -53,7 +53,6 @@ private
    procedure DeleteItems;
    procedure ShowFiles;
    procedure UpdateArchive;
-   procedure RecompressArchive;
    procedure DeleteDirectory;
    procedure ExtractFile(Directory: String);
 

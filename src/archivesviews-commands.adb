@@ -33,15 +33,14 @@ with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Busy;
-with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
-with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
+with ProgressDialog; use ProgressDialog;
 with Toolbar; use Toolbar;
 with Utils; use Utils;
 
@@ -211,27 +210,17 @@ package body ArchivesViews.Commands is
       NewDirectory: Unbounded_String;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      ProgressDialog: Tk_Toplevel :=
-        Create(".progressdialog", "-class Dialog");
-      ProgressBar: constant Ttk_ProgressBar :=
-        Create
-          (".progressdialog.progressbar",
-           "-orient horizontal -length 250 -value 0");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
       if Directory = "" then
-         Destroy(ProgressDialog);
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(ProgressDialog, "Azip - Extract progress", 275, 50);
-      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
       if Selected = Null_Unbounded_String then
-         Destroy(ProgressDialog);
          return TCL_OK;
       end if;
       Answer :=
@@ -239,9 +228,9 @@ package body ArchivesViews.Commands is
           (MessageBox
              ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
       if Answer = To_Unbounded_String("cancel") then
-         Destroy(ProgressDialog);
          return TCL_OK;
       end if;
+      CreateProgressDialog("Extract progress");
       loop
          ParentId :=
            To_Unbounded_String(Parent(DirectoryTree, To_String(Selected)));
@@ -293,11 +282,11 @@ package body ArchivesViews.Commands is
                  ("Extracting: " & ArchiveName & " file: " &
                   To_String(FilePath) & To_String(FileName) & " into: " &
                   To_String(NewDirectory & FilePath));
-               Step(ProgressBar);
+               UpdateProgress;
             end if;
          end if;
       end loop;
-      Destroy(ProgressDialog);
+      DeleteProgressDialog;
       return TCL_OK;
    end Extract_Command;
 
@@ -386,12 +375,6 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      ProgressDialog: Tk_Toplevel :=
-        Create(".progressdialog", "-class Dialog");
-      ProgressBar: constant Ttk_ProgressBar :=
-        Create
-          (".progressdialog.progressbar",
-           "-orient horizontal -length 250 -value 0");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       FilesView: Ttk_Tree_View;
       Values, FileName: Unbounded_String;
@@ -402,17 +385,15 @@ package body ArchivesViews.Commands is
               "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(ProgressDialog, "Azip - Test archive progress", 275, 50);
-      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
       FilesView.Interp := Get_Context;
       FilesView.Name :=
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
       if LastIndex = 1 then
-         Destroy(ProgressDialog);
          return TCL_OK;
       end if;
+      CreateProgressDialog("Test archive progress");
       for I in 1 .. LastIndex loop
          if Exists(FilesView, Positive'Image(I)) = "1" then
             Values :=
@@ -429,10 +410,10 @@ package body ArchivesViews.Commands is
             Item
               (FilesView, Positive'Image(I),
                "-values [list " & To_String(Values) & " OK ]");
-            Step(ProgressBar);
+            UpdateProgress;
          end if;
       end loop;
-      Destroy(ProgressDialog);
+      DeleteProgressDialog;
       return TCL_OK;
    end Test_Archive_Command;
 
@@ -623,12 +604,6 @@ package body ArchivesViews.Commands is
            "Files than are newer and diffrent (according to their CRC32 code) will replace those in the archive} -icon question -type yesno -detail {Proceed?}") =
         "yes" then
          declare
-            ProgressDialog: Tk_Toplevel :=
-              Create(".progressdialog", "-class Dialog");
-            ProgressBar: constant Ttk_ProgressBar :=
-              Create
-                (".progressdialog.progressbar",
-                 "-orient horizontal -length 250 -value 0");
             MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
             FilesView: Ttk_Tree_View;
             Values, FileName: Unbounded_String;
@@ -639,18 +614,15 @@ package body ArchivesViews.Commands is
                     "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
          begin
             Tcl.Tk.Ada.Busy.Busy(MainWindow);
-            SetDialog
-              (ProgressDialog, "Azip - Update archive progress", 275, 50);
-            Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
             FilesView.Interp := Get_Context;
             FilesView.Name :=
               New_String
                 (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
                  ".filesframe.fileslist");
             if LastIndex = 1 then
-               Destroy(ProgressDialog);
                return TCL_OK;
             end if;
+            CreateProgressDialog("Update archive progress");
             for I in 1 .. LastIndex loop
                if Exists(FilesView, Positive'Image(I)) = "1" then
                   Values :=
@@ -672,10 +644,10 @@ package body ArchivesViews.Commands is
                   Item
                     (FilesView, Positive'Image(I),
                      "-values [list " & To_String(Values) & " OK ]");
-                  Step(ProgressBar);
+                  UpdateProgress;
                end if;
             end loop;
-            Destroy(ProgressDialog);
+            DeleteProgressDialog;
             if MessageBox
                 ("-message {Update completed.} -icon info -type ok -detail {No entry needed to be updated.}") =
               "" then
@@ -705,12 +677,6 @@ package body ArchivesViews.Commands is
            "This operation  can take a long time depending on data size and content.} -icon question -type yesno -detail {Proceed?}") =
         "yes" then
          declare
-            ProgressDialog: Tk_Toplevel :=
-              Create(".progressdialog", "-class Dialog");
-            ProgressBar: constant Ttk_ProgressBar :=
-              Create
-                (".progressdialog.progressbar",
-                 "-orient horizontal -length 250 -value 0");
             MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
             FilesView: Ttk_Tree_View;
             Values, FileName: Unbounded_String;
@@ -721,18 +687,15 @@ package body ArchivesViews.Commands is
                     "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
          begin
             Tcl.Tk.Ada.Busy.Busy(MainWindow);
-            SetDialog
-              (ProgressDialog, "Azip - Update archive progress", 275, 50);
-            Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
             FilesView.Interp := Get_Context;
             FilesView.Name :=
               New_String
                 (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
                  ".filesframe.fileslist");
             if LastIndex = 1 then
-               Destroy(ProgressDialog);
                return TCL_OK;
             end if;
+            CreateProgressDialog("Update archive progress");
             for I in 1 .. LastIndex loop
                if Exists(FilesView, Positive'Image(I)) = "1" then
                   Values :=
@@ -754,10 +717,10 @@ package body ArchivesViews.Commands is
                   Item
                     (FilesView, Positive'Image(I),
                      "-values [list " & To_String(Values) & " OK ]");
-                  Step(ProgressBar);
+                  UpdateProgress;
                end if;
             end loop;
-            Destroy(ProgressDialog);
+            DeleteProgressDialog;
             if MessageBox
                 ("-message {Recompression completed.} -icon info -type ok -detail {No entry could be recompressed to a smaller size.}") =
               "" then

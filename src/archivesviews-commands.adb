@@ -622,7 +622,66 @@ package body ArchivesViews.Commands is
           ("-message {You are about to start an archive update." & LF &
            "Files than are newer and diffrent (according to their CRC32 code) will replace those in the archive} -icon question -type yesno -detail {Proceed?}") =
         "yes" then
-         UpdateArchive;
+         declare
+            ProgressDialog: Tk_Toplevel :=
+              Create(".progressdialog", "-class Dialog");
+            ProgressBar: constant Ttk_ProgressBar :=
+              Create
+                (".progressdialog.progressbar",
+                 "-orient horizontal -length 250 -value 0");
+            MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+            FilesView: Ttk_Tree_View;
+            Values, FileName: Unbounded_String;
+            LastIndex: constant Positive :=
+              Positive'Value
+                (Tcl_GetVar
+                   (MainWindow.Interp,
+                    "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
+         begin
+            Tcl.Tk.Ada.Busy.Busy(MainWindow);
+            SetDialog
+              (ProgressDialog, "Azip - Update archive progress", 275, 50);
+            Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
+            FilesView.Interp := Get_Context;
+            FilesView.Name :=
+              New_String
+                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+                 ".filesframe.fileslist");
+            if LastIndex = 1 then
+               Destroy(ProgressDialog);
+               return TCL_OK;
+            end if;
+            for I in 1 .. LastIndex loop
+               if Exists(FilesView, Positive'Image(I)) = "1" then
+                  Values :=
+                    To_Unbounded_String
+                      (Item(FilesView, Positive'Image(I), "-values"));
+                  Tcl_Eval
+                    (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+                  FileName :=
+                    To_Unbounded_String
+                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                  Ada.Text_IO.Put_Line
+                    ("Updating file: " & To_String(FileName));
+                  Tcl_Eval
+                    (FilesView.Interp,
+                     "lrange {" & To_String(Values) & "} 0 10");
+                  Values :=
+                    To_Unbounded_String
+                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                  Item
+                    (FilesView, Positive'Image(I),
+                     "-values [list " & To_String(Values) & " OK ]");
+                  Step(ProgressBar);
+               end if;
+            end loop;
+            Destroy(ProgressDialog);
+            if MessageBox
+                ("-message {Update completed.} -icon info -type ok -detail {No entry needed to be updated.}") =
+              "" then
+               return TCL_OK;
+            end if;
+         end;
       end if;
       return TCL_OK;
    end Update_Archive_Command;

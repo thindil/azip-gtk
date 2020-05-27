@@ -52,6 +52,5 @@ private
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure ShowFiles;
-   procedure ExtractFile(Directory: String);
 
 end ArchivesViews;

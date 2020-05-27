@@ -30,19 +30,14 @@ with GNAT.String_Split; use GNAT.String_Split;
 with Tcl; use Tcl;
 with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
-with Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Image.Bitmap; use Tcl.Tk.Ada.Image.Bitmap;
 with Tcl.Tk.Ada.Pack;
 with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Menu; use Tcl.Tk.Ada.Widgets.Menu;
-with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
-with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
-use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
-with Tcl.Tk.Ada.Widgets.TtkProgressBar; use Tcl.Tk.Ada.Widgets.TtkProgressBar;
 with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
@@ -50,7 +45,6 @@ with ArchivesViews.Commands;
 with ColumnsDialog;
 with MenuBar; use MenuBar;
 with Toolbar; use Toolbar;
-with Utils; use Utils;
 
 package body ArchivesViews is
 
@@ -621,67 +615,5 @@ package body ArchivesViews is
          SortArchive("Name");
       end if;
    end ShowFiles;
-
-   procedure ExtractFile(Directory: String) is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      ArchiveName: constant String := GetArchiveName;
-      FilesView: Ttk_Tree_View;
-      Path, Selected, FileName, Values, NewDirectory, Answer: Unbounded_String;
-      Tokens: Slice_Set;
-      ProgressDialog: Tk_Toplevel :=
-        Create(".progressdialog", "-class Dialog");
-      ProgressBar: constant Ttk_ProgressBar :=
-        Create
-          (".progressdialog.progressbar",
-           "-orient horizontal -length 250 -value 0");
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-   begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
-      Selected := To_Unbounded_String(Selection(FilesView));
-      if Selected = Null_Unbounded_String then
-         Destroy(ProgressDialog);
-         return;
-      end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(ProgressDialog, "Azip - Extract progress", 275, 50);
-      Tcl.Tk.Ada.Pack.Pack(ProgressBar, "-expand true");
-      Answer :=
-        To_Unbounded_String
-          (MessageBox
-             ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
-      if Answer = To_Unbounded_String("cancel") then
-         Destroy(ProgressDialog);
-         return;
-      end if;
-      if Answer = To_Unbounded_String("yes") then
-         NewDirectory :=
-           To_Unbounded_String
-             (Directory & Directory_Separator &
-              Ada.Directories.Base_Name(ArchiveName) & Directory_Separator);
-      else
-         NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
-      end if;
-      Create(Tokens, To_String(Selected), " ");
-      for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
-         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         if Length(Path) > 0 then
-            Append(Path, Directory_Separator);
-         end if;
-         Create_Path(To_String(NewDirectory & Path));
-         Ada.Text_IO.Put_Line
-           ("Extracting: " & ArchiveName & " file: " & To_String(Path) &
-            To_String(FileName) & " into: " & To_String(NewDirectory & Path));
-         Step(ProgressBar);
-      end loop;
-      Destroy(ProgressDialog);
-   end ExtractFile;
 
 end ArchivesViews;

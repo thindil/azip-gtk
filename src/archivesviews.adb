@@ -622,22 +622,6 @@ package body ArchivesViews is
       end if;
    end ShowFiles;
 
-   procedure DeleteDirectory is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      FilesView: Ttk_Tree_View;
-      DirectoryTree: Ttk_Tree_View;
-   begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
-      Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
-      DeleteItems;
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
-      Delete(DirectoryTree, Selection(DirectoryTree));
-   end DeleteDirectory;
-
    procedure ExtractFile(Directory: String) is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);

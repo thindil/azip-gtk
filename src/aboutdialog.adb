@@ -176,56 +176,45 @@ package body AboutDialog is
       CreditsDialog: constant Tk_Toplevel :=
         Create(".creditsdialog", "-class Dialog");
       Frame: Ttk_LabelFrame;
-      Label: Ttk_Label;
       CloseButton: constant Ttk_Button :=
         Create
           (".creditsdialog.close",
            "-text Close -command {CloseDialog .creditsdialog}");
+      procedure AddLabel(Name, Text: String) is
+         Label: constant Ttk_Label := Create(Name, "-text {" & Text & "}");
+      begin
+         Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
+      end AddLabel;
    begin
       Frame :=
         Create
           (".creditsdialog.framezipada",
            "-text {Zip-Ada - Zip archive management library}");
-      Label :=
-        Create
-          (".creditsdialog.framezipada.label1",
-           "-text {Stratégies Software team: intensive profiling and contributions}");
-      Tcl.Tk.Ada.Pack.Pack(Label);
-      Label :=
-        Create
-          (".creditsdialog.framezipada.label2",
-           "-text {ITEC team at NXP Semiconductors: contributions}");
-      Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
+      AddLabel
+        (".creditsdialog.framezipada.label1",
+         "Stratégies Software team: intensive profiling and contributions");
+      AddLabel
+        (".creditsdialog.framezipada.label2",
+         "ITEC team at NXP Semiconductors: contributions");
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
       Frame :=
         Create
           (".creditsdialog.framegwindows",
            "-text {GWindows - native MS Windows framework}");
-      Label :=
-        Create
-          (".creditsdialog.framegwindows.label1",
-           "-text {David Botton: main author}");
-      Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
-      Label :=
-        Create
-          (".creditsdialog.framegwindows.label2",
-           "-text {André van Splunter}");
-      Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
-      Label :=
-        Create
-          (".creditsdialog.framegwindows.label3",
-           "-text {Frank Piron, Falk Maier at KonAd GmbH: authors of GWindows Extended}");
-      Tcl.Tk.Ada.Pack.Pack(Label);
-      Tcl.Tk.Ada.Pack.Pack(Frame);
+      AddLabel
+        (".creditsdialog.framegwindows.label1", "David Botton: main author");
+      AddLabel(".creditsdialog.framegwindows.label2", "André van Splunter");
+      AddLabel
+        (".creditsdialog.framegwindows.label3",
+         "Frank Piron, Falk Maier at KonAd GmbH: authors of GWindows Extended");
+      Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
       Frame :=
         Create
           (".creditsdialog.framemisc",
            "-text {Miscellaneous comments - contributions - ideas}");
-      Label :=
-        Create
-          (".creditsdialog.framemisc.label1",
-           "-text {Asen Anastassov, Nicolas F. Mirkov}");
-      Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
+      AddLabel
+        (".creditsdialog.framemisc.label1",
+         "Asen Anastassov, Nicolas F. Mirkov");
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog(CreditsDialog, "AZip Credits", 500, 300);

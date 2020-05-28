@@ -21,7 +21,5 @@
 package AboutDialog is
 
    procedure CreateAbout;
-   procedure ShowAbout;
-   procedure ShowCredits;
 
 end AboutDialog;

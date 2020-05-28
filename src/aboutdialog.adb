@@ -19,6 +19,11 @@
 -- SOFTWARE.
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Interfaces.C;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
+with CArgv;
+with Tcl; use Tcl;
+with Tcl.Ada; use Tcl.Ada;
 with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Busy;
 with Tcl.Tk.Ada.Grid;
@@ -30,17 +35,23 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
-with AboutDialog.Commands;
 with Utils; use Utils;
 
 package body AboutDialog is
 
-   procedure CreateAbout is
-   begin
-      AboutDialog.Commands.AddCommands;
-   end CreateAbout;
+   Azip_Execute_Error: exception;
 
-   procedure ShowAbout is
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Show_About_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
       AboutDialog: constant Tk_Toplevel :=
         Create(".aboutdialog", "-class Dialog");
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
@@ -148,9 +159,20 @@ package body AboutDialog is
       Tcl.Tk.Ada.Grid.Grid
         (ButtonBox, "-column 1 -row 2 -sticky we -columnspan 2");
       SetDialog(AboutDialog, "About AZip", 500, 400);
-   end ShowAbout;
+      return TCL_OK;
+   end Show_About_Command;
 
-   procedure ShowCredits is
+   function Credits_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Credits_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
       CreditsDialog: constant Tk_Toplevel :=
         Create(".creditsdialog", "-class Dialog");
       Frame: Ttk_LabelFrame;
@@ -207,6 +229,46 @@ package body AboutDialog is
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog(CreditsDialog, "AZip Credits", 500, 300);
-   end ShowCredits;
+      return TCL_OK;
+   end Credits_Command;
+
+   function Open_Link_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Open_Link_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc);
+      OsName: constant String := Tcl_GetVar(Get_Context, "tcl_platform(os)");
+      Command: Unbounded_String;
+      ProcessId: Process_Id;
+   begin
+      if OsName = "Windows" then
+         Command := To_Unbounded_String(Locate_Exec_On_Path("start").all);
+      elsif OsName = "Linux" then
+         Command := To_Unbounded_String(Locate_Exec_On_Path("xdg-open").all);
+      elsif OsName = "Darwin" then
+         Command := To_Unbounded_String(Locate_Exec_On_Path("open").all);
+      end if;
+      ProcessId :=
+        Non_Blocking_Spawn
+          (To_String(Command),
+           Argument_String_To_List(CArgv.Arg(Argv, 1)).all);
+      if ProcessId = Invalid_Pid then
+         raise Azip_Execute_Error with "Can't open link";
+      end if;
+      return TCL_OK;
+   end Open_Link_Command;
+
+   procedure CreateAbout is
+   begin
+      AddCommand("ShowAbout", Show_About_Command'Access);
+      AddCommand("ShowCredits", Credits_Command'Access);
+      AddCommand("OpenLink", Open_Link_Command'Access);
+   end CreateAbout;
 
 end AboutDialog;

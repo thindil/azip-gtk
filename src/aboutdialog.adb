@@ -35,6 +35,7 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with Utils; use Utils;
 
 package body AboutDialog is
@@ -180,10 +181,16 @@ package body AboutDialog is
         Create
           (".creditsdialog.close",
            "-text Close -command {CloseDialog .creditsdialog}");
+      Width, ReqestedWidth, Height: Natural := 0;
       procedure AddLabel(Name, Text: String) is
          Label: constant Ttk_Label := Create(Name, "-text {" & Text & "}");
       begin
          Tcl.Tk.Ada.Pack.Pack(Label, "-fill x -expand true");
+         ReqestedWidth := Natural'Value(Winfo_Get(Label, "reqwidth"));
+         Height := Natural'Value(Winfo_Get(Label, "reqheight"));
+         if ReqestedWidth > Width then
+            Width := ReqestedWidth;
+         end if;
       end AddLabel;
    begin
       Frame :=
@@ -216,8 +223,10 @@ package body AboutDialog is
         (".creditsdialog.framemisc.label1",
          "Asen Anastassov, Nicolas F. Mirkov");
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
+      Height := Height * 9;
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
-      SetDialog(CreditsDialog, "AZip Credits", 500, 300);
+      Height := Height + Natural'Value(Winfo_Get(CloseButton, "reqheight"));
+      SetDialog(CreditsDialog, "AZip Credits", Width, Height);
       return TCL_OK;
    end Credits_Command;
 

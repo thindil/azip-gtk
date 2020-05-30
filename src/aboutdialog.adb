@@ -64,7 +64,7 @@ package body AboutDialog is
         Create
           (".aboutdialog.librariesframe",
            "-text {AZip is made with the following free, open source components}");
-      Width, ReqestedWidth, Height: Natural := 0;
+      Width, Height: Natural := 0;
       procedure AddLinkButton
         (Name, URL: String; Row: Natural; Column: Natural := 1;
          Text: String := "") is
@@ -89,11 +89,7 @@ package body AboutDialog is
          Label: constant Ttk_Label := Create(Name, "-text {" & Text & "}");
       begin
          Tcl.Tk.Ada.Grid.Grid(Label, GridOptions);
-         ReqestedWidth := Natural'Value(Winfo_Get(Label, "reqwidth"));
          Height := Natural'Value(Winfo_Get(Label, "reqheight"));
-         if ReqestedWidth > Width then
-            Width := ReqestedWidth;
-         end if;
       end AddLabel;
    begin
       if Tcl.Tk.Ada.Busy.Status(MainWindow) = "0" then
@@ -149,7 +145,8 @@ package body AboutDialog is
          "Ini file manager");
       Tcl.Tk.Ada.Grid.Grid
         (LibrariesFrame, "-column 0 -row 1 -columnspan 2 -sticky we");
-      Height := Height * 14;
+      Width := Height * 28;
+      Height := Height * 15;
       Button :=
         Create
           (".aboutdialog.buttonbox.credits",

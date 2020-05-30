@@ -165,11 +165,11 @@ package body ArchivesViews.Commands is
              (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
          Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
-      configure(Label, "-text """ & FileName & """");
+      configure(Label, "-text {" & FileName & "}");
       DirectoryTree.Interp := Get_Context;
       DirectoryTree.Name :=
         New_String(To_String(ViewName) & ".directoryframe.directorytree");
-      Insert(DirectoryTree, "{} end -text """ & Simple_Name(FileName) & """");
+      Insert(DirectoryTree, "{} end -text {" & Simple_Name(FileName) & "}");
       Selection_Set
         (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
       -- Some testing data
@@ -301,14 +301,13 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
-      Encrypted: Boolean;
+      Encrypted: constant Boolean :=
+        (if
+           CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
+           CArgv.Arg(Argv, 1) = "yes"
+         then True
+         else False);
    begin
-      if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
-        CArgv.Arg(Argv, 1) = "yes" then
-         Encrypted := True;
-      else
-         Encrypted := False;
-      end if;
       AddFiles
         (Get_Open_File
            ("-title ""Select the files to add to the archive"" -parent . -multiple true"),
@@ -451,7 +450,12 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
-      Encrypted: Boolean;
+      Encrypted: constant Boolean :=
+        (if
+           CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
+           CArgv.Arg(Argv, 1) = "yes"
+         then True
+         else False);
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
       DirectoryTree: Ttk_Tree_View;
       ViewName: constant String :=
@@ -520,12 +524,6 @@ package body ArchivesViews.Commands is
          Close(Directory);
       end AddDir;
    begin
-      if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
-        CArgv.Arg(Argv, 1) = "yes" then
-         Encrypted := True;
-      else
-         Encrypted := False;
-      end if;
       DirectoryName :=
         To_Unbounded_String
           (Choose_Directory
@@ -598,62 +596,55 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      FilesView: Ttk_Tree_View;
+      Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       if MessageBox
           ("-message {You are about to start an archive update." & LF &
            "Files than are newer and diffrent (according to their CRC32 code) will replace those in the archive} -icon question -type yesno -detail {Proceed?}") =
-        "yes" then
-         declare
-            MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-            FilesView: Ttk_Tree_View;
-            Values, FileName: Unbounded_String;
-            LastIndex: constant Positive :=
-              Positive'Value
-                (Tcl_GetVar
-                   (MainWindow.Interp,
-                    "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
-         begin
-            Tcl.Tk.Ada.Busy.Busy(MainWindow);
-            FilesView.Interp := Get_Context;
-            FilesView.Name :=
-              New_String
-                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-                 ".filesframe.fileslist");
-            if LastIndex = 1 then
-               return TCL_OK;
-            end if;
-            CreateProgressDialog("Update archive progress");
-            for I in 1 .. LastIndex loop
-               if Exists(FilesView, Positive'Image(I)) = "1" then
-                  Values :=
-                    To_Unbounded_String
-                      (Item(FilesView, Positive'Image(I), "-values"));
-                  Tcl_Eval
-                    (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-                  FileName :=
-                    To_Unbounded_String
-                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-                  Ada.Text_IO.Put_Line
-                    ("Updating file: " & To_String(FileName));
-                  Tcl_Eval
-                    (FilesView.Interp,
-                     "lrange {" & To_String(Values) & "} 0 10");
-                  Values :=
-                    To_Unbounded_String
-                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-                  Item
-                    (FilesView, Positive'Image(I),
-                     "-values [list " & To_String(Values) & " OK ]");
-                  UpdateProgress;
-               end if;
-            end loop;
-            DeleteProgressDialog;
-            if MessageBox
-                ("-message {Update completed.} -icon info -type ok -detail {No entry needed to be updated.}") =
-              "" then
-               return TCL_OK;
-            end if;
-         end;
+        "no" then
+         return TCL_OK;
+      end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      if LastIndex = 1 then
+         return TCL_OK;
+      end if;
+      CreateProgressDialog("Update archive progress");
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Updating file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            UpdateProgress;
+         end if;
+      end loop;
+      DeleteProgressDialog;
+      if MessageBox
+          ("-message {Update completed.} -icon info -type ok -detail {No entry needed to be updated.}") =
+        "" then
+         return TCL_OK;
       end if;
       return TCL_OK;
    end Update_Archive_Command;
@@ -669,64 +660,57 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      FilesView: Ttk_Tree_View;
+      Values, FileName: Unbounded_String;
+      LastIndex: constant Positive :=
+        Positive'Value
+          (Tcl_GetVar
+             (MainWindow.Interp,
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       if MessageBox
           ("-message {You are about to recompress this archive." & LF &
            "Contents will remain identical, but data compression may be better. " &
            LF &
            "This operation  can take a long time depending on data size and content.} -icon question -type yesno -detail {Proceed?}") =
-        "yes" then
-         declare
-            MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-            FilesView: Ttk_Tree_View;
-            Values, FileName: Unbounded_String;
-            LastIndex: constant Positive :=
-              Positive'Value
-                (Tcl_GetVar
-                   (MainWindow.Interp,
-                    "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
-         begin
-            Tcl.Tk.Ada.Busy.Busy(MainWindow);
-            FilesView.Interp := Get_Context;
-            FilesView.Name :=
-              New_String
-                (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-                 ".filesframe.fileslist");
-            if LastIndex = 1 then
-               return TCL_OK;
-            end if;
-            CreateProgressDialog("Update archive progress");
-            for I in 1 .. LastIndex loop
-               if Exists(FilesView, Positive'Image(I)) = "1" then
-                  Values :=
-                    To_Unbounded_String
-                      (Item(FilesView, Positive'Image(I), "-values"));
-                  Tcl_Eval
-                    (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-                  FileName :=
-                    To_Unbounded_String
-                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-                  Ada.Text_IO.Put_Line
-                    ("Recompresing file: " & To_String(FileName));
-                  Tcl_Eval
-                    (FilesView.Interp,
-                     "lrange {" & To_String(Values) & "} 0 10");
-                  Values :=
-                    To_Unbounded_String
-                      (Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-                  Item
-                    (FilesView, Positive'Image(I),
-                     "-values [list " & To_String(Values) & " OK ]");
-                  UpdateProgress;
-               end if;
-            end loop;
-            DeleteProgressDialog;
-            if MessageBox
-                ("-message {Recompression completed.} -icon info -type ok -detail {No entry could be recompressed to a smaller size.}") =
-              "" then
-               return TCL_OK;
-            end if;
-         end;
+        "no" then
+         return TCL_OK;
+      end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      FilesView.Interp := Get_Context;
+      FilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+           ".filesframe.fileslist");
+      if LastIndex = 1 then
+         return TCL_OK;
+      end if;
+      CreateProgressDialog("Update archive progress");
+      for I in 1 .. LastIndex loop
+         if Exists(FilesView, Positive'Image(I)) = "1" then
+            Values :=
+              To_Unbounded_String
+                (Item(FilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Ada.Text_IO.Put_Line("Recompresing file: " & To_String(FileName));
+            Tcl_Eval
+              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values :=
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Item
+              (FilesView, Positive'Image(I),
+               "-values [list " & To_String(Values) & " OK ]");
+            UpdateProgress;
+         end if;
+      end loop;
+      DeleteProgressDialog;
+      if MessageBox
+          ("-message {Recompression completed.} -icon info -type ok -detail {No entry could be recompressed to a smaller size.}") =
+        "" then
+         return TCL_OK;
       end if;
       return TCL_OK;
    end Recompress_Archive_Command;

@@ -330,10 +330,21 @@ package body ArchivesViews is
       ToggleButtons;
    end AddFiles;
 
+   function GetDirectoryView return Ttk_Tree_View is
+   begin
+      return FilesView: Ttk_Tree_View do
+         FilesView.Interp := Get_Context;
+         FilesView.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+              ".directoryframe.directorytree");
+      end return;
+   end GetDirectoryView;
+
    procedure SaveArchiveAs is
       NewFileName, ArchiveName, Directories: Unbounded_String;
       HeaderLabel: Ttk_Label;
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       Tokens: Slice_Set;
@@ -353,9 +364,6 @@ package body ArchivesViews is
       Ada.Text_IO.Put_Line
         ("Saving " & To_String(ArchiveName) & " as " & To_String(NewFileName));
       configure(HeaderLabel, "-text """ & To_String(NewFileName) & """");
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
       Directories := To_Unbounded_String(Children(DirectoryTree, "{}"));
       if Directories /= Null_Unbounded_String then
          Create(Tokens, To_String(Directories), " ");
@@ -536,17 +544,12 @@ package body ArchivesViews is
    end ToggleView;
 
    procedure ShowFiles is
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       FilesView: constant Ttk_Tree_View := GetFilesView;
       Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
         Null_Unbounded_String;
       FlatView: Boolean := False;
    begin
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
       if Selected = Null_Unbounded_String then
          return;

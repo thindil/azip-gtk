@@ -51,6 +51,7 @@ private
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False);
+   function GetDirectoryView return Ttk_Tree_View;
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure ShowFiles;

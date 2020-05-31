@@ -142,7 +142,7 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       Label: Ttk_Label;
       LabelText: Unbounded_String;
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       ViewName: Unbounded_String :=
         To_Unbounded_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
@@ -166,9 +166,6 @@ package body ArchivesViews.Commands is
          Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
       configure(Label, "-text {" & FileName & "}");
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(To_String(ViewName) & ".directoryframe.directorytree");
       Insert(DirectoryTree, "{} end -text {" & Simple_Name(FileName) & "}");
       Selection_Set
         (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
@@ -202,11 +199,9 @@ package body ArchivesViews.Commands is
          else Choose_Directory
              ("-parent . -title {Extract current folder's content to...}"));
       ArchiveName: constant String := GetArchiveName;
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       Values, FilePath, Selected, ParentId, Path, FileName, Answer,
       NewDirectory: Unbounded_String;
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
       FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
@@ -214,9 +209,6 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
       Selected := To_Unbounded_String(Selection(DirectoryTree));
       if Selected = Null_Unbounded_String then
          return TCL_OK;
@@ -448,9 +440,7 @@ package body ArchivesViews.Commands is
          then True
          else False);
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
-      DirectoryTree: Ttk_Tree_View;
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       MainNode, DirectoryName: Unbounded_String;
       Tokens: Slice_Set;
       function GetInsertIndex(Parent, DirName: String) return String is
@@ -531,9 +521,6 @@ package body ArchivesViews.Commands is
             return TCL_OK;
          end if;
       end if;
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
       MainNode := To_Unbounded_String(Children(DirectoryTree, "{}"));
       Create(Tokens, Children(DirectoryTree, To_String(MainNode)), " ");
       for I in 1 .. Slice_Count(Tokens) loop
@@ -729,16 +716,11 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       FilesView: constant Ttk_Tree_View := GetFilesView;
-      DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
    begin
       Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
       DeleteItems;
-      DirectoryTree.Interp := Get_Context;
-      DirectoryTree.Name :=
-        New_String(ViewName & ".directoryframe.directorytree");
       Delete(DirectoryTree, Selection(DirectoryTree));
       return TCL_OK;
    end Delete_Directory_Command;

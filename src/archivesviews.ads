@@ -20,6 +20,7 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
+with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 
 package ArchivesViews is
 
@@ -42,6 +43,7 @@ private
 
    MDI: Ttk_PanedWindow;
 
+   function GetFilesView return Ttk_Tree_View;
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
    procedure CreateView;

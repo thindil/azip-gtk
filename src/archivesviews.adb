@@ -39,7 +39,6 @@ with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkScrollbar; use Tcl.Tk.Ada.Widgets.TtkScrollbar;
-with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands;
 with ColumnsDialog;
@@ -216,15 +215,21 @@ package body ArchivesViews is
       CreateView;
    end CreateMDI;
 
+   function GetFilesView return Ttk_Tree_View is
+   begin
+      return FilesView: Ttk_Tree_View do
+         FilesView.Interp := Get_Context;
+         FilesView.Name :=
+           New_String
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+              ".filesframe.fileslist");
+      end return;
+   end GetFilesView;
+
    procedure AddFile(FileName, Path: String; Hide: Boolean := False) is
-      FilesList: Ttk_Tree_View;
+      FilesList: constant Ttk_Tree_View := GetFilesView;
       FileIndex: Unbounded_String;
    begin
-      FilesList.Interp := Get_Context;
-      FilesList.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       FileIndex :=
         To_Unbounded_String
           (Tcl_GetVar
@@ -262,7 +267,7 @@ package body ArchivesViews is
       Hide: Boolean := False) is
       Tokens, Tokens2: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Values, ExistingFileName, ExistingPath: Unbounded_String;
    begin
       if FileName = "" then
@@ -277,11 +282,6 @@ package body ArchivesViews is
             return;
          end if;
       end if;
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
          Create(Tokens2, Children(FilesView, "{}"), " ");
@@ -373,15 +373,10 @@ package body ArchivesViews is
    end SaveArchiveAs;
 
    procedure DeleteItems is
-      FilesList: Ttk_Tree_View;
+      FilesList: constant Ttk_Tree_View := GetFilesView;
       Tokens: Slice_Set;
       Selected, Values, FileName, Path: Unbounded_String;
    begin
-      FilesList.Interp := Get_Context;
-      FilesList.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       Selected := To_Unbounded_String(Selection(FilesList));
       if Selected = Null_Unbounded_String then
          return;
@@ -410,17 +405,12 @@ package body ArchivesViews is
    end DeleteItems;
 
    procedure SortArchive(Column: String) is
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       ColumnIndex, OldSortColumn: Natural;
       ArrowName, OldArrowName, Values: Unbounded_String;
       Tokens: Slice_Set;
       Ascending: Boolean := True;
    begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       Create(Tokens, cget(FilesView, "-displaycolumns"), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          ArrowName :=
@@ -462,8 +452,8 @@ package body ArchivesViews is
             end if;
          end "<";
          type Files_Array is array(Natural range <>) of File_Record;
-         procedure Sort is new Ada.Containers.Generic_Array_Sort
-           (Natural, File_Record, Files_Array);
+         procedure Sort is new Ada.Containers.Generic_Array_Sort(Natural,
+            File_Record, Files_Array);
          FilesList: Files_Array(1 .. Positive(Slice_Count(Tokens)));
          FileEntry: File_Record;
       begin
@@ -549,7 +539,7 @@ package body ArchivesViews is
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       DirectoryTree: Ttk_Tree_View;
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
         Null_Unbounded_String;
       FlatView: Boolean := False;
@@ -574,8 +564,6 @@ package body ArchivesViews is
            Path;
          Selected := ParentId;
       end loop;
-      FilesView.Interp := DirectoryTree.Interp;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       if Tcl_GetVar(FilesView.Interp, "viewtype") = "flat" then
          FlatView := True;
       else

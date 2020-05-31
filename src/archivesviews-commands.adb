@@ -39,7 +39,6 @@ with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 use Tcl.Tk.Ada.Widgets.Toplevel.MainWindow;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
-with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 with ProgressDialog; use ProgressDialog;
 with Toolbar; use Toolbar;
 with Utils; use Utils;
@@ -143,13 +142,14 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       Label: Ttk_Label;
       LabelText: Unbounded_String;
-      DirectoryTree, FilesView: Ttk_Tree_View;
+      DirectoryTree: Ttk_Tree_View;
       ViewName: Unbounded_String :=
         To_Unbounded_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
       FileName: constant String :=
         Get_Open_File
           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false");
+      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
       if FileName = "" then
          return TCL_OK;
@@ -175,9 +175,6 @@ package body ArchivesViews.Commands is
       -- Some testing data
       AddFile(FileName, "");
       -- Sort archive if enabled
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String(To_String(ViewName) & ".filesframe.fileslist");
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
          Heading(FilesView, "1", "-image {}");
          SortArchive("Name");
@@ -205,12 +202,13 @@ package body ArchivesViews.Commands is
          else Choose_Directory
              ("-parent . -title {Extract current folder's content to...}"));
       ArchiveName: constant String := GetArchiveName;
-      FilesView, DirectoryTree: Ttk_Tree_View;
+      DirectoryTree: Ttk_Tree_View;
       Values, FilePath, Selected, ParentId, Path, FileName, Answer,
       NewDirectory: Unbounded_String;
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
+      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
       if Directory = "" then
          return TCL_OK;
@@ -252,8 +250,6 @@ package body ArchivesViews.Commands is
       else
          NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
       end if;
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       for I in
         1 ..
           Positive'Value
@@ -375,7 +371,7 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
@@ -384,11 +380,6 @@ package body ArchivesViews.Commands is
               "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       if LastIndex = 1 then
          return TCL_OK;
       end if;
@@ -597,7 +588,7 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
@@ -612,11 +603,6 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       if LastIndex = 1 then
          return TCL_OK;
       end if;
@@ -661,7 +647,7 @@ package body ArchivesViews.Commands is
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
@@ -678,11 +664,6 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      FilesView.Interp := Get_Context;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       if LastIndex = 1 then
          return TCL_OK;
       end if;
@@ -726,12 +707,8 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
         CArgv.Arg(Argv, 1) = "yes" then
          Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
@@ -754,11 +731,9 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
       ViewName: constant String :=
         ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       DirectoryTree: Ttk_Tree_View;
    begin
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
       DeleteItems;
       DirectoryTree.Interp := Get_Context;
@@ -779,10 +754,8 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
       ArchiveName: constant String := GetArchiveName;
-      FilesView: Ttk_Tree_View;
+      FilesView: constant Ttk_Tree_View := GetFilesView;
       Path, Selected, FileName, Values, NewDirectory, Answer,
       Directory: Unbounded_String;
       Tokens: Slice_Set;
@@ -792,8 +765,6 @@ package body ArchivesViews.Commands is
         To_Unbounded_String
           (Choose_Directory
              ("-parent . -title {Extract the selected items to...}"));
-      FilesView.Interp := Get_Context;
-      FilesView.Name := New_String(ViewName & ".filesframe.fileslist");
       Selected := To_Unbounded_String(Selection(FilesView));
       if Selected = Null_Unbounded_String then
          return TCL_OK;

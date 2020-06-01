@@ -145,7 +145,7 @@ package body ArchivesViews.Commands is
       DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       ViewName: Unbounded_String :=
         To_Unbounded_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left));
       FileName: constant String :=
         Get_Open_File
           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false");
@@ -162,7 +162,7 @@ package body ArchivesViews.Commands is
          CreateView;
          ViewName :=
            To_Unbounded_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both));
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left));
          Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
       configure(Label, "-text {" & FileName & "}");
@@ -247,7 +247,7 @@ package body ArchivesViews.Commands is
           Positive'Value
             (Tcl_GetVar
                (FilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
+                "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
          if Exists(FilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
@@ -369,7 +369,7 @@ package body ArchivesViews.Commands is
         Positive'Value
           (Tcl_GetVar
              (MainWindow.Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
       if LastIndex = 1 then
@@ -581,7 +581,7 @@ package body ArchivesViews.Commands is
         Positive'Value
           (Tcl_GetVar
              (MainWindow.Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
           ("-message {You are about to start an archive update." & LF &
@@ -640,7 +640,7 @@ package body ArchivesViews.Commands is
         Positive'Value
           (Tcl_GetVar
              (MainWindow.Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
           ("-message {You are about to recompress this archive." & LF &

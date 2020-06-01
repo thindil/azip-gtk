@@ -50,9 +50,9 @@ package body ArchivesViews is
    procedure SetActive(NewActive: Positive; Created: Boolean := False) is
       Header: Ttk_Frame;
       OldName: constant String :=
-        ".mdi.archive" & Trim(Natural'Image(ActiveArchive), Both);
+        ".mdi.archive" & Trim(Natural'Image(ActiveArchive), Left);
       NewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(NewActive), Both);
+        ".mdi.archive" & Trim(Positive'Image(NewActive), Left);
       NameLabel: Ttk_Label;
    begin
       Header.Interp := Get_Context;
@@ -88,7 +88,7 @@ package body ArchivesViews is
 
    procedure CreateView is
       ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Both);
+        ".mdi.archive" & Trim(Positive'Image(ArchiveNumber), Left);
       ArchiveView: constant Ttk_Frame := Create(ViewName);
       Header: constant Ttk_Frame := Create(ViewName & ".header");
       CloseButton: constant Ttk_Button :=
@@ -141,7 +141,7 @@ package body ArchivesViews is
    begin
       for I in ColumnsNames'Range loop
          Heading
-           (FilesList, "#" & Trim(Natural'Image(I), Both),
+           (FilesList, "#" & Trim(Natural'Image(I), Left),
             "-text {" & To_String(ColumnsNames(I)) & "} -command {Sort {" &
             To_String(ColumnsNames(I)) & "}}");
       end loop;
@@ -166,16 +166,16 @@ package body ArchivesViews is
       SetActive(ArchiveNumber, True);
       Bind
         (Header, "<1>",
-         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
       Bind
         (DirectoryTree, "<1>",
-         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
       Bind
         (FilesList, "<1>",
-         "{setactive " & Trim(Positive'Image(ActiveArchive), Both) & "}");
+         "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
       Bind(FilesList, "<3>", "{tk_popup .filesmenu %X %Y}");
       Tcl_SetVar
-        (Paned.Interp, "lastindex" & Trim(Positive'Image(ActiveArchive), Both),
+        (Paned.Interp, "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
          "1");
       ArchiveNumber := ArchiveNumber + 1;
    end CreateView;
@@ -221,7 +221,7 @@ package body ArchivesViews is
          FilesView.Interp := Get_Context;
          FilesView.Name :=
            New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left) &
               ".filesframe.fileslist");
       end return;
    end GetFilesView;
@@ -234,7 +234,7 @@ package body ArchivesViews is
         To_Unbounded_String
           (Tcl_GetVar
              (FilesList.Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Both)));
+              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
       -- Some example data. All file data are in values list in order:
       -- Name of the file, type, modified, attributes, size, packed, ratio,
       -- format, crc32, path, name encoding, result
@@ -247,7 +247,7 @@ package body ArchivesViews is
       end if;
       Tcl_SetVar
         (FilesList.Interp,
-         "lastindex" & Trim(Positive'Image(ActiveArchive), Both),
+         "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
          Positive'Image(Positive'Value(To_String(FileIndex)) + 1));
    end AddFile;
 
@@ -257,7 +257,7 @@ package body ArchivesViews is
       HeaderLabel.Interp := Get_Context;
       HeaderLabel.Name :=
         New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left) &
            ".header.label");
       return cget(HeaderLabel, "-text");
    end GetArchiveName;
@@ -336,7 +336,7 @@ package body ArchivesViews is
          FilesView.Interp := Get_Context;
          FilesView.Name :=
            New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
+             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left) &
               ".directoryframe.directorytree");
       end return;
    end GetDirectoryView;
@@ -346,7 +346,7 @@ package body ArchivesViews is
       HeaderLabel: Ttk_Label;
       DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       ViewName: constant String :=
-        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both);
+        ".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left);
       Tokens: Slice_Set;
    begin
       HeaderLabel.Interp := Get_Context;
@@ -440,7 +440,7 @@ package body ArchivesViews is
          Ascending := False;
       end if;
       Heading
-        (FilesView, Trim(Natural'Image(ColumnIndex), Both),
+        (FilesView, Trim(Natural'Image(ColumnIndex), Left),
          "-image " & To_String(ArrowName));
       Create(Tokens, Children(FilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then
@@ -576,7 +576,7 @@ package body ArchivesViews is
                (Tcl_GetVar
                   (FilesView.Interp,
                    "lastindex" &
-                   Trim(Positive'Image(ActiveArchive), Both))) loop
+                   Trim(Positive'Image(ActiveArchive), Left))) loop
             if Exists(FilesView, Positive'Image(I)) = "1" then
                Detach(FilesView, Positive'Image(I));
             end if;
@@ -587,7 +587,7 @@ package body ArchivesViews is
           Positive'Value
             (Tcl_GetVar
                (FilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
+                "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
          if Exists(FilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String

@@ -36,7 +36,6 @@ with Utils; use Utils;
 
 package body PropertiesDialog is
 
-
    function Show_Properties_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)

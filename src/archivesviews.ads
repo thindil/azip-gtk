@@ -43,6 +43,7 @@ private
 
    MDI: Ttk_PanedWindow;
    CurrentFilesView: Ttk_Tree_View;
+   CurrentDirectoryView: Ttk_Tree_View;
 
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
@@ -51,7 +52,6 @@ private
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False);
-   function GetDirectoryView return Ttk_Tree_View;
    procedure SaveArchiveAs;
    procedure DeleteItems;
    procedure ShowFiles;

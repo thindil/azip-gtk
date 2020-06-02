@@ -142,7 +142,6 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc, Argv);
       Label: Ttk_Label;
       LabelText: Unbounded_String;
-      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       ViewName: Unbounded_String :=
         To_Unbounded_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left));
@@ -165,9 +164,11 @@ package body ArchivesViews.Commands is
          Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
       configure(Label, "-text {" & FileName & "}");
-      Insert(DirectoryTree, "{} end -text {" & Simple_Name(FileName) & "}");
+      Insert
+        (CurrentDirectoryView, "{} end -text {" & Simple_Name(FileName) & "}");
       Selection_Set
-        (DirectoryTree, "[lindex {" & Children(DirectoryTree, "{}") & "} 0]");
+        (CurrentDirectoryView,
+         "[lindex {" & Children(CurrentDirectoryView, "{}") & "} 0]");
       -- Some testing data
       AddFile(FileName, "");
       -- Sort archive if enabled
@@ -198,7 +199,6 @@ package body ArchivesViews.Commands is
          else Choose_Directory
              ("-parent . -title {Extract current folder's content to...}"));
       ArchiveName: constant String := GetArchiveName;
-      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       Values, FilePath, Selected, ParentId, Path, FileName, Answer,
       NewDirectory: Unbounded_String;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
@@ -207,7 +207,7 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      Selected := To_Unbounded_String(Selection(DirectoryTree));
+      Selected := To_Unbounded_String(Selection(CurrentDirectoryView));
       if Selected = Null_Unbounded_String then
          return TCL_OK;
       end if;
@@ -221,14 +221,15 @@ package body ArchivesViews.Commands is
       CreateProgressDialog("Extract progress");
       loop
          ParentId :=
-           To_Unbounded_String(Parent(DirectoryTree, To_String(Selected)));
+           To_Unbounded_String
+             (Parent(CurrentDirectoryView, To_String(Selected)));
          exit when ParentId = To_Unbounded_String("");
          if Path /= Null_Unbounded_String then
             Path := Directory_Separator & Path;
          end if;
          Path :=
            To_Unbounded_String
-             (Item(DirectoryTree, To_String(Selected), "-text")) &
+             (Item(CurrentDirectoryView, To_String(Selected), "-text")) &
            Path;
          Selected := ParentId;
       end loop;
@@ -432,18 +433,17 @@ package body ArchivesViews.Commands is
          then True
          else False);
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
-      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
       MainNode, DirectoryName: Unbounded_String;
       Tokens: Slice_Set;
       function GetInsertIndex(Parent, DirName: String) return String is
          Tokens2: Slice_Set;
       begin
-         Create(Tokens2, Children(DirectoryTree, Parent), " ");
+         Create(Tokens2, Children(CurrentDirectoryView, Parent), " ");
          for I in 1 .. Slice_Count(Tokens2) loop
             if Slice(Tokens2, I) /= ""
-              and then Item(DirectoryTree, Slice(Tokens2, I), "-text") >
+              and then Item(CurrentDirectoryView, Slice(Tokens2, I), "-text") >
                 DirName then
-               return Index(DirectoryTree, Slice(Tokens2, I));
+               return Index(CurrentDirectoryView, Slice(Tokens2, I));
             end if;
          end loop;
          return "end";
@@ -475,7 +475,7 @@ package body ArchivesViews.Commands is
                NewParentIndex :=
                  To_Unbounded_String
                    (Insert
-                      (DirectoryTree,
+                      (CurrentDirectoryView,
                        Parent & " " &
                        GetInsertIndex
                          (Parent, Simple_Name(FileName(1 .. Last))) &
@@ -513,11 +513,11 @@ package body ArchivesViews.Commands is
             return TCL_OK;
          end if;
       end if;
-      MainNode := To_Unbounded_String(Children(DirectoryTree, "{}"));
-      Create(Tokens, Children(DirectoryTree, To_String(MainNode)), " ");
+      MainNode := To_Unbounded_String(Children(CurrentDirectoryView, "{}"));
+      Create(Tokens, Children(CurrentDirectoryView, To_String(MainNode)), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          if Slice(Tokens, I) /= ""
-           and then Item(DirectoryTree, Slice(Tokens, I), "-text") =
+           and then Item(CurrentDirectoryView, Slice(Tokens, I), "-text") =
              Simple_Name(To_String(DirectoryName)) then
             if MessageBox
                 ("-message {Directory " &
@@ -531,7 +531,7 @@ package body ArchivesViews.Commands is
       AddDir
         (To_String(DirectoryName),
          Insert
-           (DirectoryTree,
+           (CurrentDirectoryView,
             To_String(MainNode) & " " &
             GetInsertIndex
               (To_String(MainNode), Simple_Name(To_String(DirectoryName))) &
@@ -701,12 +701,11 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
    begin
       Selection_Set
         (CurrentFilesView, "[list " & Children(CurrentFilesView, "{}") & " ]");
       DeleteItems;
-      Delete(DirectoryTree, Selection(DirectoryTree));
+      Delete(CurrentDirectoryView, Selection(CurrentDirectoryView));
       return TCL_OK;
    end Delete_Directory_Command;
 

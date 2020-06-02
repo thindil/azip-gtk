@@ -84,6 +84,10 @@ package body ArchivesViews is
       else
          ToggleButtons(False);
       end if;
+      CurrentFilesView.Name :=
+        New_String
+          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left) &
+           ".filesframe.fileslist");
    end SetActive;
 
    procedure CreateView is
@@ -208,6 +212,7 @@ package body ArchivesViews is
         (FilesMenu, "command",
          "-label {Delete files(s)} -underline 0 -command DeleteItems");
       ArchiveNumber := 1;
+      CurrentFilesView.Interp := Get_Context;
       MDI := Create(".mdi", "-orient vertical");
       Tcl.Tk.Ada.Pack.Pack(MDI, "-fill both -expand true");
       ArchivesViews.Commands.AddCommands;
@@ -215,38 +220,26 @@ package body ArchivesViews is
       CreateView;
    end CreateMDI;
 
-   function GetFilesView return Ttk_Tree_View is
-   begin
-      return FilesView: Ttk_Tree_View do
-         FilesView.Interp := Get_Context;
-         FilesView.Name :=
-           New_String
-             (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left) &
-              ".filesframe.fileslist");
-      end return;
-   end GetFilesView;
-
    procedure AddFile(FileName, Path: String; Hide: Boolean := False) is
-      FilesList: constant Ttk_Tree_View := GetFilesView;
       FileIndex: Unbounded_String;
    begin
       FileIndex :=
         To_Unbounded_String
           (Tcl_GetVar
-             (FilesList.Interp,
+             (Get_Context,
               "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
       -- Some example data. All file data are in values list in order:
       -- Name of the file, type, modified, attributes, size, packed, ratio,
       -- format, crc32, path, name encoding, result
       Insert
-        (FilesList,
+        (CurrentFilesView,
          "{} end -id " & To_String(FileIndex) & " -values [list {" &
          Simple_Name(FileName) & "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]");
       if Hide then
-         Detach(FilesList, To_String(FileIndex));
+         Detach(CurrentFilesView, To_String(FileIndex));
       end if;
       Tcl_SetVar
-        (FilesList.Interp,
+        (Get_Context,
          "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
          Positive'Image(Positive'Value(To_String(FileIndex)) + 1));
    end AddFile;
@@ -267,7 +260,6 @@ package body ArchivesViews is
       Hide: Boolean := False) is
       Tokens, Tokens2: Slice_Set;
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
       Values, ExistingFileName, ExistingPath: Unbounded_String;
    begin
       if FileName = "" then
@@ -284,20 +276,20 @@ package body ArchivesViews is
       end if;
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
-         Create(Tokens2, Children(FilesView, "{}"), " ");
+         Create(Tokens2, Children(CurrentFilesView, "{}"), " ");
          for J in 1 .. Slice_Count(Tokens2) loop
             if Slice(Tokens2, J) /= "" then
                Values :=
                  To_Unbounded_String
-                   (Item(FilesView, Slice(Tokens2, J), "-values"));
+                   (Item(CurrentFilesView, Slice(Tokens2, J), "-values"));
                Tcl_Eval
-                 (FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+                 (CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 0");
                ExistingFileName :=
-                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
                Tcl_Eval
-                 (FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+                 (CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 9");
                ExistingPath :=
-                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                 To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
                if
                  (To_String(ExistingFileName) =
                   Simple_Name(Slice(Tokens, I)) and
@@ -324,7 +316,7 @@ package body ArchivesViews is
       end loop;
       -- Sort archive if enabled
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
-         Heading(FilesView, "1", "-image {}");
+         Heading(CurrentFilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
       ToggleButtons;
@@ -381,11 +373,10 @@ package body ArchivesViews is
    end SaveArchiveAs;
 
    procedure DeleteItems is
-      FilesList: constant Ttk_Tree_View := GetFilesView;
       Tokens: Slice_Set;
       Selected, Values, FileName, Path: Unbounded_String;
    begin
-      Selected := To_Unbounded_String(Selection(FilesList));
+      Selected := To_Unbounded_String(Selection(CurrentFilesView));
       if Selected = Null_Unbounded_String then
          return;
       end if;
@@ -399,34 +390,33 @@ package body ArchivesViews is
       end if;
       for I in 1 .. Slice_Count(Tokens) loop
          Values :=
-           To_Unbounded_String(Item(FilesList, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesList.Interp, "lindex {" & To_String(Values) & "} 0");
+           To_Unbounded_String(Item(CurrentFilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 0");
          FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesList.Interp));
-         Tcl_Eval(FilesList.Interp, "lindex {" & To_String(Values) & "} 9");
-         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesList.Interp));
+           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
+         Tcl_Eval(CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
          Ada.Text_IO.Put_Line
            ("Deleting file " &
             To_String(Path & Directory_Separator & FileName));
-         Delete(FilesList, Slice(Tokens, I));
+         Delete(CurrentFilesView, Slice(Tokens, I));
       end loop;
    end DeleteItems;
 
    procedure SortArchive(Column: String) is
-      FilesView: constant Ttk_Tree_View := GetFilesView;
       ColumnIndex, OldSortColumn: Natural;
       ArrowName, OldArrowName, Values: Unbounded_String;
       Tokens: Slice_Set;
       Ascending: Boolean := True;
    begin
-      Create(Tokens, cget(FilesView, "-displaycolumns"), " ");
+      Create(Tokens, cget(CurrentFilesView, "-displaycolumns"), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          ArrowName :=
-           To_Unbounded_String(Heading(FilesView, Slice(Tokens, I), "-image"));
+           To_Unbounded_String(Heading(CurrentFilesView, Slice(Tokens, I), "-image"));
          if ArrowName /= Null_Unbounded_String then
             OldSortColumn := Positive'Value(Slice(Tokens, I));
             OldArrowName := ArrowName;
-            Heading(FilesView, Slice(Tokens, I), "-image {}");
+            Heading(CurrentFilesView, Slice(Tokens, I), "-image {}");
          end if;
          if ColumnsNames(Positive'Value(Slice(Tokens, I))) =
            To_Unbounded_String(Column) then
@@ -440,9 +430,9 @@ package body ArchivesViews is
          Ascending := False;
       end if;
       Heading
-        (FilesView, Trim(Natural'Image(ColumnIndex), Left),
+        (CurrentFilesView, Trim(Natural'Image(ColumnIndex), Left),
          "-image " & To_String(ArrowName));
-      Create(Tokens, Children(FilesView, "{}"), " ");
+      Create(Tokens, Children(CurrentFilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then
          return;
       end if;
@@ -468,20 +458,20 @@ package body ArchivesViews is
          for I in 1 .. Slice_Count(Tokens) loop
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Slice(Tokens, I), "-values"));
+                (Item(CurrentFilesView, Slice(Tokens, I), "-values"));
             Tcl_Eval
-              (FilesView.Interp,
+              (CurrentFilesView.Interp,
                "lindex {" & To_String(Values) & "}" &
                Natural'Image(ColumnIndex - 1));
             FileEntry.Index := To_Unbounded_String(Slice(Tokens, I));
             FileEntry.Value :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
             FilesList(Positive(I)) := FileEntry;
          end loop;
          Sort(FilesList);
          for I in FilesList'Range loop
             Move
-              (FilesView, To_String(FilesList(I).Index), "{}",
+              (CurrentFilesView, To_String(FilesList(I).Index), "{}",
                Natural'Image(I));
          end loop;
       end;
@@ -545,7 +535,6 @@ package body ArchivesViews is
 
    procedure ShowFiles is
       DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
-      FilesView: constant Ttk_Tree_View := GetFilesView;
       Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
         Null_Unbounded_String;
       FlatView: Boolean := False;
@@ -567,18 +556,18 @@ package body ArchivesViews is
            Path;
          Selected := ParentId;
       end loop;
-      if Tcl_GetVar(FilesView.Interp, "viewtype") = "flat" then
+      if Tcl_GetVar(CurrentFilesView.Interp, "viewtype") = "flat" then
          FlatView := True;
       else
          for I in
            1 ..
              Positive'Value
                (Tcl_GetVar
-                  (FilesView.Interp,
+                  (CurrentFilesView.Interp,
                    "lastindex" &
                    Trim(Positive'Image(ActiveArchive), Left))) loop
-            if Exists(FilesView, Positive'Image(I)) = "1" then
-               Detach(FilesView, Positive'Image(I));
+            if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
+               Detach(CurrentFilesView, Positive'Image(I));
             end if;
          end loop;
       end if;
@@ -586,23 +575,23 @@ package body ArchivesViews is
         1 ..
           Positive'Value
             (Tcl_GetVar
-               (FilesView.Interp,
+               (CurrentFilesView.Interp,
                 "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+                (Item(CurrentFilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 9");
             FilePath :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
             if (FilePath = Path) or FlatView then
-               Move(FilesView, Positive'Image(I), "{}", Positive'Image(I));
+               Move(CurrentFilesView, Positive'Image(I), "{}", Positive'Image(I));
             end if;
          end if;
       end loop;
       -- Sort archive if enabled
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
-         Heading(FilesView, "1", "-image {}");
+         Heading(CurrentFilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
    end ShowFiles;

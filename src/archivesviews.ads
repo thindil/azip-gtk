@@ -42,8 +42,8 @@ package ArchivesViews is
 private
 
    MDI: Ttk_PanedWindow;
+   CurrentFilesView: Ttk_Tree_View;
 
-   function GetFilesView return Ttk_Tree_View;
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
    procedure CreateView;

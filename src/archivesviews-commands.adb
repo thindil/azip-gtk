@@ -139,7 +139,7 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Argc, Argv);
       Label: Ttk_Label;
       LabelText: Unbounded_String;
       DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
@@ -149,12 +149,11 @@ package body ArchivesViews.Commands is
       FileName: constant String :=
         Get_Open_File
           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false");
-      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
       if FileName = "" then
          return TCL_OK;
       end if;
-      Label.Interp := Get_Context;
+      Label.Interp := Interp;
       Label.Name := New_String(To_String(ViewName) & ".header.label");
       LabelText := To_Unbounded_String(cget(Label, "-text"));
       if Length(LabelText) > 10
@@ -173,7 +172,7 @@ package body ArchivesViews.Commands is
       AddFile(FileName, "");
       -- Sort archive if enabled
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
-         Heading(FilesView, "1", "-image {}");
+         Heading(CurrentFilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
       ToggleButtons;
@@ -190,7 +189,7 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Argc, Argv);
       Directory: constant String :=
         (if ExtractingDirectory /= Null_Unbounded_String then
            Choose_Directory
@@ -203,7 +202,6 @@ package body ArchivesViews.Commands is
       Values, FilePath, Selected, ParentId, Path, FileName, Answer,
       NewDirectory: Unbounded_String;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
       if Directory = "" then
          return TCL_OK;
@@ -246,18 +244,16 @@ package body ArchivesViews.Commands is
         1 ..
           Positive'Value
             (Tcl_GetVar
-               (FilesView.Interp,
+               (Interp,
                 "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-            FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
-            FilePath :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                (Item(CurrentFilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
+            Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 9");
+            FilePath := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             if FilePath = Path or
               (Length(FilePath) > Length(Path)
                and then Head(FilePath, Length(Path)) = Path) or
@@ -361,14 +357,13 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
+      pragma Unreferenced(ClientData, Argc, Argv);
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
           (Tcl_GetVar
-             (MainWindow.Interp,
+             (Interp,
               "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
@@ -377,20 +372,17 @@ package body ArchivesViews.Commands is
       end if;
       CreateProgressDialog("Test archive progress");
       for I in 1 .. LastIndex loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-            FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                (Item(CurrentFilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Ada.Text_IO.Put_Line("Testing file: " & To_String(FileName));
-            Tcl_Eval
-              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-            Values :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Tcl_Eval(Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Item
-              (FilesView, Positive'Image(I),
+              (CurrentFilesView, Positive'Image(I),
                "-values [list " & To_String(Values) & " OK ]");
             UpdateProgress;
          end if;
@@ -573,14 +565,13 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
+      pragma Unreferenced(ClientData, Argc, Argv);
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
           (Tcl_GetVar
-             (MainWindow.Interp,
+             (Interp,
               "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
@@ -595,20 +586,17 @@ package body ArchivesViews.Commands is
       end if;
       CreateProgressDialog("Update archive progress");
       for I in 1 .. LastIndex loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-            FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                (Item(CurrentFilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Ada.Text_IO.Put_Line("Updating file: " & To_String(FileName));
-            Tcl_Eval
-              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-            Values :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Tcl_Eval(Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Item
-              (FilesView, Positive'Image(I),
+              (CurrentFilesView, Positive'Image(I),
                "-values [list " & To_String(Values) & " OK ]");
             UpdateProgress;
          end if;
@@ -632,14 +620,13 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
+      pragma Unreferenced(ClientData, Argc, Argv);
+      MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
       LastIndex: constant Positive :=
         Positive'Value
           (Tcl_GetVar
-             (MainWindow.Interp,
+             (Interp,
               "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
@@ -656,20 +643,17 @@ package body ArchivesViews.Commands is
       end if;
       CreateProgressDialog("Update archive progress");
       for I in 1 .. LastIndex loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-            FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+                (Item(CurrentFilesView, Positive'Image(I), "-values"));
+            Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 0");
+            FileName := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Ada.Text_IO.Put_Line("Recompresing file: " & To_String(FileName));
-            Tcl_Eval
-              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-            Values :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+            Tcl_Eval(Interp, "lrange {" & To_String(Values) & "} 0 10");
+            Values := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
             Item
-              (FilesView, Positive'Image(I),
+              (CurrentFilesView, Positive'Image(I),
                "-values [list " & To_String(Values) & " OK ]");
             UpdateProgress;
          end if;
@@ -694,13 +678,14 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
    begin
       if CArgv.Arg(Argv, 1) = "1" or CArgv.Arg(Argv, 1) = "true" or
         CArgv.Arg(Argv, 1) = "yes" then
-         Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
+         Selection_Set
+           (CurrentFilesView,
+            "[list " & Children(CurrentFilesView, "{}") & " ]");
       else
-         Selection_Set(FilesView, "{}");
+         Selection_Set(CurrentFilesView, "{}");
       end if;
       return TCL_OK;
    end Toggle_Select_Command;
@@ -716,10 +701,10 @@ package body ArchivesViews.Commands is
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
       pragma Unreferenced(ClientData, Interp, Argc, Argv);
-      FilesView: constant Ttk_Tree_View := GetFilesView;
       DirectoryTree: constant Ttk_Tree_View := GetDirectoryView;
    begin
-      Selection_Set(FilesView, "[list " & Children(FilesView, "{}") & " ]");
+      Selection_Set
+        (CurrentFilesView, "[list " & Children(CurrentFilesView, "{}") & " ]");
       DeleteItems;
       Delete(DirectoryTree, Selection(DirectoryTree));
       return TCL_OK;
@@ -735,9 +720,8 @@ package body ArchivesViews.Commands is
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
+      pragma Unreferenced(ClientData, Argc, Argv);
       ArchiveName: constant String := GetArchiveName;
-      FilesView: constant Ttk_Tree_View := GetFilesView;
       Path, Selected, FileName, Values, NewDirectory, Answer,
       Directory: Unbounded_String;
       Tokens: Slice_Set;
@@ -747,7 +731,7 @@ package body ArchivesViews.Commands is
         To_Unbounded_String
           (Choose_Directory
              ("-parent . -title {Extract the selected items to...}"));
-      Selected := To_Unbounded_String(Selection(FilesView));
+      Selected := To_Unbounded_String(Selection(CurrentFilesView));
       if Selected = Null_Unbounded_String then
          return TCL_OK;
       end if;
@@ -772,12 +756,12 @@ package body ArchivesViews.Commands is
       Create(Tokens, To_String(Selected), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          Values :=
-           To_Unbounded_String(Item(FilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
-         FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-         Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 9");
-         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+           To_Unbounded_String
+             (Item(CurrentFilesView, Slice(Tokens, I), "-values"));
+         Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 0");
+         FileName := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
+         Tcl_Eval(Interp, "lindex {" & To_String(Values) & "} 9");
+         Path := To_Unbounded_String(Tcl.Ada.Tcl_GetResult(Interp));
          if Length(Path) > 0 then
             Append(Path, Directory_Separator);
          end if;

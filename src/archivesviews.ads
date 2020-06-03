@@ -44,6 +44,7 @@ private
    MDI: Ttk_PanedWindow;
    CurrentFilesView: Ttk_Tree_View;
    CurrentDirectoryView: Ttk_Tree_View;
+   CurrentLastIndex: Positive := 1;
 
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    procedure SetActive(NewActive: Positive; Created: Boolean := False);

@@ -241,12 +241,7 @@ package body ArchivesViews.Commands is
       else
          NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
       end if;
-      for I in
-        1 ..
-          Positive'Value
-            (Tcl_GetVar
-               (Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
@@ -361,18 +356,13 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
-      LastIndex: constant Positive :=
-        Positive'Value
-          (Tcl_GetVar
-             (Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      if LastIndex = 1 then
+      if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
       CreateProgressDialog("Test archive progress");
-      for I in 1 .. LastIndex loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
@@ -568,11 +558,6 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
-      LastIndex: constant Positive :=
-        Positive'Value
-          (Tcl_GetVar
-             (Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
           ("-message {You are about to start an archive update." & LF &
@@ -581,11 +566,11 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      if LastIndex = 1 then
+      if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
       CreateProgressDialog("Update archive progress");
-      for I in 1 .. LastIndex loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String
@@ -623,11 +608,6 @@ package body ArchivesViews.Commands is
       pragma Unreferenced(ClientData, Argc, Argv);
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       Values, FileName: Unbounded_String;
-      LastIndex: constant Positive :=
-        Positive'Value
-          (Tcl_GetVar
-             (Interp,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
    begin
       if MessageBox
           ("-message {You are about to recompress this archive." & LF &
@@ -638,11 +618,11 @@ package body ArchivesViews.Commands is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      if LastIndex = 1 then
+      if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
       CreateProgressDialog("Update archive progress");
-      for I in 1 .. LastIndex loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String

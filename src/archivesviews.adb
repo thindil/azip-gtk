@@ -87,6 +87,17 @@ package body ArchivesViews is
       CurrentFilesView.Name := New_String(NewName & ".filesframe.fileslist");
       CurrentDirectoryView.Name :=
         New_String(NewName & ".directoryframe.directorytree");
+      if ActiveArchive > 0 then
+         Tcl_SetVar
+           (Get_Context,
+            "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
+            Positive'Image(CurrentLastIndex));
+      end if;
+      CurrentLastIndex :=
+        Positive'Value
+          (Tcl_GetVar
+             (Get_Context,
+              "lastindex" & Trim(Positive'Image(NewActive), Left)));
    end SetActive;
 
    procedure CreateView is
@@ -221,26 +232,19 @@ package body ArchivesViews is
    end CreateMDI;
 
    procedure AddFile(FileName, Path: String; Hide: Boolean := False) is
-      FileIndex: Unbounded_String;
    begin
-      FileIndex :=
-        To_Unbounded_String
-          (Tcl_GetVar
-             (Get_Context,
-              "lastindex" & Trim(Positive'Image(ActiveArchive), Left)));
       -- Some example data. All file data are in values list in order:
       -- Name of the file, type, modified, attributes, size, packed, ratio,
       -- format, crc32, path, name encoding, result
       Insert
         (CurrentFilesView,
-         "{} end -id " & To_String(FileIndex) & " -values [list {" &
-         Simple_Name(FileName) & "} 2 3 4 5 6 7 8 9 {" & Path & "} 11 12]");
+         "{} end -id " & Positive'Image(CurrentLastIndex) &
+         " -values [list {" & Simple_Name(FileName) & "} 2 3 4 5 6 7 8 9 {" &
+         Path & "} 11 12]");
       if Hide then
-         Detach(CurrentFilesView, To_String(FileIndex));
+         Detach(CurrentFilesView, Positive'Image(CurrentLastIndex));
       end if;
-      Tcl_SetVar
-        (Get_Context, "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
-         Positive'Image(Positive'Value(To_String(FileIndex)) + 1));
+      CurrentLastIndex := CurrentLastIndex + 1;
    end AddFile;
 
    function GetArchiveName return String is
@@ -556,24 +560,13 @@ package body ArchivesViews is
       if Tcl_GetVar(CurrentFilesView.Interp, "viewtype") = "flat" then
          FlatView := True;
       else
-         for I in
-           1 ..
-             Positive'Value
-               (Tcl_GetVar
-                  (CurrentFilesView.Interp,
-                   "lastindex" &
-                   Trim(Positive'Image(ActiveArchive), Left))) loop
+         for I in 1 .. CurrentLastIndex loop
             if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
                Detach(CurrentFilesView, Positive'Image(I));
             end if;
          end loop;
       end if;
-      for I in
-        1 ..
-          Positive'Value
-            (Tcl_GetVar
-               (CurrentFilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Left))) loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String

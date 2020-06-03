@@ -89,6 +89,7 @@ package body ColumnsDialog is
            "-text Done -command {CloseDialog .columnsdialog}");
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
+      Width, Height: Positive := 1;
    begin
       FilesView.Interp := Interp;
       FilesView.Name :=
@@ -115,10 +116,17 @@ package body ColumnsDialog is
          if I in 1 | 10 | 12 then
             Tcl.Tk.Ada.Widgets.configure(CheckButton, "-state disabled");
          end if;
-         Tcl.Tk.Ada.Pack.Pack(CheckButton);
+         Tcl.Tk.Ada.Pack.Pack(CheckButton, "-anchor w -padx 20");
+         if Width < Positive'Value(Winfo_Get(CheckButton, "reqwidth")) then
+            Width := Positive'Value(Winfo_Get(CheckButton, "reqwidth"));
+         end if;
+         Height :=
+           Height + Positive'Value(Winfo_Get(CheckButton, "reqheight"));
       end loop;
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
-      SetDialog(ColumnsDialog, "Azip - Select displayed columns", 200, 450);
+      Height := Height + Positive'Value(Winfo_Get(CloseButton, "reqheight"));
+      SetDialog
+        (ColumnsDialog, "Azip - Select displayed columns", Width + 40, Height);
       return TCL_OK;
    end Set_Visible_Columns_Command;
 

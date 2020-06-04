@@ -41,6 +41,7 @@ with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
 with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews; use ArchivesViews;
 with Utils; use Utils;
 
@@ -65,6 +66,7 @@ package body FindDialog is
       Button: Ttk_Button;
       Tokens: Slice_Set;
       FilesView: Ttk_Tree_View;
+      IconWidth, Width, Height: Positive := 1;
    begin
       FilesView.Interp := Interp;
       FilesView.Name :=
@@ -77,16 +79,21 @@ package body FindDialog is
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
-      SetDialog(FindDialog, "AZip - find in archive", 300, 200);
       Label := Create(".finddialog.findimage", "-image .toolbar.findicon");
+      IconWidth := Positive'Value(Winfo_Get(Label, "reqwidth"));
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
       Label :=
         Create
           (".finddialog.labelname",
            "-text {Entry name ( if empty: all names )}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
+      if Width < Positive'Value(Winfo_Get(Label, "reqwidth")) then
+         Width := Positive'Value(Winfo_Get(Label, "reqwidth"));
+      end if;
+      Height := Height + Positive'Value(Winfo_Get(Label, "reqheight"));
       TEntry := Create(".finddialog.entryname");
       Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 1 -sticky we");
+      Height := Height + Positive'Value(Winfo_Get(TEntry, "reqheight"));
       Label := Create(".finddialog.findimage2", "-image .toolbar.findicon");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 3");
       Label :=
@@ -94,17 +101,25 @@ package body FindDialog is
           (".finddialog.labelcontent",
            "-text {Content ( if empty: all content )}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
+      if Width < Positive'Value(Winfo_Get(Label, "reqwidth")) then
+         Width := Positive'Value(Winfo_Get(Label, "reqwidth"));
+      end if;
+      Height := Height + Positive'Value(Winfo_Get(Label, "reqheight"));
       TEntry := Create(".finddialog.entrycontent");
       Tcl.Tk.Ada.Grid.Grid(TEntry, "-column 1 -row 3 -sticky we");
+      Height := Height + Positive'Value(Winfo_Get(TEntry, "reqheight"));
       Button :=
         Create(".finddialog.buttonbox.ok", "-text Ok -command FindInArchive");
       Tcl.Tk.Ada.Grid.Grid(Button);
+      Height := Height + Positive'Value(Winfo_Get(Button, "reqheight"));
       Button :=
         Create
           (".finddialog.buttonbox.cancel",
            "-text Cancel -command {CloseDialog .finddialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
       Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 1 -row 4 -sticky e");
+      SetDialog
+        (FindDialog, "AZip - find in archive", Width + IconWidth, Height);
       return TCL_OK;
    end Show_Find_Dialog_Command;
 
@@ -137,12 +152,7 @@ package body FindDialog is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
-      for I in
-        1 ..
-          Positive'Value
-            (Tcl_GetVar
-               (FilesView.Interp,
-                "lastindex" & Trim(Positive'Image(ActiveArchive), Both))) loop
+      for I in 1 .. CurrentLastIndex loop
          if Exists(FilesView, Positive'Image(I)) = "1" then
             Values :=
               To_Unbounded_String

@@ -73,7 +73,7 @@ package body HelpDialog is
              (Widget_Image(SubHelpFrame) & ".label",
               "-text {" & Text & "} -wraplength" & Positive'Image(Length));
          Tcl.Tk.Ada.Pack.Pack(Label, "-side right");
-         Tcl.Tk.Ada.Pack.Pack(SubHelpFrame);
+         Tcl.Tk.Ada.Pack.Pack(SubHelpFrame, "-expand true -fill both");
       end AddSubFrame;
    begin
       HelpFrame := Create(".helpdialog.notebook.userinterface");

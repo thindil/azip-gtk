@@ -39,7 +39,17 @@ with Utils; use Utils;
 
 package body HelpDialog is
 
-   procedure ShowHelp is
+   function Show_Help_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Show_Help_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
       OptionsDialog: constant Tk_Toplevel :=
         Create(".helpdialog", "-class Dialog");
       CloseButton: constant Ttk_Button :=
@@ -105,33 +115,13 @@ package body HelpDialog is
       Tcl.Tk.Ada.Pack.Pack(HelpNoteBook);
       Tcl.Tk.Ada.Pack.Pack(CloseButton);
       SetDialog
-        (OptionsDialog, "AZip - Quick Help, general tips and hints", 600, 300);
-   end ShowHelp;
-
-   function Show_Help_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int with
-      Convention => C;
-
-   function Show_Help_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-   begin
-      ShowHelp;
+        (OptionsDialog, "AZip - Quick Help, general tips and hints", 620, 300);
       return TCL_OK;
    end Show_Help_Command;
 
-   procedure AddCommands is
-   begin
-      AddCommand("ShowHelp", Show_Help_Command'Access);
-   end AddCommands;
-
    procedure CreateHelp is
    begin
-      AddCommands;
+      AddCommand("ShowHelp", Show_Help_Command'Access);
    end CreateHelp;
 
 end HelpDialog;

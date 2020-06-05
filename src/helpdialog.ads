@@ -20,7 +20,6 @@
 
 package HelpDialog is
 
-   procedure ShowHelp;
    procedure CreateHelp;
 
 end HelpDialog;

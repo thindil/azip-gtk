@@ -27,11 +27,14 @@ with Tcl.Tk.Ada; use Tcl.Tk.Ada;
 with Tcl.Tk.Ada.Dialogs; use Tcl.Tk.Ada.Dialogs;
 with Tcl.Tk.Ada.Grid;
 with Tcl.Tk.Ada.Pack;
+with Tcl.Tk.Ada.Widgets; use Tcl.Tk.Ada.Widgets;
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 with Tcl.Tk.Ada.Widgets.TtkButton; use Tcl.Tk.Ada.Widgets.TtkButton;
 with Tcl.Tk.Ada.Widgets.TtkEntry; use Tcl.Tk.Ada.Widgets.TtkEntry;
 with Tcl.Tk.Ada.Widgets.TtkFrame; use Tcl.Tk.Ada.Widgets.TtkFrame;
+with Tcl.Tk.Ada.Widgets.TtkLabel; use Tcl.Tk.Ada.Widgets.TtkLabel;
 with Tcl.Tk.Ada.Widgets.TtkLabelFrame; use Tcl.Tk.Ada.Widgets.TtkLabelFrame;
+with Tcl.Tk.Ada.Winfo; use Tcl.Tk.Ada.Winfo;
 with ArchivesViews.Commands; use ArchivesViews.Commands;
 with Utils; use Utils;
 
@@ -42,12 +45,21 @@ package body OptionsDialog is
         Create(".optionsdialog", "-class Dialog");
       ButtonBox: constant Ttk_Frame := Create(".optionsdialog.buttonbox");
       Button: Ttk_Button;
+      Label: constant Ttk_Label :=
+        Create
+          (".optionsdialog.label",
+           "-text {Directory suggested for archive extraction (if empty: archive's location)}");
       DirectoryFrame: constant Ttk_LabelFrame :=
         Create
           (".optionsdialog.directoryframe",
-           "-text {Directory suggested for archive extraction (if empty: archive's location)}");
+           "-labelwidget " & Widget_Image(Label));
       DirectoryEntry: constant Ttk_Entry :=
         Create(".optionsdialog.directoryframe.entry");
+      Width: constant Positive :=
+        Positive'Value(Winfo_Get(Label, "reqwidth")) + 20;
+      Height: Positive :=
+        Positive'Value(Winfo_Get(Label, "reqheight")) +
+        Positive'Value(Winfo_Get(DirectoryEntry, "reqheight"));
    begin
       Tcl.Tk.Ada.Pack.Pack(DirectoryEntry, "-expand true -fill x -side left");
       Button :=
@@ -65,7 +77,8 @@ package body OptionsDialog is
            "-text Close -command {CloseDialog .optionsdialog}");
       Tcl.Tk.Ada.Grid.Grid(Button, "-column 1 -row 0");
       Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 1");
-      SetDialog(OptionsDialog, "AZip - General Options", 550, 100);
+      Height := Height + Positive'Value(Winfo_Get(Button, "reqheight")) + 5;
+      SetDialog(OptionsDialog, "AZip - General Options", Width, Height);
    end ShowOptions;
 
    function Show_Options_Command

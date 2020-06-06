@@ -62,18 +62,18 @@ package body PropertiesDialog is
       Label :=
         Create
           (".propertiesdialog.uncompressedtext", "-text {Uncompressed size}");
-      Tcl.Tk.Ada.Grid.Grid(Label);
+      Tcl.Tk.Ada.Grid.Grid(Label, "-sticky w");
       Label := Create(".propertiesdialog.uncompressed", "-text {0 bytes}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 0");
       Label :=
         Create(".propertiesdialog.compressedtext", "-text {Compressed size}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1 -sticky w");
       Label := Create(".propertiesdialog.compressed", "-text {0 bytes}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 1");
       Label := Create(".propertiesdialog.ratio");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 2 -row 1");
       Label := Create(".propertiesdialog.entriestext", "-text {Entries}");
-      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 2");
+      Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 2 -sticky w");
       Label := Create(".propertiesdialog.entries", "-text {0 bytes}");
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 1 -row 2");
       Heading(PropertiesTree, "format", "-text {Format (""method"")}");

@@ -40,7 +40,17 @@ with Utils; use Utils;
 
 package body OptionsDialog is
 
-   procedure ShowOptions is
+   function Show_Options_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int with
+      Convention => C;
+
+   function Show_Options_Command
+     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
+      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
+      return Interfaces.C.int is
+      pragma Unreferenced(ClientData, Interp, Argc, Argv);
       OptionsDialog: constant Tk_Toplevel :=
         Create(".optionsdialog", "-class Dialog");
       ButtonBox: constant Ttk_Frame := Create(".optionsdialog.buttonbox");
@@ -79,21 +89,6 @@ package body OptionsDialog is
       Tcl.Tk.Ada.Grid.Grid(ButtonBox, "-column 0 -row 1");
       Height := Height + Positive'Value(Winfo_Get(Button, "reqheight")) + 5;
       SetDialog(OptionsDialog, "AZip - General Options", Width, Height);
-   end ShowOptions;
-
-   function Show_Options_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int with
-      Convention => C;
-
-   function Show_Options_Command
-     (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
-      Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
-      return Interfaces.C.int is
-      pragma Unreferenced(ClientData, Interp, Argc, Argv);
-   begin
-      ShowOptions;
       return TCL_OK;
    end Show_Options_Command;
 
@@ -149,16 +144,11 @@ package body OptionsDialog is
       return TCL_OK;
    end Set_Options_Command;
 
-   procedure AddCommands is
+   procedure CreateOptions is
    begin
       AddCommand("ShowOptions", Show_Options_Command'Access);
       AddCommand("SelectDirectory", Select_Directory_Command'Access);
       AddCommand("SetOptions", Set_Options_Command'Access);
-   end AddCommands;
-
-   procedure CreateOptions is
-   begin
-      AddCommands;
    end CreateOptions;
 
 end OptionsDialog;

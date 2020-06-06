@@ -20,7 +20,6 @@
 
 package OptionsDialog is
 
-   procedure ShowOptions;
    procedure CreateOptions;
 
 end OptionsDialog;

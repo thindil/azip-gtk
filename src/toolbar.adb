@@ -42,14 +42,11 @@ package body Toolbar is
         (Name: String; StartX: Natural; ToolTip: String; Command: String := "";
          Disabled: Boolean := False) is
          Icon: constant Tk_Photo := Create(Name & "icon");
-         Toolbutton: Ttk_Button;
+         Toolbutton: constant Ttk_Button :=
+           (if Command'Length > 0 then
+              Create(Name, "-style Toolbutton -command {" & Command & "}")
+            else Create(Name, "-style Toolbutton"));
       begin
-         if Command /= "" then
-            Toolbutton :=
-              Create(Name, "-style Toolbutton -command """ & Command & """");
-         else
-            Toolbutton := Create(Name, "-style Toolbutton");
-         end if;
          Copy
            (Image, Icon,
             "-from" & Natural'Image(StartX) & " 0 " &

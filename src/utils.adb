@@ -32,12 +32,11 @@ package body Utils is
 
    procedure AddCommand
      (Name: String; AdaCommand: not null CreateCommands.Tcl_CmdProc) is
-      Command: Tcl.Tcl_Command;
-      Aziptk_Add_Command_Error: exception;
-   begin
-      Command :=
+      Command: constant Tcl.Tcl_Command :=
         CreateCommands.Tcl_CreateCommand
           (Get_Context, Name, AdaCommand, 0, null);
+      Aziptk_Add_Command_Error: exception;
+   begin
       if Command = null then
          raise Aziptk_Add_Command_Error with "Can't add command " & Name;
       end if;

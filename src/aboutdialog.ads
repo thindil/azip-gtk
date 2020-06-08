@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/AboutDialog
+-- FUNCTION
+-- Provide code to show about the program dialog
+-- SOURCE
 package AboutDialog is
+-- ****
 
+   -- ****f* AboutDialog/CreateAbout
+   -- FUNCTION
+   -- Add Tcl commands required for show the about dialog
+   -- SOURCE
    procedure CreateAbout;
+   -- ****
 
 end AboutDialog;

@@ -40,8 +40,6 @@ with Utils; use Utils;
 
 package body AboutDialog is
 
-   Azip_Execute_Error: exception;
-
    function Show_About_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
@@ -245,6 +243,7 @@ package body AboutDialog is
       OsName: constant String := Tcl_GetVar(Get_Context, "tcl_platform(os)");
       Command: Unbounded_String;
       ProcessId: Process_Id;
+      Azip_Execute_Error: exception;
    begin
       if OsName = "Windows" then
          Command := To_Unbounded_String(Locate_Exec_On_Path("start").all);

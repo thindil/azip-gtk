@@ -18,10 +18,25 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* ArchivesViews/ACommands
+-- FUNCTION
+-- Provide code for Tcl commands for archives views
+-- SOURCE
 package ArchivesViews.Commands is
+-- ****
 
+   -- ****v* ACommands/ExtractingDirectory
+   -- FUNCTION
+   -- The default directory to which all archives will be extracted
+   -- SOURCE
    ExtractingDirectory: Unbounded_String;
+   -- ****
 
+   -- ****f* ACommands/CreateAbout
+   -- FUNCTION
+   -- Add Tcl commands required for archives views
+   -- SOURCE
    procedure AddCommands;
+   -- ****
 
 end ArchivesViews.Commands;

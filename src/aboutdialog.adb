@@ -40,11 +40,23 @@ with Utils; use Utils;
 
 package body AboutDialog is
 
+   -- ****if* AboutDialog/Show_About_Command
+   -- FUNCTION
+   -- Create and show the about dialog to the user
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Show_About_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Show_About_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -93,8 +105,10 @@ package body AboutDialog is
       if Tcl.Tk.Ada.Busy.Status(MainWindow) = "0" then
          Tcl.Tk.Ada.Busy.Busy(MainWindow);
       end if;
+      -- The program logo
       Label := Create(".aboutdialog.logo", "-image logo");
       Tcl.Tk.Ada.Grid.Grid(Label);
+      -- General information about the program
       AddLabel
         (".aboutdialog.infoframe.general",
          "AZip - A portable Zip Archive Manager", "-columnspan 2 -sticky w");
@@ -114,6 +128,7 @@ package body AboutDialog is
       AddLabel
         (".aboutdialog.infoframe.versionnumber", "2.36", "-column 1 -row 4");
       Tcl.Tk.Ada.Grid.Grid(InfoFrame, "-column 1 -row 0");
+      -- Information about used components
       Tcl.Tk.Ada.Grid.Column_Configure(AboutDialog, InfoFrame, "-weight 1");
       AddLinkButton
         (".aboutdialog.librariesframe.gnatlink",
@@ -162,11 +177,23 @@ package body AboutDialog is
       return TCL_OK;
    end Show_About_Command;
 
+   -- ****if* AboutDialog/Credits_Command
+   -- FUNCTION
+   -- Show the program credits to the user
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Credits_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Credits_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -192,6 +219,7 @@ package body AboutDialog is
          end if;
       end AddLabel;
    begin
+      -- Credits about the program
       Frame :=
         Create
           (".creditsdialog.framezipada",
@@ -203,6 +231,7 @@ package body AboutDialog is
         (".creditsdialog.framezipada.label2",
          "ITEC team at NXP Semiconductors: contributions");
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
+      -- Credits about the GWindows
       Frame :=
         Create
           (".creditsdialog.framegwindows",
@@ -214,6 +243,7 @@ package body AboutDialog is
         (".creditsdialog.framegwindows.label3",
          "Frank Piron, Falk Maier at KonAd GmbH: authors of GWindows Extended");
       Tcl.Tk.Ada.Pack.Pack(Frame, "-fill x -expand true");
+      -- Miscellaneous credits
       Frame :=
         Create
           (".creditsdialog.framemisc",
@@ -229,11 +259,23 @@ package body AboutDialog is
       return TCL_OK;
    end Credits_Command;
 
+   -- ****if* AboutDialog/Open_Link_Command
+   -- FUNCTION
+   -- Open the selected link in the default web browser
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Open_Link_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Open_Link_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

@@ -369,7 +369,7 @@ package body ArchivesViews is
 
    procedure DeleteItems is
       Tokens: Slice_Set;
-      Selected, Values, FileName, Path: Unbounded_String;
+      Selected, FileName, Path: Unbounded_String;
    begin
       Selected := To_Unbounded_String(Selection(CurrentFilesView));
       if Selected = Null_Unbounded_String then
@@ -384,17 +384,10 @@ package body ArchivesViews is
          return;
       end if;
       for I in 1 .. Slice_Count(Tokens) loop
-         Values :=
-           To_Unbounded_String
-             (Item(CurrentFilesView, Slice(Tokens, I), "-values"));
-         Tcl_Eval
-           (CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 0");
          FileName :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
-         Tcl_Eval
-           (CurrentFilesView.Interp, "lindex {" & To_String(Values) & "} 9");
+           To_Unbounded_String(Set(CurrentFilesView, Slice(Tokens, I), "1"));
          Path :=
-           To_Unbounded_String(Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
+           To_Unbounded_String(Set(CurrentFilesView, Slice(Tokens, I), "10"));
          Ada.Text_IO.Put_Line
            ("Deleting file " &
             To_String(Path & Directory_Separator & FileName));
@@ -535,7 +528,7 @@ package body ArchivesViews is
    end ToggleView;
 
    procedure ShowFiles is
-      Path, ParentId, Selected, Values, FilePath: Unbounded_String :=
+      Path, ParentId, Selected, FilePath: Unbounded_String :=
         Null_Unbounded_String;
       FlatView: Boolean := False;
    begin
@@ -568,15 +561,9 @@ package body ArchivesViews is
       end if;
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
-            Values :=
-              To_Unbounded_String
-                (Item(CurrentFilesView, Positive'Image(I), "-values"));
-            Tcl_Eval
-              (CurrentFilesView.Interp,
-               "lindex {" & To_String(Values) & "} 9");
             FilePath :=
               To_Unbounded_String
-                (Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
+                (Set(CurrentFilesView, Positive'Image(I), "10"));
             if (FilePath = Path) or FlatView then
                Move
                  (CurrentFilesView, Positive'Image(I), "{}",

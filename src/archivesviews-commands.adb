@@ -45,11 +45,24 @@ with Utils; use Utils;
 
 package body ArchivesViews.Commands is
 
+   -- ****if* ACommands/Close_Command
+   -- FUNCTION
+   -- Close the selected archive view and remove all variables related to it.
+   -- If it was the last available an archive view, create a new, empty one
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command.
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Close_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Close_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -70,11 +83,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Close_Command;
 
+   -- ****if* ACommands/Create_Command
+   -- FUNCTION
+   -- Create a new, empty archive view
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Create_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Create_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -86,11 +111,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Create_Command;
 
+   -- ****if* ACommands/SetActive_Command
+   -- FUNCTION
+   -- Set the selected archive view as currently active
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function SetActive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function SetActive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -102,11 +139,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end SetActive_Command;
 
+   -- ****if* ACommands/Close_All_Command
+   -- FUNCTION
+   -- Close all archives views and create a new, empty view
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Close_All_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Close_All_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -129,11 +178,24 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Close_All_Command;
 
+   -- ****if* ACommands/Load_Command
+   -- FUNCTION
+   -- Load the selected archive file into the empty archive view. If currently
+   -- selected archive view is not empty, create a new one
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Load_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Load_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -149,12 +211,14 @@ package body ArchivesViews.Commands is
         Get_Open_File
           ("-filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -title ""Select the archive to open"" -parent . -multiple false");
    begin
+      -- If user don't selected any file, quit
       if FileName = "" then
          return TCL_OK;
       end if;
       Label.Interp := Interp;
       Label.Name := New_String(To_String(ViewName) & ".header.label");
       LabelText := To_Unbounded_String(cget(Label, "-text"));
+      -- If currently selected archive is not empty, create a new one
       if Length(LabelText) > 10
         and then Slice(LabelText, 1, 10) /= "New Archiv" then
          CreateView;
@@ -163,19 +227,24 @@ package body ArchivesViews.Commands is
              (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Left));
          Label.Name := New_String(To_String(ViewName) & ".header.label");
       end if;
+      -- Set the label for the archive view
       configure(Label, "-text {" & FileName & "}");
+      -- Here should go all directories from the selected archive file. This
+      -- one is parent for them all (file name of the archive)
       Insert
         (CurrentDirectoryView, "{} end -text {" & Simple_Name(FileName) & "}");
       Selection_Set
         (CurrentDirectoryView,
          "[lindex {" & Children(CurrentDirectoryView, "{}") & "} 0]");
-      -- Some testing data
+      -- Some testing data, normally here should go all files from the selected
+      -- archive file.
       AddFile(FileName, "");
-      -- Sort archive if enabled
+      -- Sort archive by name if sorting is enabled
       if Tcl_GetVar(Get_Context, "nosorting") = "0" then
          Heading(CurrentFilesView, "1", "-image {}");
          SortArchive("Name");
       end if;
+      -- Enable toolbars buttons and menus entries if needed
       ToggleButtons;
       return TCL_OK;
    end Load_Command;

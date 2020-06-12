@@ -525,11 +525,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Test_Archive_Command;
 
+   -- ****if* ACommands/Toggle_View_Command
+   -- FUNCTION
+   -- Toggle flat or tree view for all archives views
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Toggle_View_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Toggle_View_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -548,11 +560,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Toggle_View_Command;
 
+   -- ****if* ACommands/Add_Folder_Command
+   -- FUNCTION
+   -- Add the selected directory and its contents to the selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Add_Folder_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Add_Folder_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -594,6 +618,7 @@ package body ArchivesViews.Commands is
             if FileName(1 .. Last) in "." | ".." then
                goto End_Of_Loop;
             end if;
+            -- If the selected child is directory, go to it and add its content
             if Is_Directory
                 (DirName & Directory_Separator & FileName(1 .. Last)) then
                if not Encrypted then
@@ -616,6 +641,7 @@ package body ArchivesViews.Commands is
                AddDir
                  (DirName & Directory_Separator & FileName(1 .. Last),
                   To_String(NewParentIndex));
+            -- Add the file to the archive
             else
                AddFiles
                  (DirName & Directory_Separator & FileName(1 .. Last),
@@ -637,6 +663,7 @@ package body ArchivesViews.Commands is
       if DirectoryName = Null_Unbounded_String then
          return TCL_OK;
       end if;
+      -- If the selected archive isn't saved yet, save it first
       if Length(ArchiveName) > 10
         and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          SaveArchiveAs;
@@ -647,6 +674,7 @@ package body ArchivesViews.Commands is
          end if;
       end if;
       MainNode := To_Unbounded_String(Children(CurrentDirectoryView, "{}"));
+      -- Check if the selected directory isn't exists in the selected archive
       Create(Tokens, Children(CurrentDirectoryView, To_String(MainNode)), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          if Slice(Tokens, I) /= ""
@@ -661,6 +689,7 @@ package body ArchivesViews.Commands is
             end if;
          end if;
       end loop;
+      -- Add recursively the selected archive to the selected directory
       AddDir
         (To_String(DirectoryName),
          Insert
@@ -672,11 +701,24 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Add_Folder_Command;
 
+   -- ****if* ACommands/Directory_Selected_Command
+   -- FUNCTION
+   -- Show files in the selected directory when an user select new directory
+   -- from the archive view directory list
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Directory_Selected_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Directory_Selected_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -688,11 +730,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Directory_Selected_Command;
 
+   -- ****if* ACommands/Update_Archive_Command
+   -- FUNCTION
+   -- Trigger update the selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Update_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Update_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -702,16 +756,19 @@ package body ArchivesViews.Commands is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       FileName: Unbounded_String;
    begin
+      -- Confirm if update should be done
       if MessageBox
           ("-message {You are about to start an archive update." & LF &
            "Files than are newer and diffrent (according to their CRC32 code) will replace those in the archive} -icon question -type yesno -detail {Proceed?}") =
         "no" then
          return TCL_OK;
       end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      -- Don't update if the currenlty selected archive is empty
       if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
+      -- Update each file in the selected archive
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       CreateProgressDialog("Update archive progress");
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
@@ -724,6 +781,7 @@ package body ArchivesViews.Commands is
          end if;
       end loop;
       DeleteProgressDialog;
+      -- Show update status to the user
       if MessageBox
           ("-message {Update completed.} -icon info -type ok -detail {No entry needed to be updated.}") =
         "" then
@@ -732,11 +790,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Update_Archive_Command;
 
+   -- ****if* ACommands/Recompress_Archive_Command
+   -- FUNCTION
+   -- Trigger recompressing the selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Recompress_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Recompress_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -746,6 +816,7 @@ package body ArchivesViews.Commands is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       FileName: Unbounded_String;
    begin
+      -- Confirm if recompression should be done
       if MessageBox
           ("-message {You are about to recompress this archive." & LF &
            "Contents will remain identical, but data compression may be better. " &
@@ -754,10 +825,12 @@ package body ArchivesViews.Commands is
         "no" then
          return TCL_OK;
       end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      -- Don't recompress if the currently selected archive is empty
       if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
+      -- Recompress every file in the selected archive
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       CreateProgressDialog("Update archive progress");
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
@@ -770,6 +843,7 @@ package body ArchivesViews.Commands is
          end if;
       end loop;
       DeleteProgressDialog;
+      -- Show recompress status to the user
       if MessageBox
           ("-message {Recompression completed.} -icon info -type ok -detail {No entry could be recompressed to a smaller size.}") =
         "" then
@@ -778,11 +852,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Recompress_Archive_Command;
 
+   -- ****if* ACommands/Toggle_Select_Command
+   -- FUNCTION
+   -- Toggle selection (all or none) of files in the selected archive view
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Toggle_Select_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Toggle_Select_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

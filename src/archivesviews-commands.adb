@@ -249,11 +249,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Load_Command;
 
+   -- ****if* ACommands/Extract_Command
+   -- FUNCTION
+   -- Extract the selected directory in the current archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Extract_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Extract_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -272,11 +284,12 @@ package body ArchivesViews.Commands is
       NewDirectory: Unbounded_String;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
+      -- If no directory selected for extraction, quit
       if Directory = "" then
          return TCL_OK;
       end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       Selected := To_Unbounded_String(Selection(CurrentDirectoryView));
+      -- If no directory selected in the current archive, quit
       if Selected = Null_Unbounded_String then
          return TCL_OK;
       end if;
@@ -284,10 +297,13 @@ package body ArchivesViews.Commands is
         To_Unbounded_String
           (MessageBox
              ("-message {Use archive's folder name for output? } -icon question -type yesnocancel"));
+      -- Quit if the user selected cancel option
       if Answer = To_Unbounded_String("cancel") then
          return TCL_OK;
       end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       CreateProgressDialog("Extract progress");
+      -- Set the path for the files which will be extracted
       loop
          ParentId :=
            To_Unbounded_String
@@ -302,6 +318,7 @@ package body ArchivesViews.Commands is
            Path;
          Selected := ParentId;
       end loop;
+      -- Use archive folder name as an output folder for extraction
       if Answer = To_Unbounded_String("yes") then
          NewDirectory :=
            To_Unbounded_String
@@ -310,6 +327,7 @@ package body ArchivesViews.Commands is
       else
          NewDirectory := To_Unbounded_String(Directory & Directory_Separator);
       end if;
+      -- Extract all files from the selected folder
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             FileName :=
@@ -338,11 +356,24 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Extract_Command;
 
+   -- ****if* ACommands/Add_Files_Command
+   -- FUNCTION
+   -- Add the selected files (with or without encryption) to the currently
+   -- selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Add_Files_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Add_Files_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -363,11 +394,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Add_Files_Command;
 
+   -- ****if* ACommands/Save_As_Command
+   -- FUNCTION
+   -- Save the currently selected archive with a new name
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Save_As_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Save_As_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -379,11 +422,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Save_As_Command;
 
+   -- ****if* ACommands/Delete_Items_Command
+   -- FUNCTION
+   -- Delete the selected files from the currently selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Delete_Items_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Delete_Items_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -395,11 +450,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Delete_Items_Command;
 
+   -- ****if* ACommands/Sort_Command
+   -- FUNCTION
+   -- Sort the currently selected archive files list
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Sort_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Sort_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -411,11 +478,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Sort_Command;
 
+   -- ****if* ACommands/Test_Archive_Command
+   -- FUNCTION
+   -- Test the currently selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Test_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Test_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -425,11 +504,13 @@ package body ArchivesViews.Commands is
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Interp);
       FileName: Unbounded_String;
    begin
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      -- If the currently selected archive is empty, quit
       if CurrentLastIndex = 1 then
          return TCL_OK;
       end if;
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       CreateProgressDialog("Test archive progress");
+      -- Test the files in the selected archive
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             FileName :=

@@ -887,11 +887,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Toggle_Select_Command;
 
+   -- ****if* ACommands/Delete_Directory_Command
+   -- FUNCTION
+   -- Delete the selected directory with its content from the selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Delete_Directory_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Delete_Directory_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -906,11 +918,23 @@ package body ArchivesViews.Commands is
       return TCL_OK;
    end Delete_Directory_Command;
 
+   -- ****if* ACommands/Extract_File_Command
+   -- FUNCTION
+   -- Extract the selected files from the selected archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Extract_File_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Extract_File_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -923,6 +947,7 @@ package body ArchivesViews.Commands is
       Tokens: Slice_Set;
       MainWindow: constant Tk_Toplevel := Get_Main_Window(Get_Context);
    begin
+      -- Get directory to which extraction will be done
       Directory :=
         To_Unbounded_String
           (Choose_Directory
@@ -931,7 +956,7 @@ package body ArchivesViews.Commands is
       if Selected = Null_Unbounded_String then
          return TCL_OK;
       end if;
-      Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      -- Ask if use archive name as output folder
       Answer :=
         To_Unbounded_String
           (MessageBox
@@ -939,6 +964,8 @@ package body ArchivesViews.Commands is
       if Answer = To_Unbounded_String("cancel") then
          return TCL_OK;
       end if;
+      -- Extracting the selected files to the selected directory
+      Tcl.Tk.Ada.Busy.Busy(MainWindow);
       if Answer = To_Unbounded_String("yes") then
          NewDirectory :=
            Directory &

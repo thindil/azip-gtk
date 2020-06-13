@@ -22,8 +22,17 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Tcl.Tk.Ada.Widgets.TtkPanedWindow; use Tcl.Tk.Ada.Widgets.TtkPanedWindow;
 with Tcl.Tk.Ada.Widgets.TtkTreeView; use Tcl.Tk.Ada.Widgets.TtkTreeView;
 
+-- ****h* AzipTk/ArchivesViews
+-- FUNCTION
+-- Provide code to manipulate the archives views
+-- SOURCE
 package ArchivesViews is
+-- ****
 
+   -- ****v* ArchivesViews/ColumnsNames
+   -- FUNCTION
+   -- The names of the columns in the files view in each archive's view
+   -- SOURCE
    ColumnsNames: constant array(1 .. 12) of Unbounded_String :=
      (To_Unbounded_String("Name"), To_Unbounded_String("Type"),
       To_Unbounded_String("Modified"), To_Unbounded_String("Attributes"),
@@ -31,14 +40,53 @@ package ArchivesViews is
       To_Unbounded_String("Ratio"), To_Unbounded_String("Format"),
       To_Unbounded_String("CRC 32"), To_Unbounded_String("Path"),
       To_Unbounded_String("Name encoding"), To_Unbounded_String("Result"));
+   -- ****
 
+   -- ****v* ArchivesViews/ActiveArchive
+   -- FUNCTION
+   -- Index of the currently selected archive. Default value is 0
+   -- SOURCE
    ActiveArchive: Natural := 0;
-   ArchiveNumber: Positive;
-   CurrentLastIndex: Positive := 1;
+   -- ****
 
+   -- ****v* ArchivesViews/ArchiveNumber
+   -- FUNCTION
+   -- Last index for the archive in the archives list
+   -- SOURCE
+   ArchiveNumber: Positive;
+   -- ****
+
+   -- ****v* ArchivesViews/CurrentLastIndex
+   -- FUNCTION
+   -- Last index of the file in the currently selected archive. Default value
+   -- is 1
+   -- SOURCE
+   CurrentLastIndex: Positive := 1;
+   -- ****
+
+   -- ****f* ArchivesViews/CreateMDI
+   -- FUNCTION
+   -- Create main archives view UI and fill it with one empty archive view
+   -- SOURCE
    procedure CreateMDI;
+   -- ****
+
+   -- ****f* ArchivesViews/SortArchive
+   -- FUNCTION
+   -- Sort the selected archive by the selected column. If column is currently
+   -- used to sorting, revert sorting
+   -- PARAMETERS
+   -- Column - The index of the column which will be used for sorting
+   -- SOURCE
    procedure SortArchive(Column: String);
+   -- ****
+
+   -- ****f* ArchivesViews/ToggleView
+   -- FUNCTION
+   -- Toggle tree or flat view for the archive's views
+   -- SOURCE
    procedure ToggleView;
+   -- ****
 
 private
 

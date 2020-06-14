@@ -90,14 +90,66 @@ package ArchivesViews is
 
 private
 
+   -- ****v* ArchivesViews/MDI (private)
+   -- FUNCTION
+   -- Main view for archives views
+   -- SOURCE
    MDI: Ttk_PanedWindow;
-   CurrentFilesView: Ttk_Tree_View;
-   CurrentDirectoryView: Ttk_Tree_View;
+   -- ****
 
+   -- ****v* ArchivesViews/CurrentFilesView (private)
+   -- FUNCTION
+   -- The Ttk_Tree_View with list of files in the currently selected archive
+   -- SOURCE
+   CurrentFilesView: Ttk_Tree_View;
+   -- ****
+
+   -- ****v* ArchivesViews/CurrentDirectoryView (private)
+   -- FUNCTION
+   -- The Ttk_Tree_View with list of directories in the currently selected
+   -- archive
+   -- SOURCE
+   CurrentDirectoryView: Ttk_Tree_View;
+   -- ****
+
+   -- ****f* ArchivesViews/AddFile (private)
+   -- FUNCTION
+   -- Add the selected file to the currently selected archive view (not to the
+   -- archive itself)
+   -- PARAMETERS
+   -- FileName - Name of the file to add
+   -- Path     - Full path to the file (without its name)
+   -- Hide     - If true, the selected file will not be displayed after add.
+   --            Default value is false (display it)
+   -- SOURCE
    procedure AddFile(FileName, Path: String; Hide: Boolean := False);
+   -- ****
+
+   -- ****f* ArchivesViews/SetActive (private)
+   -- FUNCTION
+   -- Set the archive as the currently selected
+   -- PARAMETERS
+   -- NewActive - Index of the archive view to set as the currently active
+   -- Created   - If true, the archive was just created. Default value is
+   --             false (currently selected archive is existing archive)
+   -- SOURCE
    procedure SetActive(NewActive: Positive; Created: Boolean := False);
+   -- ****
+
+   -- ****f* ArchivesViews/CreateView (private)
+   -- FUNCTION
+   -- Create a new, empty archive view
+   -- SOURCE
    procedure CreateView;
+   -- ****
+
+   -- ****f* ArchivesViews/GetArchiveName (private)
+   -- FUNCTION
+   -- Get the name of currently selected archive
+   -- SOURCE
    function GetArchiveName return String;
+   -- ****
+
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False);

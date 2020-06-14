@@ -150,11 +150,40 @@ private
    function GetArchiveName return String;
    -- ****
 
+   -- ****f* ArchivesViews/AddFiles (private)
+   -- FUNCTION
+   -- Add the selected files to the currently selected archive
+   -- PARAMETERS
+   -- FileName  - Names of the files to add to the archive
+   -- Encrypted - If true, add the selected files as encrypted to the archive
+   -- Path      - Full path to the directory in archive where the selected
+   --             files will be added. Can be empty. Default value is empty
+   -- SOURCE
    procedure AddFiles
      (FileName: String; Encrypted: Boolean; Path: String := "";
       Hide: Boolean := False);
+   -- ****
+
+   -- ****f* ArchivesViews/SaveArchiveAs
+   -- FUNCTION
+   -- Save the currently selected archive with as a new file
+   -- SOURCE
    procedure SaveArchiveAs;
+   -- ****
+
+   -- ****f* ArchivesViews/DeleteItems
+   -- FUNCTION
+   -- Delete the selected files from the currently selected archive view
+   -- SOURCE
    procedure DeleteItems;
+   -- ****
+
+   -- ****f* ArchivesViews/ShowFiles
+   -- FUNCTION
+   -- Show the files which are inside of the selected directory in the current
+   -- selected archive
+   -- SOURCE
    procedure ShowFiles;
+   -- ****
 
 end ArchivesViews;

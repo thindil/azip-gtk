@@ -56,6 +56,7 @@ package body ArchivesViews is
       NameLabel: Ttk_Label;
    begin
       Header.Interp := Get_Context;
+      -- Set style for the old active archive's header
       if ActiveArchive > 0 then
          Header.Name := New_String(OldName & ".header");
          if Winfo_Get(Header, "exists") = "1" then
@@ -64,6 +65,7 @@ package body ArchivesViews is
             configure(Header, "-style TLabel");
          end if;
       end if;
+      -- Set style for the new active archive's header
       Header.Name := New_String(NewName & ".header");
       configure(Header, "-style aziptk.TFrame");
       NameLabel.Interp := Get_Context;
@@ -71,6 +73,7 @@ package body ArchivesViews is
       configure(NameLabel, "-style aziptk.TLabel");
       ActiveArchive := NewActive;
       SetCloseCommand(ActiveArchive);
+      -- Set files view type
       Header.Name := New_String(NewName & ".directoryframe");
       if not Created then
          if Winfo_Get(Header, "ismapped") = "1" then
@@ -79,11 +82,13 @@ package body ArchivesViews is
             Tcl_SetVar(Header.Interp, "viewtype", "flat");
          end if;
       end if;
+      -- Enable or disable toolbars buttons and some options in menu
       if cget(NameLabel, "-text")(1 .. 3) /= "New" then
          ToggleButtons;
       else
          ToggleButtons(False);
       end if;
+      -- Set values for global variables related to the currently active archive
       CurrentFilesView.Name := New_String(NewName & ".filesframe.fileslist");
       CurrentDirectoryView.Name :=
         New_String(NewName & ".directoryframe.directorytree");
@@ -153,6 +158,7 @@ package body ArchivesViews is
            Widget_Image(DirectoryXScroll) & " set"" -yscrollcommand """ &
            Widget_Image(DirectoryYScroll) & " set""");
    begin
+      -- Configure the files view list - visible columns
       for I in ColumnsNames'Range loop
          Heading
            (FilesList, "#" & Trim(Natural'Image(I), Left),
@@ -160,17 +166,18 @@ package body ArchivesViews is
             To_String(ColumnsNames(I)) & "}}");
       end loop;
       configure(FilesList, "-displaycolumns [split $visiblecolumns]");
-      Bind(DirectoryTree, "<<TreeviewSelect>>", "DirectorySelected");
-      Bind(DirectoryTree, "<3>", "{tk_popup .directorymenu %X %Y}");
+      -- Set archive view bar with archive name and close button
       Tcl.Tk.Ada.Pack.Pack(NameLabel, "-side left");
       Tcl.Tk.Ada.Pack.Pack(CloseButton, "-side right");
       Tcl.Tk.Ada.Pack.Pack(Header, "-fill x");
+      -- Add the directory tree view
       Tcl.Tk.Ada.Pack.Pack(DirectoryXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(DirectoryYScroll, "-side right -fill y");
       Tcl.Tk.Ada.Pack.Pack(DirectoryTree, "-side top -fill both -expand true");
       if ViewType = "tree" then
          Add(Paned, DirectoryFrame, "-weight 1");
       end if;
+      -- Add the files view
       Add(Paned, FilesFrame, "-weight 20");
       Tcl.Tk.Ada.Pack.Pack(FilesXScroll, "-side bottom -fill x");
       Tcl.Tk.Ada.Pack.Pack(FilesYScroll, "-side right -fill y");
@@ -178,16 +185,20 @@ package body ArchivesViews is
       Tcl.Tk.Ada.Pack.Pack(Paned, "-fill both -expand true");
       Add(MDI, ArchiveView);
       SetActive(ArchiveNumber, True);
+      -- Add proper keyboard and mouse bindings for the elements
       Bind
         (Header, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
       Bind
         (DirectoryTree, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
+      Bind(DirectoryTree, "<<TreeviewSelect>>", "DirectorySelected");
+      Bind(DirectoryTree, "<3>", "{tk_popup .directorymenu %X %Y}");
       Bind
         (FilesList, "<1>",
          "{setactive " & Trim(Positive'Image(ActiveArchive), Left) & "}");
       Bind(FilesList, "<3>", "{tk_popup .filesmenu %X %Y}");
+      -- Set related global variables
       Tcl_SetVar
         (Paned.Interp, "lastindex" & Trim(Positive'Image(ActiveArchive), Left),
          "1");

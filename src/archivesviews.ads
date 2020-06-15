@@ -112,19 +112,6 @@ private
    CurrentDirectoryView: Ttk_Tree_View;
    -- ****
 
-   -- ****f* ArchivesViews/AddFile (private)
-   -- FUNCTION
-   -- Add the selected file to the currently selected archive view (not to the
-   -- archive itself)
-   -- PARAMETERS
-   -- FileName - Name of the file to add
-   -- Path     - Full path to the file (without its name)
-   -- Hide     - If true, the selected file will not be displayed after add.
-   --            Default value is false (display it)
-   -- SOURCE
-   procedure AddFile(FileName, Path: String; Hide: Boolean := False);
-   -- ****
-
    -- ****f* ArchivesViews/SetActive (private)
    -- FUNCTION
    -- Set the archive as the currently selected
@@ -141,6 +128,19 @@ private
    -- Create a new, empty archive view
    -- SOURCE
    procedure CreateView;
+   -- ****
+
+   -- ****f* ArchivesViews/AddFile (private)
+   -- FUNCTION
+   -- Add the selected file to the currently selected archive view (not to the
+   -- archive itself)
+   -- PARAMETERS
+   -- FileName - Name of the file to add
+   -- Path     - Full path to the file (without its name)
+   -- Hide     - If true, the selected file will not be displayed after add.
+   --            Default value is false (display it)
+   -- SOURCE
+   procedure AddFile(FileName, Path: String; Hide: Boolean := False);
    -- ****
 
    -- ****f* ArchivesViews/GetArchiveName (private)

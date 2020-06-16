@@ -276,13 +276,16 @@ package body ArchivesViews is
       ArchiveName: Unbounded_String := To_Unbounded_String(GetArchiveName);
       Values, ExistingFileName, ExistingPath: Unbounded_String;
    begin
+      -- Quit if the user doesn't selected any files to add
       if FileName = "" then
          return;
       end if;
+      -- If the selected archive is empty, save it first to the file
       if Length(ArchiveName) > 10
         and then Slice(ArchiveName, 1, 10) = "New Archiv" then
          SaveArchiveAs;
          ArchiveName := To_Unbounded_String(GetArchiveName);
+         -- Quit if the user doesn't saved the selected archive
          if Length(ArchiveName) > 10
            and then Slice(ArchiveName, 1, 10) = "New Archiv" then
             return;
@@ -290,6 +293,8 @@ package body ArchivesViews is
       end if;
       Create(Tokens, FileName, " ");
       for I in 1 .. Slice_Count(Tokens) loop
+         -- Check if the selected file doesn't exists in the currently selected
+         -- archive
          Create(Tokens2, Children(CurrentFilesView, "{}"), " ");
          for J in 1 .. Slice_Count(Tokens2) loop
             if Slice(Tokens2, J) /= "" then
@@ -321,6 +326,7 @@ package body ArchivesViews is
                end if;
             end if;
          end loop;
+         -- Add file to the currently selected archive
          if not Encrypted then
             Ada.Text_IO.Put_Line
               ("Adding file " & Slice(Tokens, I) & " to archive " &
@@ -353,15 +359,18 @@ package body ArchivesViews is
       NewFileName :=
         To_Unbounded_String
           (Get_Save_File
-             ("-parent . -title ""Select a new name for the archive"" -filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -initialfile """ &
-              Simple_Name(To_String(ArchiveName)) & """ -initialdir """ &
-              Containing_Directory(To_String(ArchiveName)) & """"));
+             ("-parent . -title {Select a new name for the archive} -filetypes {{{Zip archives} {.zip}} {{JAR (Java archives)} {.jar}} {{All files} *}} -initialfile {" &
+              Simple_Name(To_String(ArchiveName)) & "} -initialdir {" &
+              Containing_Directory(To_String(ArchiveName)) & "}"));
+      -- Quit if the user doesn't selected a new name for the currently
+      -- selected archive
       if NewFileName = Null_Unbounded_String then
          return;
       end if;
+      -- Saving the currently selected archive
       Ada.Text_IO.Put_Line
         ("Saving " & To_String(ArchiveName) & " as " & To_String(NewFileName));
-      configure(HeaderLabel, "-text """ & To_String(NewFileName) & """");
+      configure(HeaderLabel, "-text {" & To_String(NewFileName) & "}");
       Directories := To_Unbounded_String(Children(CurrentDirectoryView, "{}"));
       if Directories /= Null_Unbounded_String then
          Create(Tokens, To_String(Directories), " ");
@@ -383,10 +392,12 @@ package body ArchivesViews is
       Selected, FileName, Path: Unbounded_String;
    begin
       Selected := To_Unbounded_String(Selection(CurrentFilesView));
+      -- Quit if no files are selecte in the currently selected archive
       if Selected = Null_Unbounded_String then
          return;
       end if;
       Create(Tokens, To_String(Selected), " ");
+      -- Deletion confirmation
       if MessageBox
           ("-message {Do you want to remove the" &
            Slice_Number'Image(Slice_Count(Tokens)) &
@@ -394,6 +405,7 @@ package body ArchivesViews is
         "no" then
          return;
       end if;
+      -- Deleting the selected files from the currently selected archive
       for I in 1 .. Slice_Count(Tokens) loop
          FileName :=
            To_Unbounded_String(Set(CurrentFilesView, Slice(Tokens, I), "1"));
@@ -412,6 +424,8 @@ package body ArchivesViews is
       Tokens: Slice_Set;
       Ascending: Boolean := True;
    begin
+      -- If there is any sort order based on column in the currently selected
+      -- archive view, revert it and remember the column index
       Create(Tokens, cget(CurrentFilesView, "-displaycolumns"), " ");
       for I in 1 .. Slice_Count(Tokens) loop
          ArrowName :=
@@ -427,19 +441,24 @@ package body ArchivesViews is
             ColumnIndex := Positive'Value(Slice(Tokens, I));
          end if;
       end loop;
+      -- Set the arrow image (up or down)
       ArrowName := To_Unbounded_String("arrow-down");
       if OldSortColumn = ColumnIndex
         and then OldArrowName = To_Unbounded_String("arrow-down") then
          ArrowName := To_Unbounded_String("arrow-up");
          Ascending := False;
       end if;
+      -- Set the order image for the selected column
       Heading
         (CurrentFilesView, Trim(Natural'Image(ColumnIndex), Left),
          "-image " & To_String(ArrowName));
+      -- Stop ordering if there no files in the currently selected archive
       Create(Tokens, Children(CurrentFilesView, "{}"), " ");
       if Slice(Tokens, 1) = "" then
          return;
       end if;
+      -- Sort the displayed files in the currently selected archive based on
+      -- column and the sort order
       declare
          type File_Record is record
             Index: Unbounded_String;

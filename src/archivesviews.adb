@@ -420,7 +420,7 @@ package body ArchivesViews is
 
    procedure SortArchive(Column: String) is
       ColumnIndex, OldSortColumn: Natural;
-      ArrowName, OldArrowName, Values: Unbounded_String;
+      ArrowName, OldArrowName: Unbounded_String;
       Tokens: Slice_Set;
       Ascending: Boolean := True;
    begin
@@ -479,17 +479,12 @@ package body ArchivesViews is
          FileEntry: File_Record;
       begin
          for I in 1 .. Slice_Count(Tokens) loop
-            Values :=
-              To_Unbounded_String
-                (Item(CurrentFilesView, Slice(Tokens, I), "-values"));
-            Tcl_Eval
-              (CurrentFilesView.Interp,
-               "lindex {" & To_String(Values) & "}" &
-               Natural'Image(ColumnIndex - 1));
             FileEntry.Index := To_Unbounded_String(Slice(Tokens, I));
             FileEntry.Value :=
               To_Unbounded_String
-                (Tcl.Ada.Tcl_GetResult(CurrentFilesView.Interp));
+                (Set
+                   (CurrentFilesView, Slice(Tokens, I),
+                    Positive'Image(ColumnIndex)));
             FilesList(Positive(I)) := FileEntry;
          end loop;
          Sort(FilesList);

@@ -506,6 +506,7 @@ package body ArchivesViews is
       DirectoryFrame.Interp := Get_Context;
       Paned.Interp := DirectoryFrame.Interp;
       FilesList.Interp := DirectoryFrame.Interp;
+      -- Set visible columns for files list
       if Tcl_GetVar(Get_Context, "viewtype") = "tree" then
          Create(Tokens, Tcl_GetVar(Get_Context, "visiblecolumns"), " ");
          for I in 1 .. Slice_Count(Tokens) loop
@@ -522,6 +523,7 @@ package body ArchivesViews is
          end if;
       end if;
       Tcl_SetVar(Get_Context, "visiblecolumns", To_String(VisibleColumns));
+      -- Set view for each archive
       for I in 1 .. ArchiveNumber loop
          FilesList.Name :=
            New_String
@@ -558,9 +560,11 @@ package body ArchivesViews is
       FlatView: Boolean := False;
    begin
       Selected := To_Unbounded_String(Selection(CurrentDirectoryView));
+      -- If no directory selected, quit
       if Selected = Null_Unbounded_String then
          return;
       end if;
+      -- Get the full path in the archive for the files to list in files view
       loop
          ParentId :=
            To_Unbounded_String
@@ -584,6 +588,8 @@ package body ArchivesViews is
             end if;
          end loop;
       end if;
+      -- Show the files in the selected directory or all files in the archive
+      -- if flat view is set
       for I in 1 .. CurrentLastIndex loop
          if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             FilePath :=

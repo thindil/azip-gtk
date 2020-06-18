@@ -32,7 +32,7 @@ package ArchivesViews.Commands is
    ExtractingDirectory: Unbounded_String;
    -- ****
 
-   -- ****f* ACommands/CreateAbout
+   -- ****f* ACommands/AddCommands
    -- FUNCTION
    -- Add Tcl commands required for archives views
    -- SOURCE

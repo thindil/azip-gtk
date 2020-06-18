@@ -121,12 +121,13 @@ begin
      ("aziptk.TLabel",
       "-background [ttk::style lookup . -selectbackground] -foreground [ttk::style lookup . -selectforeground]");
 
-   -- Create UI
    Set_Directory(Containing_Directory(Command_Name));
+   -- Set the main window
    MainWindow := Get_Main_Window(Interp);
    Wm_Set(MainWindow, "title", "AZip");
    Icon := Create("logo", "-file ""azip.gif""");
    Wm_Set(MainWindow, "iconphoto", "-default logo");
+   -- Set keyboard shortcuts for various actions
    Bind_To_Main_Window(Interp, "<Alt-F4>", "{exit}");
    Bind_To_Main_Window(Interp, "<Control-n>", "{Create}");
    Bind_To_Main_Window(Interp, "<Control-o>", "{Load}");
@@ -145,6 +146,7 @@ begin
    Bind_To_Main_Window(Interp, "<Control-a>", "{ToggleSelect true}");
    Bind_To_Main_Window(Interp, "<Control-u>", "{ToggleSelect false}");
    Bind_To_Main_Window(Interp, "<F1>", "{ShowHelp}");
+   -- Create UI
    CreateMenuBar(MainWindow);
    CreateToolbar;
    CreateMDI;
@@ -161,6 +163,7 @@ begin
    Tcl.Tk.Tk_MainLoop;
 
 exception
+      -- Save exception traceback to the file and write it to the console
    when An_Exception : others =>
       declare
          ErrorFile: File_Type;

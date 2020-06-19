@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/ColumnsDialog
+-- FUNCTION
+-- Provide code to setup visible columns in files list in every archive view
+-- SOURCE
 package ColumnsDialog is
+-- ****
 
+   -- ****f* ColumnsDialog/AddCommands
+   -- FUNCTION
+   -- Add Tcl commands required for archives views
+   -- SOURCE
    procedure AddCommands;
+   -- ****
 
 end ColumnsDialog;

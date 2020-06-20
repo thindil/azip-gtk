@@ -43,11 +43,23 @@ with Utils; use Utils;
 
 package body ColumnsDialog is
 
+   -- ****if* ColumnsDialog/Close_Dialog_Command
+   -- FUNCTION
+   -- Close the selected dialog and unblock the main window
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command.
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Close_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Close_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -69,11 +81,24 @@ package body ColumnsDialog is
       return TCL_OK;
    end Close_Dialog_Command;
 
+   -- ****if* ColumnsDialog/Set_Visible_Columns_Command
+   -- FUNCTION
+   -- Set and show the dialog window to set visible columns in files list in
+   -- archives views
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Set_Visible_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Set_Visible_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -98,6 +123,8 @@ package body ColumnsDialog is
            ".filesframe.fileslist");
       Create
         (Tokens, Tcl.Tk.Ada.Widgets.cget(FilesView, "-displaycolumns"), " ");
+      -- Create buttons for each column in files list view and set it state
+      -- based on column visibility
       for I in ColumnsNames'Range loop
          CheckButton :=
            Create
@@ -113,6 +140,7 @@ package body ColumnsDialog is
                exit;
             end if;
          end loop;
+         -- Columns Name, Path and Result cannot be hidden manually
          if I in 1 | 10 | 12 then
             Tcl.Tk.Ada.Widgets.configure(CheckButton, "-state disabled");
          end if;
@@ -130,11 +158,16 @@ package body ColumnsDialog is
       return TCL_OK;
    end Set_Visible_Columns_Command;
 
+   -- ****if* ColumnsDialog/Set_Columns_Command
+   -- FUNCTION
+   -- Set visibility of the columns in files list in archives views
+   -- SOURCE
    function Set_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Set_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -144,6 +177,7 @@ package body ColumnsDialog is
       DisplayColumns: Unbounded_String;
       FilesView: Ttk_Tree_View;
    begin
+      -- Get the names of the visible commands
       for I in ColumnsNames'Range loop
          if Tcl_GetVar
              (Interp,
@@ -154,6 +188,7 @@ package body ColumnsDialog is
       end loop;
       Trim(DisplayColumns, Left);
       Tcl_SetVar(Interp, "visiblecolumns", To_String(DisplayColumns));
+      -- Set the displayed columns in all opened archives views
       FilesView.Interp := Interp;
       for I in 1 .. ArchiveNumber loop
          FilesView.Name :=

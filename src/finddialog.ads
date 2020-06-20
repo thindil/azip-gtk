@@ -18,8 +18,19 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/FindDialog
+-- FUNCTION
+-- Provides code to show UI and search for the selected criteria in files in
+-- the currently selected archive
+-- SOURCE
 package FindDialog is
+-- ****
 
+   -- ****f* FindDialog/AddCommands
+   -- FUNCTION
+   -- Add Tcl commands required for archives views
+   -- SOURCE
    procedure AddCommands;
+   -- ****
 
 end FindDialog;

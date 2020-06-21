@@ -47,11 +47,23 @@ with Utils; use Utils;
 
 package body FindDialog is
 
+   -- ****if* FindDialog/Show_Find_Dialog_Command
+   -- FUNCTION
+   -- Create and show find dialog to the user
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Show_Find_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Show_Find_Dialog_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -74,11 +86,13 @@ package body FindDialog is
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
       Create(Tokens, Children(FilesView, "{}"), " ");
+      -- If there no files in the currently selected archive, quit
       if Slice(Tokens, 1) = "" then
          Destroy(FindDialog);
          return TCL_OK;
       end if;
       Tcl.Tk.Ada.Busy.Busy(MainWindow);
+      -- Create find dialog UI
       Label := Create(".finddialog.findimage", "-image .toolbar.findicon");
       IconWidth := Positive'Value(Winfo_Get(Label, "reqwidth"));
       Tcl.Tk.Ada.Grid.Grid(Label, "-column 0 -row 1");
@@ -123,11 +137,23 @@ package body FindDialog is
       return TCL_OK;
    end Show_Find_Dialog_Command;
 
+   -- ****if* FindDialog/Find_In_Archive_Command
+   -- FUNCTION
+   -- Search for the selected strings in the currently selected archive files
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Find_In_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Find_In_Archive_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -152,6 +178,8 @@ package body FindDialog is
         New_String
           (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
            ".filesframe.fileslist");
+      -- Search for the selected strings in the currently selected archive's
+      -- files
       for I in 1 .. CurrentLastIndex loop
          if Exists(FilesView, Positive'Image(I)) = "1" then
             Values :=
@@ -191,6 +219,8 @@ package body FindDialog is
          end if;
       end loop;
       Destroy(FindDialog);
+      -- Show search result to the user. If user answer yes, show flat view of
+      -- the currently selected archive, sorted by the result column
       if MessageBox
           ("-message {Search completed. " & LF & LF & "Occurences found:" &
            Natural'Image(Occurences) & " " & LF & "Total entries:" &

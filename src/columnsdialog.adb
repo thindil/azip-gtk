@@ -161,6 +161,13 @@ package body ColumnsDialog is
    -- ****if* ColumnsDialog/Set_Columns_Command
    -- FUNCTION
    -- Set visibility of the columns in files list in archives views
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
    -- SOURCE
    function Set_Columns_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

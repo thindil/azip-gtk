@@ -162,8 +162,7 @@ package body FindDialog is
       pragma Unreferenced(ClientData, Argc, Argv);
       FindDialog: Tk_Toplevel;
       TextEntry: Ttk_Entry;
-      Name, Content, Values, FileName: Unbounded_String;
-      FilesView: Ttk_Tree_View;
+      Name, Content, FileName: Unbounded_String;
       EntriesFound, Occurences, OverallResult, Result: Natural := 0;
    begin
       FindDialog.Interp := Interp;
@@ -173,21 +172,13 @@ package body FindDialog is
       Name := To_Unbounded_String(Get(TextEntry));
       TextEntry.Name := New_String(".finddialog.entrycontent");
       Content := To_Unbounded_String(Get(TextEntry));
-      FilesView.Interp := Interp;
-      FilesView.Name :=
-        New_String
-          (".mdi.archive" & Trim(Positive'Image(ActiveArchive), Both) &
-           ".filesframe.fileslist");
       -- Search for the selected strings in the currently selected archive's
       -- files
       for I in 1 .. CurrentLastIndex loop
-         if Exists(FilesView, Positive'Image(I)) = "1" then
-            Values :=
-              To_Unbounded_String
-                (Item(FilesView, Positive'Image(I), "-values"));
-            Tcl_Eval(FilesView.Interp, "lindex {" & To_String(Values) & "} 0");
+         if Exists(CurrentFilesView, Positive'Image(I)) = "1" then
             FileName :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
+              To_Unbounded_String
+                (Set(CurrentFilesView, Positive'Image(I), "1"));
             Ada.Text_IO.Put_Line
               ("Looking for name: " & To_String(Name) & " in " &
                To_String(FileName));
@@ -208,14 +199,9 @@ package body FindDialog is
             Result := 0;
             Occurences := Occurences + Result;
             OverallResult := OverallResult + Result;
-            Tcl_Eval
-              (FilesView.Interp, "lrange {" & To_String(Values) & "} 0 10");
-            Values :=
-              To_Unbounded_String(Tcl.Ada.Tcl_GetResult(FilesView.Interp));
-            Item
-              (FilesView, Positive'Image(I),
-               "-values [list " & To_String(Values) & "" &
-               Natural'Image(OverallResult) & " ]");
+            Set
+              (CurrentFilesView, Positive'Image(I), "12",
+               Natural'Image(OverallResult));
          end if;
       end loop;
       Destroy(FindDialog);
@@ -227,9 +213,9 @@ package body FindDialog is
            Natural'Image(EntriesFound) &
            "} -icon question -type yesno -detail {Do you want to see full results (flat view & result sort)?}") =
         "yes" then
-         Tcl_SetVar(FilesView.Interp, "viewtype", "flat");
+         Tcl_SetVar(Interp, "viewtype", "flat");
          ToggleView;
-         Heading(FilesView, "12", "-image arrow-down");
+         Heading(CurrentFilesView, "12", "-image arrow-down");
          SortArchive("Result");
       end if;
       return TCL_OK;

@@ -64,6 +64,13 @@ package ArchivesViews is
    CurrentLastIndex: Positive := 1;
    -- ****
 
+   -- ****v* ArchivesViews/CurrentFilesView (private)
+   -- FUNCTION
+   -- The Ttk_Tree_View with list of files in the currently selected archive
+   -- SOURCE
+   CurrentFilesView: Ttk_Tree_View;
+   -- ****
+
    -- ****f* ArchivesViews/CreateMDI
    -- FUNCTION
    -- Create main archives view UI and fill it with one empty archive view
@@ -95,13 +102,6 @@ private
    -- Main view for archives views
    -- SOURCE
    MDI: Ttk_PanedWindow;
-   -- ****
-
-   -- ****v* ArchivesViews/CurrentFilesView (private)
-   -- FUNCTION
-   -- The Ttk_Tree_View with list of files in the currently selected archive
-   -- SOURCE
-   CurrentFilesView: Ttk_Tree_View;
    -- ****
 
    -- ****v* ArchivesViews/CurrentDirectoryView (private)

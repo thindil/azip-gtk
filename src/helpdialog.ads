@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/HelpDialog
+-- FUNCTION
+-- Provides code to show help related UI to the user
+-- SOURCE
 package HelpDialog is
+-- ****
 
+   -- ****f* HelpDialog/CreateHelp
+   -- FUNCTION
+   -- Add Tcl commands required by help UI
+   -- SOURCE
    procedure CreateHelp;
+   -- ****
 
 end HelpDialog;

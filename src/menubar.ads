@@ -20,10 +20,40 @@
 
 with Tcl.Tk.Ada.Widgets.Toplevel; use Tcl.Tk.Ada.Widgets.Toplevel;
 
+-- ****h* AzipTk/MenuBar
+-- FUNCTION
+-- Provide code for manipulate the main program menu
+-- SOURCE
 package MenuBar is
+-- ****
 
+   -- ****f* MenuBar/CreateMenuBar
+   -- FUNCTION
+   -- Create the menu bar and show it to the user
+   -- PARAMETERS
+   -- MainWindow - The main window of the program
+   -- SOURCE
    procedure CreateMenuBar(MainWindow: Tk_Toplevel);
+   -- ****
+
+   -- ****f* MenuBar/SetCloseCommand
+   -- FUNCTION
+   -- Set close command to currently selected archive view
+   -- PARAMETERS
+   -- Index - Index of the archive view which will be closed by the menu entry
+   -- SOURCE
    procedure SetCloseCommand(Index: Positive);
+   -- ****
+
+   -- ****f* MenuBar/ToggleEntries
+   -- FUNCTION
+   -- Enable or disable the menu entries, depends on the state of currently
+   -- selected archive view
+   -- PARAMETERS
+   -- Enable - If true, enable the selected entries in menu. Default value
+   -- is True
+   -- SOURCE
    procedure ToggleEntries(Enable: Boolean := True);
+   -- ****
 
 end MenuBar;

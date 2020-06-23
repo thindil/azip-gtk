@@ -39,11 +39,23 @@ with Utils; use Utils;
 
 package body HelpDialog is
 
+   -- ****if* HelpDialog/Show_Help_Command
+   -- FUNCTION
+   -- Create and show the help dialog
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed. Unused
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Show_Help_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Show_Help_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -86,6 +98,7 @@ package body HelpDialog is
          Tcl.Tk.Ada.Pack.Pack(SubHelpFrame, "-expand true -fill both");
       end AddSubFrame;
    begin
+      -- Help about user interface
       HelpFrame := Create(".helpdialog.notebook.userinterface");
       AddSubFrame
         (Widget_Image(HelpFrame) & ".adding", "Adding files and folders",
@@ -96,12 +109,14 @@ package body HelpDialog is
          "drag_unpack.gif",
          "You can extract selected files, the selected folder, or the entire archive via the Extract command (Ctrl+E) or a button. BUT: you can also extract files via Drag && Drop to a Windows Explorer window or to the Desktop.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {User Interface}");
+      -- Help about the installation
       HelpFrame := Create(".helpdialog.notebook.installation");
       AddSubFrame
         (Widget_Image(HelpFrame) & ".stealth",
          "Using AZip as a portable software - stealth mode", "no_regedit.gif",
          "For convenience, by default, AZip writes user settings in the registry, as standard Windows software does. If you want the registry NOT being written to, you can add a file, azip.cfg (can be empty), in the same directory as azip*.exe. User settings will be recorded there. If the file is read-only, it simply won't be changed, and settings won't be saved.");
       Add(HelpNoteBook, Widget_Image(HelpFrame), "-text {Installation}");
+      -- Help about commandline
       HelpFrame := Create(".helpdialog.notebook.commandline");
       AddSubFrame
         (Widget_Image(HelpFrame) & ".parameters", "Command-line parameters",

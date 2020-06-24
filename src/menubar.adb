@@ -63,6 +63,7 @@ package body MenuBar is
             To_Unbounded_String("-label Recent -underline 0 -menu .recent"));
       end CreateRecent;
    begin
+      -- Create File menu
       CreateSubMenu
         (".menubar.file", "File",
          ((To_Unbounded_String("command"),
@@ -85,6 +86,7 @@ package body MenuBar is
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Quit"" -underline 0 -accelerator Alt+F4 -command exit"))));
+      -- Create Edit menu
       CreateSubMenu
         (".menubar.edit", "Edit",
          ((To_Unbounded_String("command"),
@@ -112,6 +114,7 @@ package body MenuBar is
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Add folder with encryption..."" -command {AddFolder true}"))));
+      -- Create Tools menu
       CreateSubMenu
         (".menubar.tools", "Tools",
          ((To_Unbounded_String("command"),
@@ -140,6 +143,7 @@ package body MenuBar is
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Merge archives"" -underline 0 -state disabled"))));
+      -- Create View menu
       CreateSubMenu
         (".menubar.view", "View",
          ((To_Unbounded_String("radiobutton"),
@@ -155,12 +159,14 @@ package body MenuBar is
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Select columns"" -underline 0 -command SetVisibleColumns"))));
+      -- Create Options menu
       CreateSubMenu
         (".menubar.options", "Options",
          (1 =>
             (To_Unbounded_String("command"),
              To_Unbounded_String
                ("-label ""General options"" -underline 0 -command ShowOptions"))));
+      -- Create Window menu
       CreateSubMenu
         (".menubar.window", "Window",
          ((To_Unbounded_String("radiobutton"),
@@ -172,6 +178,7 @@ package body MenuBar is
           (To_Unbounded_String("command"),
            To_Unbounded_String
              ("-label ""Close all"" -underline 0 -command CloseAll"))));
+      -- Create Help menu
       CreateSubMenu
         (".menubar.help", "Help",
          ((To_Unbounded_String("command"),

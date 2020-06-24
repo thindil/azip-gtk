@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* OptionsDialog/OptionsDialog
+-- FUNCTION
+-- Provide code for show and set the program options
+-- SOURCE
 package OptionsDialog is
+-- ****
 
+   -- ****f* OptionsDialog/CreateOptions
+   -- FUNCTION
+   -- Add Tcl commands required by options UI
+   -- SOURCE
    procedure CreateOptions;
+   -- ****
 
 end OptionsDialog;

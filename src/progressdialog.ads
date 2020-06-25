@@ -18,10 +18,34 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/ProgressDialog
+-- FUNCTION
+-- Provide code to show progress of the selected action
+-- SOURCE
 package ProgressDialog is
+-- ****
 
+   -- ****f* ProgressDialog/CreateProgressDialog
+   -- FUNCTION
+   -- Create a new progress dialog and show it to the user
+   -- PARAMETERS
+   -- Title - Title of the progress dialog
+   -- SOURCE
    procedure CreateProgressDialog(Title: String);
+   -- ****
+
+   -- ****f* ProgressDialog/DeleteProgressDialog
+   -- FUNCTION
+   -- Remove the current progress dialog
+   -- SOURCE
    procedure DeleteProgressDialog;
+   -- ****
+
+   -- ****f* ProgressDialog/UpdateProgress
+   -- FUNCTION
+   -- Update action progress on the current progress dialog
+   -- SOURCE
    procedure UpdateProgress;
+   -- ****
 
 end ProgressDialog;

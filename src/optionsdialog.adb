@@ -40,11 +40,23 @@ with Utils; use Utils;
 
 package body OptionsDialog is
 
+   -- ****if* OptionsDialog/Show_Options_Command
+   -- FUNCTION
+   -- Show the main program options UI to the user
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Show_Options_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Show_Options_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -92,11 +104,24 @@ package body OptionsDialog is
       return TCL_OK;
    end Show_Options_Command;
 
+   -- ****if* OptionsDialog/Select_Directory_Command
+   -- FUNCTION
+   -- Show directory selection dialog to the user and fill configuration field
+   -- if the user selected a new directory
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command.
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Select_Directory_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Select_Directory_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -108,6 +133,7 @@ package body OptionsDialog is
           ("-parent . -title {Choose extract directory} -mustexist true");
       DirectoryEntry: Ttk_Entry;
    begin
+      -- If the user doesn't selected any directory, quit without any changes
       if SelectedDirectory = "" then
          return TCL_OK;
       end if;
@@ -118,11 +144,23 @@ package body OptionsDialog is
       return TCL_OK;
    end Select_Directory_Command;
 
+   -- ****if* OptionsDialog/Set_Options_Command
+   -- FUNCTION
+   -- Set the program options and close options UI
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command.
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Set_Options_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Set_Options_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;

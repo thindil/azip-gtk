@@ -18,8 +18,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/PropertiesDialog
+-- FUNCTION
+-- Provide code to show the properties of the currently selected archive
+-- SOURCE
 package PropertiesDialog is
+-- ****
 
+   -- ****f* PropertiesDialog/AddCommands
+   -- FUNCTION
+   -- Add Tcl commands required by properties UI
+   -- SOURCE
    procedure AddCommands;
+   -- ****
 
 end PropertiesDialog;

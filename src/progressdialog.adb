@@ -26,8 +26,19 @@ with Utils; use Utils;
 
 package body ProgressDialog is
 
+   -- ****iv* ProgressDialog/ProgressDialog
+   -- FUNCTION
+   -- Tk_Toplevel widget used as a progress dialog
+   -- SOURCE
    ProgressDialog: Tk_Toplevel;
+   -- ****
+
+   -- ****iv* ProgressDialog/ProgressBar
+   -- FUNCTION
+   -- Ttk_ProgressBar to show the progress of the action
+   -- SOURCE
    ProgressBar: Ttk_ProgressBar;
+   -- ****
 
    procedure CreateProgressDialog(Title: String) is
    begin

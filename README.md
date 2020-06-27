@@ -25,8 +25,8 @@ To build you need:
 
    https://github.com/thindil/tashy
 
-   **Important:** The program should work with version 8.6.6. Earlier versions
-   not works and future versions can bring some breaking changes in API.
+   **Important:** The program works with version 8.6.6. Earlier versions not
+   works and future versions can bring some breaking changes in API.
 
 If you have all the required packages, navigate to the main directory(where
 this file is) to compile:

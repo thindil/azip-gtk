@@ -36,11 +36,24 @@ with Utils; use Utils;
 
 package body PropertiesDialog is
 
+   -- ****if* PropertiesDialog/Show_Properties_Command
+   -- FUNCTION
+   -- Create and show dialog with information about the currently selected
+   -- archive
+   -- PARAMETERS
+   -- ClientData - Custom data send to the command. Unused
+   -- Interp     - Tcl interpreter in which command was executed.
+   -- Argc       - Number of arguments passed to the command. Unused
+   -- Argv       - Values of arguments passed to the command. Unused
+   -- RESULT
+   -- This function always return TCL_OK
+   -- SOURCE
    function Show_Properties_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
       Argc: in Interfaces.C.int; Argv: in CArgv.Chars_Ptr_Ptr)
       return Interfaces.C.int with
       Convention => C;
+      -- ****
 
    function Show_Properties_Command
      (ClientData: in Integer; Interp: in Tcl.Tcl_Interp;
@@ -86,8 +99,10 @@ package body PropertiesDialog is
       Column(PropertiesTree, "ratio", "-width 100");
       Tcl.Tk.Ada.Grid.Grid
         (PropertiesTree, "-column 0 -row 3 -sticky we -columnspan 3");
-      -- Some test data
+      -- Some test data, first value is compression method, second amount of
+      -- entries, third percent of all entries, fourth compression ratio
       Insert(PropertiesTree, "{} end -values [list deflate 0 0% 0%]");
+      -- End of test data
       Button :=
         Create
           (".propertiesdialog.buttonbox.ok",

@@ -18,9 +18,28 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+-- ****h* AzipTk/Toolbar
+-- FUNCTION
+-- Provides code for manipulate the program toolbar
+-- SOURCE
 package Toolbar is
+-- ****
 
+   -- ****f* Toolbar/CreateToolbar
+   -- FUNCTION
+   -- Create the toolbar and show it to the user
+   -- SOURCE
    procedure CreateToolbar;
+   -- ****
+
+   -- ****f* Toolbar/ToggleButtons
+   -- FUNCTION
+   -- Enable or disable the selected toolbar's buttons
+   -- PARAMETERS
+   -- Enable - If true, enable buttons, otherwise disable them. Default value
+   --          is True
+   -- SOURCE
    procedure ToggleButtons(Enable: Boolean := True);
+   -- ****
 
 end Toolbar;

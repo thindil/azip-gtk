@@ -38,6 +38,7 @@ package body Toolbar is
    procedure CreateToolbar is
       Toolbar: constant Ttk_Frame := Create(".toolbar");
       Image: Tk_Photo;
+      -- Add button to the toolbar
       procedure AddButton
         (Name: String; StartX: Natural; ToolTip: String; Command: String := "";
          Disabled: Boolean := False) is
@@ -58,6 +59,7 @@ package body Toolbar is
          Tcl.Tk.Ada.Pack.Pack(Toolbutton, "-side left");
          Add(Toolbutton, ToolTip);
       end AddButton;
+      -- Add separator to the toolbar
       procedure AddSeparator(Number: String) is
          Separator: constant Ttk_Separator :=
            Create(".toolbar.separator" & Number, "-orient vertical");
